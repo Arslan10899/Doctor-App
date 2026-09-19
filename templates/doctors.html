@@ -11,7 +11,7 @@
 </section>
 
 <div class="container">
-    <form class="filter-bar" method="get" action="{{ url_for('doctors') }}">
+    <form class="filter-bar" method="get" action="{{ url_for('doctors') }}" id="filterForm" autocomplete="off">
         <input type="text" name="q" value="{{ search }}" placeholder="Search doctor, specialty, hospital..." style="flex:1;min-width:220px;">
         <select name="city">
             <option value="">All Cities</option>
@@ -28,7 +28,6 @@
         <label style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;">
             <input type="checkbox" name="online" value="1" {% if online %}checked{% endif %}> Online only
         </label>
-        <button type="submit" class="btn btn-primary">Apply Filters</button>
     </form>
 
     {% if doctors %}
@@ -78,4 +77,21 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        var form = document.getElementById('filterForm');
+        var q = form.querySelector('[name="q"]');
+        var timer = null;
+        q.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () { form.submit(); }, 450);
+        });
+        form.querySelectorAll('select, input[type="checkbox"]').forEach(function (el) {
+            el.addEventListener('change', function () { form.submit(); });
+        });
+    })();
+</script>
 {% endblock %}
