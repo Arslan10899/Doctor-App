@@ -7,25 +7,14 @@
 <section class="hero">
     <div class="container">
         <div class="hero-grid">
-            <div>
-                <span class="hero-badge"><span class="dot"></span> {{ online_count }} Doctors Online Now</span>
+            <div class="hero-visual">
+                <div class="hero-doctor-card">
+                    <img src="{{ url_for('static', filename='img/hero-doctor.png') }}" alt="Pakistani doctor">
+                </div>
+            </div>
+            <div class="hero-content">
                 <h1>Find and Book the Best Doctors near you</h1>
                 <p class="hero-sub">Search for doctors, hospitals, specialties and book in-clinic or video consultations instantly.</p>
-
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <strong>25K+</strong>
-                        <span>Verified Doctors</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>9M+</strong>
-                        <span>Tele-consultations</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>50M+</strong>
-                        <span>Patients served</span>
-                    </div>
-                </div>
 
                 <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
                     <div class="search-row">
@@ -33,7 +22,7 @@
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
                             <input type="text" name="q" placeholder="Search doctors, hospitals, specialties..." aria-label="Search">
                         </div>
-                        <div class="search-field">
+                        <div class="search-field field-city">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                             <select name="city" aria-label="City">
                                 <option value="">All Cities</option>
@@ -42,50 +31,9 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-lg">Search</button>
-                    </div>
-                    <div class="search-suggest">
-                        <span>Popular:</span>
-                        <a href="{{ url_for('doctors', specialty='Dermatologist') }}">Dermatologist</a>
-                        <a href="{{ url_for('doctors', specialty='Gynecologist') }}">Gynecologist</a>
-                        <a href="{{ url_for('doctors', specialty='Child Specialist') }}">Pediatrician</a>
-                        <a href="{{ url_for('doctors', specialty='Dentist') }}">Dentist</a>
-                        <a href="{{ url_for('doctors', specialty='Cardiologist') }}">Cardiologist</a>
+                        <button type="submit" class="btn btn-search"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>Search</button>
                     </div>
                 </form>
-            </div>
-
-            <div class="hero-visual">
-                <div class="hero-slider" id="heroSlider" aria-label="Healthcare image slider">
-                    <div class="slides">
-                        <div class="slide active">
-                            <img src="{{ url_for('static', filename='img/slider/s1.jpg') }}" alt="Doctor using digital technology">
-                        </div>
-                        <div class="slide">
-                            <img src="{{ url_for('static', filename='img/slider/s2.jpg') }}" alt="Medical team consultation call">
-                        </div>
-                        <div class="slide">
-                            <img src="{{ url_for('static', filename='img/slider/s3.jpg') }}" alt="Healthcare medical team">
-                        </div>
-                        <div class="slide">
-                            <img src="{{ url_for('static', filename='img/slider/s4.jpg') }}" alt="Hospital facility">
-                        </div>
-                        <div class="slide">
-                            <img src="{{ url_for('static', filename='img/slider/s5.jpg') }}" alt="Medical laboratory research">
-                        </div>
-                        <div class="slide">
-                            <img src="{{ url_for('static', filename='img/slider/s6.jpg') }}" alt="Medical equipment and checkup">
-                        </div>
-                    </div>
-                    <button class="slide-arrow prev" aria-label="Previous slide">&#10094;</button>
-                    <button class="slide-arrow next" aria-label="Next slide">&#10095;</button>
-                    <div class="slide-dots"></div>
-                    <div class="slider-progress"><span></span></div>
-                    <div class="slider-rating">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        4.8 &middot; 25,000+ rated
-                    </div>
-                </div>
             </div>
         </div>
     </div>

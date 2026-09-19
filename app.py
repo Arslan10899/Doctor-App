@@ -56,7 +56,7 @@ def execute(sql, args=()):
 # Schema + seed
 # ---------------------------------------------------------------------------
 
-CITIES = ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Multan", "Peshawar", "Quetta", "Faisalabad"]
+CITIES = ["Dera Ismail Khan", "Karachi", "Lahore", "Islamabad", "Rawalpindi", "Multan", "Peshawar", "Quetta", "Faisalabad"]
 
 SPECIALTIES = [
     "Dermatologist", "Gynecologist", "Urologist", "Gastroenterologist", "Neurologist",
