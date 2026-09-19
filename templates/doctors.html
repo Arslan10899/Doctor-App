@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Find Doctors in Pakistan - Doctor App{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="crumbs"><a href="{{ url_for('index') }}">Home</a> &nbsp;/&nbsp; Doctors</div>
+        <h1 class="gradient-text">Find the Best Doctors</h1>
+        <p>{{ total }} doctor{{ 's' if total != 1 else '' }} found {{ ('in ' + city) if city else '' }} {{ ('specializing in ' + specialty) if specialty else '' }}</p>
+    </div>
+</section>
+
+<div class="container">
+    <form class="filter-bar" method="get" action="{{ url_for('doctors') }}">
+        <input type="text" name="q" value="{{ search }}" placeholder="Search doctor, specialty, hospital..." style="flex:1;min-width:220px;">
+        <select name="city">
+            <option value="">All Cities</option>
+            {% for c in cities %}
+                <option value="{{ c }}" {% if city == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <select name="specialty">
+            <option value="">All Specialties</option>
+            {% for s in specialties %}
+                <option value="{{ s['name'] }}" {% if specialty == s['name'] %}selected{% endif %}>{{ s['name'] }}</option>
+            {% endfor %}
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;">
+            <input type="checkbox" name="online" value="1" {% if online %}checked{% endif %}> Online only
+        </label>
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </form>
+
+    {% if doctors %}
+        <div class="doctor-grid">
+            {% for d in doctors %}
+                <a class="doctor-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
+                    {% if d['online'] %}
+                        <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>
+                    {% endif %}
+                    <div class="doctor-card-top">
+                        <div class="doctor-avatar">
+                            {% if d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                        </div>
+                        <div>
+                            <h3>{{ d['name'] }}</h3>
+                            <p class="doctor-spec">{{ d['specialty_name'] }}</p>
+                            <p class="doctor-loc">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                {{ d['city_name'] }}{% if d['hospital_name'] %} - {{ d['hospital_name'] }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="doctor-card-body">
+                        <div class="doctor-meta">
+                            <span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="#f5a623"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                {{ d['rating'] }}
+                            </span>
+                            <span>{{ d['reviews'] }} reviews</span>
+                            <span>{{ d['experience'] }} yrs exp</span>
+                        </div>
+                    </div>
+                    <div class="doctor-card-foot">
+                        <span class="fee">Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult</span>
+                        <span class="btn btn-primary btn-sm">Book Now</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" width="72" height="72" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+            <h3>No doctors found</h3>
+            <p>Try adjusting your search filters or search for a different specialty.</p>
+            <br>
+            <a href="{{ url_for('doctors') }}" class="btn btn-primary">Clear All Filters</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

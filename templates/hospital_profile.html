@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ hospital['name'] }} - Doctor App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{{ url_for('index') }}">Home</a> &rsaquo;
+        <a href="{{ url_for('hospitals') }}">Hospitals</a> &rsaquo;
+        <span style="color:#2b2f38;">{{ hospital['name'] }}</span>
+    </div>
+
+    <div class="profile-card" style="max-width:860px;margin-bottom:32px;">
+        <div class="profile-head">
+            <div class="hospital-logo" style="width:90px;height:90px;border-radius:20px;">
+                <svg viewBox="0 0 24 24" width="42" height="42" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-2v-3H9v-2h3V9h2v3h3v2z"/></svg>
+            </div>
+            <div>
+                <h1>{{ hospital['name'] }}</h1>
+                <p class="profile-spec">{{ hospital['city_name'] }}</p>
+                <div style="display:flex;gap:24px;margin-top:10px;">
+                    <span class="rating">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <strong>{{ hospital['rating'] }}</strong>
+                    </span>
+                    <span><strong>{{ doctors|length }}</strong> doctors</span>
+                </div>
+            </div>
+        </div>
+        <div class="about-section">
+            <h3>Contact Information</h3>
+            <div class="qual-list">
+                <div class="qual-item">
+                    <span class="q-icon">&#9998;</span>
+                    <span>{{ hospital['address'] }}</span>
+                </div>
+                <div class="qual-item">
+                    <span class="q-icon">&#9742;</span>
+                    <span>{{ hospital['phone'] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="font-size:22px;margin-bottom:16px;">Doctors at {{ hospital['name'] }}</h2>
+    {% if doctors %}
+        <div class="doctor-grid">
+            {% for d in doctors %}
+                <a class="doctor-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
+                    {% if d['online'] %}
+                        <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>
+                    {% endif %}
+                    <div class="doctor-card-top">
+                        <div class="doctor-avatar">
+                            {% if d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                        </div>
+                        <div>
+                            <h3>{{ d['name'] }}</h3>
+                            <p class="doctor-spec">{{ d['specialty_name'] }}</p>
+                        </div>
+                    </div>
+                    <div class="doctor-card-body">
+                        <div class="doctor-meta">
+                            <span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="#f5a623"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                {{ d['rating'] }}
+                            </span>
+                            <span>{{ d['reviews'] }} reviews</span>
+                            <span>{{ d['experience'] }} yrs exp</span>
+                        </div>
+                    </div>
+                    <div class="doctor-card-foot">
+                        <span class="fee">Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult</span>
+                        <span class="btn btn-primary btn-sm">Book Now</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No doctors listed at this hospital yet</h3>
+            <p>Please check back soon.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

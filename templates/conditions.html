@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Conditions & Treatments - Doctor App{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="crumbs"><a href="{{ url_for('index') }}">Home</a> &nbsp;/&nbsp; Conditions</div>
+        <h1>Search by Condition</h1>
+        <p>Not sure which specialist you need? Start with your condition.</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="chip-grid cols-4">
+        {% for cond in conditions %}
+            <a class="chip" href="{{ url_for('doctors', q=cond) }}">
+                <span class="chip-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+                </span>
+                {{ cond }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="section-header" style="margin-top:56px;">
+        <h2>Common Conditions We Treat</h2>
+        <p>Our doctors specialize in treating a wide range of conditions.</p>
+    </div>
+
+    <div class="feature-list">
+        {% for cond in conditions %}
+            <div class="feature-item">
+                <h4>{{ cond }}</h4>
+                <p>Find verified specialists in {{ cond }} near you and book an appointment online in minutes.</p>
+                <br>
+                <a href="{{ url_for('doctors', q=cond) }}" style="color:#2a7f8e;font-weight:600;font-size:14px;">Find a Doctor &rarr;</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Login or Sign Up - Doctor App{% endblock %}
+
+{% block content %}
+<div class="container auth-wrap">
+    <div class="auth-card">
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="tabLogin">Login</button>
+            <button class="auth-tab" id="tabSignup">Sign Up</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="auth-body" id="panelLogin">
+            <h2>Welcome back</h2>
+            <p class="sub">Login to manage your appointments.</p>
+            <form method="post" action="{{ url_for('auth') }}">
+                <input type="hidden" name="form_type" value="login">
+                <div class="form-group">
+                    <label for="loginEmail">Email or Username</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        <input type="text" id="loginEmail" name="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        <input type="password" id="loginPassword" name="password" placeholder="Your password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+            </form>
+            <p class="auth-switch">Don't have an account? <a href="#" id="switchToSignup">Sign Up</a></p>
+            <p class="auth-switch" style="font-size:12.5px;color:#9ca3af;">Demo: umersaleem@example.com / 123456</p>
+        </div>
+
+        <!-- SIGNUP -->
+        <div class="auth-body" id="panelSignup" style="display:none;">
+            <h2>Create your account</h2>
+            <p class="sub">Book appointments in under a minute.</p>
+            <form method="post" action="{{ url_for('auth') }}">
+                <input type="hidden" name="form_type" value="signup">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="full_name" placeholder="e.g. Ahmed Ali" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" id="phone" name="phone" placeholder="03xx-xxxxxxx">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Optional - defaults to email">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div style="display:flex;gap:18px;padding-top:4px;">
+                        <label style="display:flex;align-items:center;gap:7px;font-size:14.5px;">
+                            <input type="radio" name="gender" value="Male" checked> Male
+                        </label>
+                        <label style="display:flex;align-items:center;gap:7px;font-size:14.5px;">
+                            <input type="radio" name="gender" value="Female"> Female
+                        </label>
+                        <label style="display:flex;align-items:center;gap:7px;font-size:14.5px;">
+                            <input type="radio" name="gender" value="Other"> Other
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" name="password" placeholder="Min 6 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" name="confirm_password" placeholder="Repeat password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tabLogin = document.getElementById("tabLogin");
+    const tabSignup = document.getElementById("tabSignup");
+    const pLogin = document.getElementById("panelLogin");
+    const pSignup = document.getElementById("panelSignup");
+
+    function showLogin() {
+        tabLogin.classList.add("active");
+        tabSignup.classList.remove("active");
+        pLogin.style.display = "block";
+        pSignup.style.display = "none";
+    }
+    function showSignup() {
+        tabSignup.classList.add("active");
+        tabLogin.classList.remove("active");
+        pSignup.style.display = "block";
+        pLogin.style.display = "none";
+    }
+    tabLogin.addEventListener("click", showLogin);
+    tabSignup.addEventListener("click", showSignup);
+    document.getElementById("switchToSignup").addEventListener("click", function (e) { e.preventDefault(); showSignup(); });
+    document.getElementById("switchToLogin").addEventListener("click", function (e) { e.preventDefault(); showLogin(); });
+
+    if (window.location.hash === "#signup") showSignup();
+});
+</script>
+{% endblock %}

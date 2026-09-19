@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Doctor App - Find and Book the Best Doctors{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/app-icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        {{ message }}
+                        <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{{ url_for('index') }}" class="logo">
+                <span class="logo-icon">
+                    <img src="{{ url_for('static', filename='img/app-icon.png') }}" alt="Doctor App" class="app-icon">
+                </span>
+                <span class="logo-text">
+                    <span>Doctor<span class="logo-accent">App</span></span>
+                    <small class="logo-tagline">Find your Doctor</small>
+                </span>
+            </a>
+
+            <nav class="main-nav" id="mainNav">
+                <a href="{{ url_for('doctors') }}" class="nav-link">Find Doctors</a>
+                <a href="{{ url_for('specialties_page') }}" class="nav-link">Specialties</a>
+                <a href="{{ url_for('conditions_page') }}" class="nav-link">Conditions</a>
+                <a href="{{ url_for('hospitals') }}" class="nav-link">Hospitals</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About Us</a>
+                <a href="{{ url_for('contact') }}" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                {% if session.get('patient_id') %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        {{ session.get('patient_name', 'My Account') }}
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline btn-sm">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth') }}" class="btn btn-outline btn-sm">Login</a>
+                    <a href="{{ url_for('auth') }}#signup" class="btn btn-primary btn-sm">Sign Up</a>
+                {% endif %}
+            </div>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-brand">
+                    <a href="{{ url_for('index') }}" class="logo footer-logo">
+                        <span class="logo-icon">
+                            <img src="{{ url_for('static', filename='img/stethoscope.svg') }}" alt="Doctor App">
+                        </span>
+                        <span class="logo-text">Doctor<span class="logo-accent">App</span></span>
+                    </a>
+                    <p>Find and book appointments with Pakistan's best doctors, hospitals and labs. Verified doctors, trusted reviews, and easy online booking.</p>
+                    <div class="footer-badges">
+                        <div class="badge-item">
+                            <span class="badge-check">&#10003;</span>
+                            <span><strong>PMDC Verified</strong><br>Doctors</span>
+                        </div>
+                        <div class="badge-item">
+                            <span class="badge-check">&#10003;</span>
+                            <span><strong>Secure Booking</strong><br>SSL Certified</span>
+                        </div>
+                        <div class="badge-item">
+                            <span class="badge-check">&#10003;</span>
+                            <span><strong>Support</strong><br>7 days a week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-title">Major Cities</h4>
+                    <ul class="footer-links">
+                        {% for city in cities[:8] %}
+                            <li><a href="{{ url_for('doctors', city=city) }}">{{ city }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-title">Top Specialties</h4>
+                    <ul class="footer-links">
+                        {% for sp in all_specialties[:9] %}
+                            <li><a href="{{ url_for('doctors', specialty=sp) }}">{{ sp }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-title">Get in Touch</h4>
+                    <ul class="footer-links">
+                        <li class="footer-contact">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            <a href="tel:+924211114443">042-111-144-443</a>
+                        </li>
+                        <li class="footer-contact">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                            <a href="mailto:care@doctorapp.pk">care@doctorapp.pk</a>
+                        </li>
+                        <li class="footer-contact">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <span>Gulberg III, Lahore, Pakistan</span>
+                        </li>
+                    </ul>
+<div class="social-links">
+                        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a>
+                        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c2.72 0 3.06.01 4.12.06 1.06.05 1.78.22 2.42.47.66.25 1.22.6 1.78 1.16.56.56.91 1.12 1.16 1.78.25.64.42 1.36.47 2.42.05 1.06.06 1.4.06 4.12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.78-.47 2.42a4.9 4.9 0 0 1-1.16 1.78c-.56.56-1.12.91-1.78 1.16-.64.25-1.36.42-2.42.47-1.06.05-1.4.06-4.12.06-4.12 0-3.06-.01-4.12-.06-1.06-.05-1.78-.22-2.42-.47a4.9 4.9 0 0 1-1.78-1.16 4.9 4.9 0 0 1-1.16-1.78c-.25-.64-.42-1.36-.47-2.42C2.01 15.06 2 14.72 2 12s.01-3.06.06-4.12c.05-1.06.22-1.78.47-2.42.25-.66.6-1.22 1.16-1.78.56-.56 1.12-.91 1.78-1.16.64-.25 1.36-.42 2.42-.47C8.94 2.01 9.28 2 12 2zm0 3.13c3.87 0 3.61.01 4.88.07 1.18.05 1.82.25 2.25.42.56.22.96.48 1.38.9.42.42.68.82.9 1.38.17.43.37 1.07.42 2.25.06 1.27.07 1.01.07 4.88s-.01 3.61-.07 4.88c-.05 1.18-.25 1.82-.42 2.25a3.7 3.7 0 0 1-.9 1.38c-.42.42-.82.68-1.38.9-.43.17-1.07.37-2.25.42-1.27.06-1.01.07-4.88.07s-3.61-.01-4.88-.07c-1.18-.05-1.82-.25-2.25-.42a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.17-.43-.37-1.07-.42-2.25C2.01 15.61 2 15.87 2 12s.01-3.61.07-4.88c.05-1.18.25-1.82.42-2.25.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.43-.17 1.07-.37 2.25-.42C8.39 2.01 8.13 2 12 2zm0 5.4a4.6 4.6 0 1 0 0 9.2 4.6 4.6 0 0 0 0-9.2zm0 7.58a2.98 2.98 0 1 1 0-5.96 2.98 2.98 0 0 1 0 5.96z"/></svg></a>
+                        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></a>
+                        <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93zm-1.29 19.5h2.04L6.49 3.24H4.3l13.31 17.41z"/></svg></a>
+                    </div>
+                    <a class="store-badge store-badge-dark" style="margin-top:16px;" href="https://play.google.com/store/apps/details?id=com.nexusappstech.doctorapp" target="_blank" rel="noopener">
+                        <span class="badge-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.7c-.35.26-.6.74-.6 1.35v17.9c0 .61.25 1.09.6 1.35l.08.04 9.95-10.2v-.18L3.68 1.66h-.08z"/><path d="M17.24 15.92l-3.21-3.27v-.18l3.21-3.27 4.03 2.3c1.15.66 1.15 1.73 0 2.39l-4.03 2.03z"/><path d="M14.03 12.47l-3.23 3.27-4.7-2.61V11.1l4.7-.02 3.23 3.27zM3.68 22.34c.35.26.82.36 1.34.06l9.01-4.83-3.23-3.27-7.12 8.04zM3.68 1.66l7.12 8.04 3.23-3.27-9.01-4.83c-.52-.3-.99-.2-1.34.06z"/></svg>
+                        </span>
+                        <span>
+                            <small>Available on the</small>
+                            <strong>Google Play</strong>
+                        </span>
+                    </a>
+                </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Copyright &copy; 2015 - 2026 Doctor App (Pvt) Ltd - All Rights Reserved</p>
+                <p>Book appointments with the best doctors and specialists across Pakistan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

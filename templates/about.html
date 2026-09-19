@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}About Us - Doctor App{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="crumbs"><a href="{{ url_for('index') }}">Home</a> &nbsp;/&nbsp; About Us</div>
+        <h1>About Doctor App</h1>
+        <p>Pakistan's leading platform for finding and booking doctors.</p>
+    </div>
+</section>
+
+<div class="container">
+    <section class="section" style="padding-top:20px;">
+        <div class="section-header">
+            <h2>Bringing Healthcare to Your Fingertips</h2>
+            <p>Since 2015, we've made it easier for millions of Pakistanis to find verified doctors and book appointments.</p>
+        </div>
+        <div class="stat-band">
+            <div class="stat-box">
+                <strong>{{ stats['doctors'] }}K+</strong>
+                <span>Verified Doctors</span>
+            </div>
+            <div class="stat-box">
+                <strong>9M+</strong>
+                <span>Tele-consultations</span>
+            </div>
+            <div class="stat-box">
+                <strong>50M+</strong>
+                <span>Patients Served</span>
+            </div>
+            <div class="stat-box">
+                <strong>10+</strong>
+                <span>Cities Covered</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-light">
+        <div class="section-header">
+            <h2>Why Choose Doctor App</h2>
+        </div>
+        <div class="feature-list">
+            <div class="feature-item">
+                <h4>PMDC Verified Doctors</h4>
+                <p>Every doctor on our platform is verified with valid medical licenses and credentials.</p>
+            </div>
+            <div class="feature-item">
+                <h4>Easy Online Booking</h4>
+                <p>Find a doctor, pick a slot, and book in seconds - no more waiting rooms and phone calls.</p>
+            </div>
+            <div class="feature-item">
+                <h4>Video Consultations</h4>
+                <p>Consult specialists from home with secure video calls and get e-prescriptions.</p>
+            </div>
+            <div class="feature-item">
+                <h4>Verified Patient Reviews</h4>
+                <p>Read honest reviews from real patients to choose the right doctor with confidence.</p>
+            </div>
+            <div class="feature-item">
+                <h4>Trusted Hospital Partners</h4>
+                <p>We partner with the best hospitals across Pakistan for quality patient care.</p>
+            </div>
+            <div class="feature-item">
+                <h4>Support 7 Days a Week</h4>
+                <p>Our dedicated helpline team is always ready to help with bookings and queries.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="cta-band">
+            <div>
+                <h3>Ready to book your appointment?</h3>
+                <p>Join thousands of satisfied patients today.</p>
+            </div>
+            <a href="{{ url_for('doctors') }}" class="btn btn-white btn-lg">Find a Doctor</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

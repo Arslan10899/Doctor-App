@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard - Doctor App{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="crumbs"><a href="{{ url_for('index') }}">Home</a> &nbsp;/&nbsp; Dashboard</div>
+        <h1>My Dashboard</h1>
+        <p>Manage your appointments and profile.</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="dash-grid">
+        <aside class="dash-side">
+            <div class="dash-avatar">{{ patient['full_name'][0] }}</div>
+            <h3>{{ patient['full_name'] }}</h3>
+            <p style="color:#6b7280;font-size:14px;">{{ patient['email'] }}</p>
+            <div class="dash-detail">
+                <div class="dd"><span>Gender</span><strong>{{ patient['gender'] }}</strong></div>
+                <div class="dd"><span>Phone</span><strong>{{ patient['phone'] or 'Not added' }}</strong></div>
+                <div class="dd"><span>Username</span><strong>{{ patient['username'] }}</strong></div>
+                <div class="dd"><span>Member since</span><strong>{{ patient['created_at'][:10] }}</strong></div>
+            </div>
+            <div style="margin-top:18px;">
+                <a href="{{ url_for('doctors') }}" class="btn btn-primary btn-block">Find Doctors</a>
+            </div>
+        </aside>
+
+        <div>
+            <h2 style="font-size:22px;margin-bottom:16px;">Upcoming Appointments ({{ active|length }})</h2>
+
+            {% if active %}
+                {% for a in active %}
+                    <div class="appt-card">
+                        <div class="appt-date">
+                            <span style="display:block;" class="d">{{ a['appointment_date'][8:]|int }}</span>
+                            <span style="display:block;" class="m">{{ a['appointment_date'][5:7] }}</span>
+                        </div>
+                        <div class="appt-info">
+                            <h4>{{ a['doctor_name'] }}</h4>
+                            <p>{{ a['specialty_name'] }} &middot; {{ a['city_name'] }}</p>
+                            <p>
+                                {{ a['appointment_date'] }} at {{ a['slot'] }} &middot; {{ a['type'] }}
+                                {% if a['notes'] %}<br>Note: {{ a['notes'] }}{% endif %}
+                            </p>
+                        </div>
+                        <span class="appt-badge {{ a['status'] }}">{{ a['status']|title }}</span>
+                        <form method="post" action="{{ url_for('cancel_appointment', appointment_id=a['id']) }}" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                            <button type="submit" class="btn btn-outline btn-sm">Cancel</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state appt-card" style="border:none;box-shadow:none;">
+                    <svg viewBox="0 0 24 24" width="64" height="64" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                    <h3>No upcoming appointments</h3>
+                    <p>Book your first appointment with a top doctor today.</p>
+                    <br>
+                    <a href="{{ url_for('doctors') }}" class="btn btn-primary">Browse Doctors</a>
+                </div>
+            {% endif %}
+
+            <h2 style="font-size:22px;margin:34px 0 16px;">Past Appointments ({{ past|length }})</h2>
+            {% if past %}
+                {% for a in past %}
+                    <div class="appt-card" style="opacity:.75;">
+                        <div class="appt-date">
+                            <span class="d">{{ a['appointment_date'][8:]|int }}</span>
+                            <span class="m">{{ a['appointment_date'][5:7] }}</span>
+                        </div>
+                        <div class="appt-info">
+                            <h4>{{ a['doctor_name'] }}</h4>
+                            <p>{{ a['specialty_name'] }} &middot; {{ a['city_name'] }}</p>
+                            <p>{{ a['appointment_date'] }} at {{ a['slot'] }} &middot; {{ a['type'] }}</p>
+                        </div>
+                        <span class="appt-badge {{ a['status'] }}">{{ a['status']|title }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:#6b7280;">No past appointments yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

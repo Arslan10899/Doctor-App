@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}{{ doc['name'] }} - {{ doc['specialty_name'] }} in {{ doc['city_name'] }} | Doctor App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{{ url_for('index') }}">Home</a> &rsaquo;
+        <a href="{{ url_for('doctors') }}">Doctors</a> &rsaquo;
+        <a href="{{ url_for('doctors', specialty=doc['specialty_name']) }}">{{ doc['specialty_name'] }}</a> &rsaquo;
+        <span style="color:#2b2f38;">{{ doc['name'] }}</span>
+    </div>
+
+    <div class="doctor-profile">
+        <div>
+            <!-- Profile card -->
+            <div class="profile-card">
+                <div class="profile-head">
+                    <div class="avatar-lg">
+                        {% if doc['image'] %}<img src="{{ url_for('static', filename='img/' ~ doc['image']) }}" alt="{{ doc['name'] }}">{% else %}{{ doc['name'].replace('Dr. ', '')[0] }}{% endif %}
+                    </div>
+                    <div style="text-align:left;">
+                        <h1>{{ doc['name'] }}</h1>
+                        <p class="profile-spec">{{ doc['specialty_name'] }}</p>
+                        <p class="profile-info-line">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            {{ doc['city_name'] }}{% if doc['hospital_name'] %} &middot; {{ doc['hospital_name'] }}, {{ doc['hospital_address'] or '' }}{% endif %}
+                        </p>
+                        <p class="profile-info-line">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            {{ doc['hospital_phone'] or '042-111-144-443' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-box">
+                        <strong>{{ doc['rating'] }}</strong>
+                        <span>Rating</span>
+                    </div>
+                    <div class="info-box">
+                        <strong>{{ doc['reviews'] }}</strong>
+                        <span>Patient Reviews</span>
+                    </div>
+                    <div class="info-box">
+                        <strong>{{ doc['experience'] }}+ yrs</strong>
+                        <span>Experience</span>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <h3>About the Doctor</h3>
+                    <p>{{ doc['about'] }}</p>
+                    {% if doc['online'] %}
+                        <p style="margin-top:10px;color:#059669;font-weight:600;">&#9889; Available for online video consultation</p>
+                    {% endif %}
+                </div>
+
+                <div class="about-section">
+                    <h3>Qualifications</h3>
+                    <div class="qual-list">
+                        {% for q in [doc['mbbs'], doc['fellowship']] %}
+                            <div class="qual-item">
+                                <span class="q-icon">&#10003;</span>
+                                <span>{{ q }}</span>
+                            </div>
+                        {% endfor %}
+                        <div class="qual-item">
+                            <span class="q-icon">&#10003;</span>
+                            <span>PMDC Verified: {{ doc['pmdc'] }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar doctors -->
+            {% if similar %}
+                <div style="margin-top:32px;">
+                    <h2 style="font-size:22px;margin-bottom:16px;">Similar Doctors You May Like</h2>
+                    {% for d in similar %}
+                        <a class="mini-doctor" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
+                            <div class="doctor-avatar">
+                                {% if d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                            </div>
+                            <div>
+                                <h4>{{ d['name'] }}</h4>
+                                <p class="mini-meta">{{ d['specialty_name'] }} &middot; {{ d['city_name'] }} &middot; {{ d['experience'] }} yrs exp &middot; Rs. {{ '{:,}'.format(d['fee']) }}</p>
+                                <span class="rating">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                    {{ d['rating'] }} ({{ d['reviews'] }} reviews)
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Booking widget -->
+        <div class="profile-card booking-card">
+            <h3>Book Appointment</h3>
+            <p class="sub">Consultation fee: Rs. {{ '{:,}'.format(doc['fee']) }}</p>
+
+            {% if session.get('patient_id') %}
+                <form id="bookingForm" method="post" action="{{ url_for('book', doctor_id=doc['id']) }}">
+                    <div class="type-toggle" style="margin-bottom:16px;">
+                        <button type="button" class="type-btn selected" data-type="In-Clinic">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H7v-2h4v2zm4-4h-8v-2h8v2zm0-4H7V7h8v2z"/></svg>
+                            In-Clinic
+                        </button>
+                        <button type="button" class="type-btn" data-type="Video Consultation">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4V6.5l-4 4z"/></svg>
+                            Video Consult
+                        </button>
+                    </div>
+                    <input type="hidden" name="appointment_type" id="appointmentType" value="In-Clinic">
+
+                    <div class="form-group">
+                        <label for="appointmentDate">Select Date</label>
+                        <input type="date" id="appointmentDate" name="appointment_date" data-doctor-id="{{ doc['id'] }}" min="{{ min_date }}" value="{{ min_date }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Available Time Slots</label>
+                        <div class="slot-grid" id="slotGrid">
+                            <p class="slot-loading">Loading...</p>
+                        </div>
+                        <input type="hidden" name="slot" id="slot" value="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Reason for Visit (optional)</label>
+                        <textarea name="notes" id="notes" placeholder="Briefly describe your symptoms or reason for consultation..."></textarea>
+                    </div>
+
+                    <div class="fee-note">
+                        <strong>Rs. {{ '{:,}'.format(doc['fee']) }}</strong> consultation fee payable at clinic. Free to book.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Confirm Appointment</button>
+                </form>
+            {% else %}
+                <div class="login-prompt">
+                    <p>Please login to book an appointment with {{ doc['name'] }}.</p>
+                    <a href="{{ url_for('auth', next=request.path) }}" class="btn btn-primary">Login / Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% block title %}Doctor App - Find and Book the Best Doctors in Pakistan{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-grid">
+            <div>
+                <span class="hero-badge"><span class="dot"></span> {{ online_count }} Doctors Online Now</span>
+                <h1>Find and Book the Best Doctors near you</h1>
+                <p class="hero-sub">Search for doctors, hospitals, specialties and book in-clinic or video consultations instantly.</p>
+
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <strong>25K+</strong>
+                        <span>Verified Doctors</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong>9M+</strong>
+                        <span>Tele-consultations</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong>50M+</strong>
+                        <span>Patients served</span>
+                    </div>
+                </div>
+
+                <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
+                    <div class="search-row">
+                        <div class="search-field">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+                            <input type="text" name="q" placeholder="Search doctors, hospitals, specialties..." aria-label="Search">
+                        </div>
+                        <div class="search-field">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <select name="city" aria-label="City">
+                                <option value="">All Cities</option>
+                                {% for c in cities %}
+                                    <option value="{{ c }}">{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-lg">Search</button>
+                    </div>
+                    <div class="search-suggest">
+                        <span>Popular:</span>
+                        <a href="{{ url_for('doctors', specialty='Dermatologist') }}">Dermatologist</a>
+                        <a href="{{ url_for('doctors', specialty='Gynecologist') }}">Gynecologist</a>
+                        <a href="{{ url_for('doctors', specialty='Child Specialist') }}">Pediatrician</a>
+                        <a href="{{ url_for('doctors', specialty='Dentist') }}">Dentist</a>
+                        <a href="{{ url_for('doctors', specialty='Cardiologist') }}">Cardiologist</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-slider" id="heroSlider" aria-label="Healthcare image slider">
+                    <div class="slides">
+                        <div class="slide active">
+                            <img src="{{ url_for('static', filename='img/slider/s1.jpg') }}" alt="Doctor using digital technology">
+                        </div>
+                        <div class="slide">
+                            <img src="{{ url_for('static', filename='img/slider/s2.jpg') }}" alt="Medical team consultation call">
+                        </div>
+                        <div class="slide">
+                            <img src="{{ url_for('static', filename='img/slider/s3.jpg') }}" alt="Healthcare medical team">
+                        </div>
+                        <div class="slide">
+                            <img src="{{ url_for('static', filename='img/slider/s4.jpg') }}" alt="Hospital facility">
+                        </div>
+                        <div class="slide">
+                            <img src="{{ url_for('static', filename='img/slider/s5.jpg') }}" alt="Medical laboratory research">
+                        </div>
+                        <div class="slide">
+                            <img src="{{ url_for('static', filename='img/slider/s6.jpg') }}" alt="Medical equipment and checkup">
+                        </div>
+                    </div>
+                    <button class="slide-arrow prev" aria-label="Previous slide">&#10094;</button>
+                    <button class="slide-arrow next" aria-label="Next slide">&#10095;</button>
+                    <div class="slide-dots"></div>
+                    <div class="slider-progress"><span></span></div>
+                    <div class="slider-rating">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        4.8 &middot; 25,000+ rated
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Healthcare Services</h2>
+            <p>Everything you need for your health, all in one place.</p>
+        </div>
+        <div class="services-grid">
+            <a href="{{ url_for('doctors', online='1') }}" class="service-card">
+                <span class="service-img">
+                    <img src="{{ url_for('static', filename='img/services/online3.jpg') }}" alt="Online video consultation">
+                    <span class="service-icon" style="background:#ecfdf5;color:#059669;">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </span>
+                </span>
+                <span class="service-body">
+                    <h3>Consult Online Now</h3>
+                    <p>Instantly connect with specialists through video call.</p>
+                </span>
+            </a>
+            <a href="{{ url_for('doctors') }}" class="service-card">
+                <span class="service-img">
+                    <img src="{{ url_for('static', filename='img/services/clinic1.jpg') }}" alt="In-clinic appointment">
+                    <span class="service-icon" style="background:#fff7ed;color:#ea580c;">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+                    </span>
+                </span>
+                <span class="service-body">
+                    <h3>In-Clinic Appointments</h3>
+                    <p>Book an in-person visit to a doctor's clinic.</p>
+                </span>
+            </a>
+            <a href="{{ url_for('hospitals') }}" class="service-card">
+                <span class="service-img">
+                    <img src="{{ url_for('static', filename='img/services/hosp1.jpg') }}" alt="Top hospitals">
+                    <span class="service-icon" style="background:#eff6ff;color:#2563eb;">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-2v-3H9v-2h3V9h2v3h3v2z"/></svg>
+                    </span>
+                </span>
+                <span class="service-body">
+                    <h3>Hospitals</h3>
+                    <p>Find and book appointments at top hospitals.</p>
+                </span>
+            </a>
+            <a href="{{ url_for('conditions_page') }}" class="service-card">
+                <span class="service-img">
+                    <img src="{{ url_for('static', filename='img/services/lab1.jpg') }}" alt="Conditions and treatments">
+                    <span class="service-icon" style="background:#fdf2f8;color:#db2777;">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+                    </span>
+                </span>
+                <span class="service-body">
+                    <h3>Conditions & Treatments</h3>
+                    <p>Find the right specialist for your condition.</p>
+                </span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= TOP SPECIALTIES ================= -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="gradient-text">Consult Best Doctors Online</h2>
+            <p>Find a doctor by specialty and book your appointment today.</p>
+        </div>
+        <div class="chip-grid cols-5">
+            {% for sp in top_specialties %}
+                <a class="chip" href="{{ url_for('doctors', specialty=sp['name']) }}">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </span>
+                    {{ sp['name'] }}
+                </a>
+            {% endfor %}
+        </div>
+        <div class="section-link"><a href="{{ url_for('specialties_page') }}">View All Specialties &rarr;</a></div>
+    </div>
+</section>
+
+<!-- ================= SEARCH BY CONDITION ================= -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Search Doctor by Condition</h2>
+            <p>Not sure which specialist you need? Start with your condition.</p>
+        </div>
+        <div class="chip-grid cols-4">
+            {% for cond in conditions[:8] %}
+                <a class="chip" href="{{ url_for('doctors', q=cond) }}">
+                    <span class="chip-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+                    </span>
+                    {{ cond }}
+                </a>
+            {% endfor %}
+        </div>
+        <div class="section-link"><a href="{{ url_for('conditions_page') }}">View All Conditions &rarr;</a></div>
+    </div>
+</section>
+
+<!-- ================= FEATURED DOCTORS ================= -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>Featured Doctors</h2>
+            <p>Top-rated specialists trusted by thousands of patients.</p>
+        </div>
+        <div class="doctor-grid">
+            {% for d in featured %}
+                <a class="doctor-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
+                    {% if d['online'] %}
+                        <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>
+                    {% endif %}
+                    <div class="doctor-card-top">
+                        <div class="doctor-avatar">
+                            {% if d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                        </div>
+                        <div>
+                            <h3>{{ d['name'] }}</h3>
+                            <p class="doctor-spec">{{ d['specialty_name'] }}</p>
+                            <p class="doctor-loc">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                {{ d['city_name'] }} {% if d['hospital_name'] %} - {{ d['hospital_name'] }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="doctor-card-body">
+                        <div class="doctor-meta">
+                            <span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="#f5a623"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                {{ d['rating'] }}
+                            </span>
+                            <span>{{ d['reviews'] }} reviews</span>
+                            <span>{{ d['experience'] }} yrs exp</span>
+                        </div>
+                    </div>
+                    <div class="doctor-card-foot">
+                        <span class="fee">Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult</span>
+                        <span class="btn btn-primary btn-sm">Book Now</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="section-link"><a href="{{ url_for('doctors') }}">View All Doctors &rarr;</a></div>
+    </div>
+</section>
+
+<!-- ================= HOSPITALS ================= -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our Partner Hospitals</h2>
+            <p>Find and book appointments at Pakistan's leading hospitals.</p>
+        </div>
+
+        <div class="hospital-grid">
+            {% for h in hospitals_lhr %}
+                <a class="hospital-card" href="{{ url_for('hospital_profile', hospital_id=h['id']) }}">
+                    <span class="hospital-logo">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-2v-3H9v-2h3V9h2v3h3v2z"/></svg>
+                    </span>
+                    <div>
+                        <h3>{{ h['name'] }}</h3>
+                        <span class="rating">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            {{ h['rating'] }}
+                        </span>
+                        <p>Lahore</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="section-link"><a href="{{ url_for('hospitals') }}">View All Hospitals &rarr;</a></div>
+    </div>
+</section>
+
+<!-- ================= REVIEWS ================= -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our Customers Love Us</h2>
+            <p>Check out the reviews from our satisfied patients.</p>
+        </div>
+        <div class="reviews-grid">
+            {% for r in reviews[:6] %}
+                <div class="review-card">
+                    <div class="review-stars">{% for i in range(r['rating']) %}&#9733;{% endfor %}</div>
+                    <p>"{{ r['content'] }}"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">{{ r['patient_name'][0] }}</div>
+                        <div>
+                            <strong>{{ r['patient_name'] }}</strong>
+                            <small style="color:#6b7280;">Verified Patient</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ================= DOWNLOAD APP ================= -->
+<section class="section section-light">
+    <div class="container">
+        <div class="app-section">
+            <div class="app-phone">
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="phone-topbar">
+                            <div class="p-logo"><i></i> Doctor App</div>
+                            <span class="p-dot"></span>
+                        </div>
+                        <div class="phone-searchbar">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+                            Find doctors, hospitals...
+                        </div>
+                        <div class="phone-card">
+                            <span class="pc-avatar"></span>
+                            <span class="pc-line"><span></span><span></span></span>
+                            <span class="pc-btn">Book</span>
+                        </div>
+                        <div class="phone-card">
+                            <span class="pc-avatar"></span>
+                            <span class="pc-line"><span></span><span></span></span>
+                            <span class="pc-btn">Video</span>
+                        </div>
+                        <div class="phone-card">
+                            <span class="pc-avatar"></span>
+                            <span class="pc-line"><span></span><span></span></span>
+                            <span class="pc-btn">Book</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <h2>Book Appointments From Your Phone</h2>
+                <p>Download the Doctor App for a better consultation experience. Manage appointments, video-consult doctors, and stay on top of your health anywhere in Pakistan.</p>
+                <ul class="app-features">
+                    <li>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Book in-clinic appointments in seconds
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Video consultations with verified specialists
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Search 25K+ doctors by specialty and location
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Appointment reminders so you never miss a visit
+                    </li>
+                </ul>
+                <div class="store-row">
+                    <a class="store-badge store-badge-dark" href="https://play.google.com/store/apps/details?id=com.nexusappstech.doctorapp" target="_blank" rel="noopener">
+                        <span class="badge-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.7c-.35.26-.6.74-.6 1.35v17.9c0 .61.25 1.09.6 1.35l.08.04 9.95-10.2v-.18L3.68 1.66h-.08z"/><path d="M17.24 15.92l-3.21-3.27v-.18l3.21-3.27 4.03 2.3c1.15.66 1.15 1.73 0 2.39l-4.03 2.03z"/><path d="M14.03 12.47l-3.23 3.27-4.7-2.61V11.1l4.7-.02 3.23 3.27zM3.68 22.34c.35.26.82.36 1.34.06l9.01-4.83-3.23-3.27-7.12 8.04zM3.68 1.66l7.12 8.04 3.23-3.27-9.01-4.83c-.52-.3-.99-.2-1.34.06z"/></svg>
+                        </span>
+                        <span>
+                            <small>Available on the</small>
+                            <strong>Google Play</strong>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="section">
+    <div class="container">
+        <div class="cta-band">
+            <div>
+                <h3>Are you a Doctor?</h3>
+                <p>Grow your practice 2x by signing up with Doctor App.</p>
+            </div>
+            <a href="{{ url_for('contact') }}" class="btn btn-white btn-lg">Join as Doctor</a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Everything you need to know about booking healthcare with Doctor App.</p>
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question">How can I book a doctor appointment on Doctor App?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>Search for a doctor by specialty, location, or name. View their available slots, select a convenient time, and book instantly. Confirm your appointment via email or SMS.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Is booking appointments on Doctor App free?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>Yes, booking through Doctor App is completely free. You only pay the consultation fee to the doctor or clinic.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Can I reschedule or cancel my appointment?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>Yes, you can reschedule or cancel your appointment up to 24 hours before the scheduled time through your Doctor App account.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Does Doctor App offer video consultations?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>Yes! Many doctors offer video consultations. Simply book a video consultation slot and meet your doctor from the comfort of your home.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How does Doctor App ensure doctor verification?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>All doctors on Doctor App are thoroughly verified professionals with valid PMDC medical licenses and credentials.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">What services does Doctor App provide besides doctor appointments?
+                    <span class="faq-arrow">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </span>
+                </button>
+                <div class="faq-answer"><p>Beyond doctor consultations, Doctor App offers hospital booking, lab test services with home sample collection, and health guidance.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

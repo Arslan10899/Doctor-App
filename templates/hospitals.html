@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Hospitals in Pakistan - Doctor App{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="crumbs"><a href="{{ url_for('index') }}">Home</a> &nbsp;/&nbsp; Hospitals</div>
+        <h1>Find and Book Hospital Appointments</h1>
+        <p>Start treatment at Pakistan's most trusted hospitals.</p>
+    </div>
+</section>
+
+<div class="container">
+    <form class="filter-bar" method="get" action="{{ url_for('hospitals') }}">
+        <select name="city">
+            <option value="">All Cities</option>
+            {% for c in cities %}
+                <option value="{{ c }}" {% if city == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <div class="hospital-detail-grid">
+        {% for h in hospitals %}
+            <a class="hospital-card-lg" href="{{ url_for('hospital_profile', hospital_id=h['id']) }}">
+                <span class="hospital-logo">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-2v-3H9v-2h3V9h2v3h3v2z"/></svg>
+                </span>
+                <div style="flex:1;">
+                    <h3>{{ h['name'] }}</h3>
+                    <p>{{ h['address'] }}</p>
+                    <p style="display:flex;align-items:center;gap:14px;margin-top:8px;">
+                        <span class="rating">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            {{ h['rating'] }}
+                        </span>
+                        <span style="color:#6b7280;">{{ h['doctor_count'] }} doctors</span>
+                        <span style="color:#6b7280;">{{ h['city_name'] }}</span>
+                    </p>
+                </div>
+                <span class="btn btn-outline">View Details</span>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
