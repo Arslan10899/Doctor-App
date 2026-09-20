@@ -106,6 +106,11 @@
             <input type="text" name="title" id="carousel-title" placeholder="e.g. 22">
             <label class="flabel">Image URL *</label>
             <input type="text" name="image_url" id="carousel-image" placeholder="https://...jpg" required>
+            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                <button class="btn btn-sm" type="button" id="carousel-edit-browse-btn">Browse &amp; Upload</button>
+                <input type="file" id="carousel-edit-browse-file" accept="image/*" style="display:none;">
+                <span id="carousel-edit-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+            </div>
             <div style="display:flex;gap:10px;margin-top:6px;">
                 <button class="btn btn-primary" type="submit">Save Changes</button>
                 <button class="btn" type="button" onclick="document.getElementById('carouselModal').style.display='none';">Cancel</button>
@@ -191,34 +196,41 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 <script>
-(function() {
-    var browseBtn = document.getElementById('carousel-browse-btn');
-    var browseFile = document.getElementById('carousel-browse-file');
-    var urlInput = document.getElementById('new-carousel-image');
-    var status = document.getElementById('carousel-upload-status');
-    if (!browseBtn) return;
-    browseBtn.addEventListener('click', function() { browseFile.click(); });
-    browseFile.addEventListener('change', function() {
-        if (!browseFile.files.length) return;
-        var fd = new FormData();
-        fd.append('file', browseFile.files[0]);
-        status.textContent = 'Uploading...';
-        fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
-            .then(function(res) {
-                if (res.ok) {
-                    urlInput.value = res.url;
-                    urlInput.removeAttribute('required');
-                    status.textContent = 'Uploaded. Now click Add Slide, or pick another.';
-                } else {
-                    status.textContent = 'Error: ' + (res.error || 'upload failed');
-                }
-            })
-            .catch(function() {
-                status.textContent = 'Upload failed. Check server.';
-            });
+function uploadToInput(fileInput, urlInput, statusEl) {
+    if (!fileInput.files.length) { return; }
+    var fd = new FormData();
+    fd.append('file', fileInput.files[0]);
+    if (statusEl) statusEl.textContent = 'Uploading...';
+    fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.ok) {
+                urlInput.value = res.url;
+                urlInput.removeAttribute('required');
+                if (statusEl) statusEl.textContent = 'Uploaded.';
+            } else {
+                if (statusEl) statusEl.textContent = 'Error: ' + (res.error || 'upload failed');
+            }
+        })
+        .catch(function() {
+            if (statusEl) statusEl.textContent = 'Upload failed. Check server.';
+        });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var pairs = [
+        ['carousel-browse-btn', 'carousel-browse-file', 'new-carousel-image', 'carousel-upload-status'],
+        ['carousel-edit-browse-btn', 'carousel-edit-browse-file', 'carousel-image', 'carousel-edit-upload-status']
+    ];
+    pairs.forEach(function(p) {
+        var btn = document.getElementById(p[0]);
+        var file = document.getElementById(p[1]);
+        var url = document.getElementById(p[2]);
+        var status = document.getElementById(p[3]);
+        if (!btn || !file || !url) { return; }
+        btn.addEventListener('click', function() { file.click(); });
+        file.addEventListener('change', function() { uploadToInput(file, url, status); });
     });
-})();
+});
 </script>
 
 <div class="card">
