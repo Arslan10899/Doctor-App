@@ -58,7 +58,7 @@
                 <td>{{ h['name'] }}</td>
                 <td>{{ h['city_name'] }}</td>
                 <td>{{ h['phone'] or '—' }}</td>
-                <td>{{ h['rating']|round|int }}</td>
+                <td>{{ h['rating']|round(1) }}</td>
                 <td>{% if h['ot_schedules'] %}Yes{% else %}—{% endif %}</td>
                 <td>
                     <a class="btn btn-sm" href="{{ url_for('admin_hospital_edit', hospital_id=h['id']) }}" style="background:#eef2f6;color:#0c3444;">Edit</a>

@@ -27,7 +27,7 @@
                 </td>
                 <td>{{ 'Rs. %s'|format('{:,}'.format(d['fee'])) }}</td>
                 <td>{{ d['experience_text'] or (d['experience']|string + ' yrs') }}</td>
-                <td>{{ d['rating']|round|int }}</td>
+                <td>{{ d['rating']|round(1) }}</td>
                 <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
                 <td>
                     <a class="btn btn-outline btn-sm" href="{{ url_for('admin_doctor_edit', doctor_id=d['id']) }}">Edit</a>
