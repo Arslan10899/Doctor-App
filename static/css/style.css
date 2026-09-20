@@ -100,13 +100,15 @@ input, select, textarea { font-family: inherit; }
 }
 .logo-icon img { width: 22px; height: 22px; filter: brightness(0) invert(1); }
 .site-header .logo-icon {
-    width: auto;
-    height: auto;
-    background: none;
-    border: none;
-    box-shadow: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--primary), #4db6ac);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 10px rgba(15, 40, 60, .18);
 }
-.site-header .logo { gap: 2px; }
+.site-header .logo { gap: 11px; }
 .site-header .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .site-header .logo-tagline {
     font-size: 10px;
@@ -115,7 +117,7 @@ input, select, textarea { font-family: inherit; }
     text-transform: uppercase;
     letter-spacing: .6px;
 }
-.site-header .logo-icon img { filter: none; width: 88px; height: 88px; transform: translateY(20px); }
+.site-header .logo-icon img { filter: none; width: 34px; height: 34px; }
 .logo-text { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
 .logo-accent { color: var(--primary); }
 
