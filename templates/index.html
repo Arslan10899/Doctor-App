@@ -6,6 +6,10 @@
 <!-- ================= ANNOUNCEMENT BAR (under header) ================= -->
 {% if announcements %}
 <section class="announcement-bar">
+    <span class="announce-tag">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M3 10v4a1 1 0 0 0 1 1h2l3 4h2V6H6l-3 4H3zM14 8.1a4 4 0 0 1 0 7.8M16.2 5.5a8 8 0 0 1 0 13"/></svg>
+        Announcement
+    </span>
     <div class="announcement-list">
         {% for a in announcements %}
             <span class="announcement-item">{{ a['content'] }}</span>
