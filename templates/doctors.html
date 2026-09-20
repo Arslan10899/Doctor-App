@@ -43,8 +43,9 @@
                             {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
                         </div>
                         <div>
-                            <h3>{{ d['name'] }}</h3>
-                            <p class="doctor-spec">{{ d['specialty_name'] }}{% if d['urdu_name'] %} <span title="{{ d['urdu_name'] }}">({{ d['urdu_name'] }})</span>{% endif %}</p>
+                            <h3 class="doctor-name">{{ d['name'] }}</h3>
+                            {% if d['urdu_name'] %}<p class="doctor-urdu">{{ d['urdu_name'] }}</p>{% endif %}
+                            <p class="doctor-spec">{{ d['specialty_name'] }}</p>
                             <p class="doctor-loc">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                                 {{ d['city_name'] }}{% if d['hospital_name'] %} - {{ d['hospital_name'] }}{% endif %}

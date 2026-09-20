@@ -82,7 +82,8 @@
                             {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
                         </div>
                         <div>
-                            <h3>{{ d['name'] }}</h3>
+                            <h3 class="doctor-name">{{ d['name'] }}</h3>
+                            {% if d['urdu_name'] %}<p class="doctor-urdu">{{ d['urdu_name'] }}</p>{% endif %}
                             <p class="doctor-spec">{{ d['specialty_name'] }}</p>
                         </div>
                     </div>
