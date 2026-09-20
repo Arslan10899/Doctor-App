@@ -1304,11 +1304,12 @@ position: sticky;
     gap: 0;
     width: max-content;
     white-space: nowrap;
-    animation: announce-scroll 22s linear infinite;
+    animation: announce-scroll 18s linear infinite;
+    padding-left: 100%;
 }
 @keyframes announce-scroll {
     from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    to { transform: translateX(-100%); }
 }
 .announcement-item {
     display: inline-flex;
