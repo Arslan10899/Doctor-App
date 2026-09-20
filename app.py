@@ -578,24 +578,18 @@ def _active_announcements():
     all_ann = query("SELECT * FROM announcements ORDER BY id DESC")
     now = datetime.now()
     active = []
-    last_always = None
     for a in all_ann:
         d_from = _parse_ann_dt(a["date_from"])
         d_to = _parse_ann_dt(a["date_to"])
         if not a["date_from"] and not a["date_to"]:
-            if last_always is None:
-                last_always = a
+            active.append(a)
             continue
         if d_from and now < d_from:
             continue
         if d_to and now > d_to:
             continue
         active.append(a)
-    if active:
-        return active
-    if last_always:
-        return [last_always]
-    return []
+    return active
 
 @app.route("/")
 def index():
