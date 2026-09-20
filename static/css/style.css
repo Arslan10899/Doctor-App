@@ -1324,7 +1324,7 @@ input, select, textarea { font-family: inherit; }
     gap: 0;
     width: max-content;
     white-space: nowrap;
-    animation: announce-scroll 45s linear infinite;
+    animation: announce-scroll 45s linear infinite reverse;
     padding-left: 100%;
     -webkit-mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
     mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
