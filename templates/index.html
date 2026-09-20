@@ -6,12 +6,13 @@
 <!-- ================= ANNOUNCEMENT BAR (under header) ================= -->
 {% if announcements %}
 <section class="announcement-bar">
-    <div class="container">
-        <div class="announcement-list">
-            {% for a in announcements %}
-                <span class="announcement-item">{{ a['content'] }}</span>
-            {% endfor %}
-        </div>
+    <div class="announcement-list">
+        {% for a in announcements %}
+            <span class="announcement-item">{{ a['content'] }}</span>
+        {% endfor %}
+        {% for a in announcements %}
+            <span class="announcement-item">{{ a['content'] }}</span>
+        {% endfor %}
     </div>
 </section>
 {% endif %}
