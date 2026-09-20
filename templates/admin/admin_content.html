@@ -21,7 +21,12 @@
             <label class="flabel">Title</label>
             <input type="text" name="title" placeholder="e.g. 22">
             <label class="flabel">Image URL *</label>
-            <input type="text" name="image_url" placeholder="https://...jpg" required>
+            <input type="text" name="image_url" id="new-carousel-image" placeholder="https://...jpg" required>
+            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                <button class="btn btn-sm" type="button" id="carousel-browse-btn">Browse &amp; Upload</button>
+                <input type="file" id="carousel-browse-file" accept="image/*" style="display:none;">
+                <span id="carousel-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+            </div>
             <button class="btn btn-primary" type="submit">Add Slide</button>
         </form>
     </div>
@@ -49,6 +54,8 @@
             <td>{{ a['title'] or '—' }}</td>
             <td>{{ a['content'] }}</td>
             <td>
+                <button class="btn btn-sm" type="button"
+                        onclick="openAnnouncementEdit({{ a['id'] }}, {{ a['title']|tojson }}, {{ a['content']|tojson }})">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="announcements">
@@ -111,6 +118,92 @@ function openCarouselEdit(id, title, image) {
 }
 </script>
 
+<!-- Announcement edit modal -->
+<div id="announcementModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
+        <h2 style="font-size:17px;margin-bottom:16px;">Edit Announcement</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="announcement_edit">
+            <input type="hidden" name="id" id="announcement-id">
+            <label class="flabel">Title</label>
+            <input type="text" name="title" id="announcement-title" placeholder="e.g. Promotion">
+            <label class="flabel">Content *</label>
+            <textarea name="content" id="announcement-content" rows="2" required></textarea>
+            <div style="display:flex;gap:10px;margin-top:6px;">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <button class="btn" type="button" onclick="document.getElementById('announcementModal').style.display='none';">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Notification edit modal -->
+<div id="notificationModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
+        <h2 style="font-size:17px;margin-bottom:16px;">Edit Notification</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="notification_edit">
+            <input type="hidden" name="id" id="notification-id">
+            <label class="flabel">Title *</label>
+            <input type="text" name="title" id="notification-title" required>
+            <label class="flabel">Description</label>
+            <textarea name="description" id="notification-description" rows="2"></textarea>
+            <label class="flabel">Image URL</label>
+            <input type="text" name="image_url" id="notification-image">
+            <div style="display:flex;gap:10px;margin-top:6px;">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <button class="btn" type="button" onclick="document.getElementById('notificationModal').style.display='none';">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+function openAnnouncementEdit(id, title, content) {
+    document.getElementById('announcement-id').value = id;
+    document.getElementById('announcement-title').value = title || '';
+    document.getElementById('announcement-content').value = content || '';
+    document.getElementById('announcementModal').style.display = 'flex';
+}
+function openNotificationEdit(id, title, desc, image) {
+    document.getElementById('notification-id').value = id;
+    document.getElementById('notification-title').value = title || '';
+    document.getElementById('notification-description').value = desc || '';
+    document.getElementById('notification-image').value = image || '';
+    document.getElementById('notificationModal').style.display = 'flex';
+}
+</script>
+
+<script>
+(function() {
+    var browseBtn = document.getElementById('carousel-browse-btn');
+    var browseFile = document.getElementById('carousel-browse-file');
+    var urlInput = document.getElementById('new-carousel-image');
+    var status = document.getElementById('carousel-upload-status');
+    if (!browseBtn) return;
+    browseBtn.addEventListener('click', function() { browseFile.click(); });
+    browseFile.addEventListener('change', function() {
+        if (!browseFile.files.length) return;
+        var fd = new FormData();
+        fd.append('file', browseFile.files[0]);
+        status.textContent = 'Uploading...';
+        fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.ok) {
+                    urlInput.value = res.url;
+                    urlInput.removeAttribute('required');
+                    status.textContent = 'Uploaded. Now click Add Slide, or pick another.';
+                } else {
+                    status.textContent = 'Error: ' + (res.error || 'upload failed');
+                }
+            })
+            .catch(function() {
+                status.textContent = 'Upload failed. Check server.';
+            });
+    });
+})();
+</script>
+
 <div class="card">
     <h2>Notifications ({{ notifications|length }})</h2>
     <table class="table">
@@ -120,6 +213,8 @@ function openCarouselEdit(id, title, image) {
             <td>{{ n['title'] }}</td>
             <td>{{ n['description'] or '—' }}</td>
             <td>
+                <button class="btn btn-sm" type="button"
+                        onclick="openNotificationEdit({{ n['id'] }}, {{ n['title']|tojson }}, {{ n['description']|tojson }}, {{ n['image_url']|tojson }})">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="notifications">

@@ -1402,6 +1402,27 @@ def admin_content():
                 execute("INSERT INTO notifications (title, description, image_url) VALUES (?,?,?)",
                         (title, description or None, image_url or None))
                 flash("Notification added.", "success")
+        elif section == "announcement_edit":
+            aid = request.form.get("id", type=int)
+            title = request.form.get("title", "").strip()
+            content = request.form.get("content", "").strip()
+            if aid and content:
+                execute("UPDATE announcements SET title=?, content=? WHERE id=?",
+                        (title or None, content, aid))
+                flash("Announcement updated.", "success")
+            else:
+                flash("Announcement content is required.", "warning")
+        elif section == "notification_edit":
+            nid = request.form.get("id", type=int)
+            title = request.form.get("title", "").strip()
+            description = request.form.get("description", "").strip()
+            image_url = request.form.get("image_url", "").strip()
+            if nid and title:
+                execute("UPDATE notifications SET title=?, description=?, image_url=? WHERE id=?",
+                        (title, description or None, image_url or None, nid))
+                flash("Notification updated.", "success")
+            else:
+                flash("Notification title is required.", "warning")
         elif section == "delete":
             table = request.form.get("table", "")
             cid = request.form.get("id", type=int)
@@ -1415,6 +1436,26 @@ def admin_content():
         carousel=query("SELECT * FROM carousel_images ORDER BY id DESC"),
         notifications=query("SELECT * FROM notifications ORDER BY id DESC"),
     )
+
+
+@app.route("/admin/upload", methods=["POST"])
+@admin_required
+def admin_upload():
+    """Upload an image (used for carousel / notifications) and return its URL."""
+    f = request.files.get("file")
+    if not f or not f.filename:
+        return jsonify({"ok": False, "error": "No file selected."}), 400
+    ext = os.path.splitext(f.filename)[1].lower()
+    if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"):
+        return jsonify({"ok": False, "error": "Only image files are allowed (png/jpg/jpeg/gif/webp/svg)."}), 400
+    up_dir = os.path.join(BASE_DIR, "static", "uploads")
+    os.makedirs(up_dir, exist_ok=True)
+    fname = secure_filename(f.filename)
+    if not fname:
+        fname = "image" + ext
+    fname = datetime.now().strftime("%Y%m%d%H%M%S") + "_" + fname
+    f.save(os.path.join(up_dir, fname))
+    return jsonify({"ok": True, "url": url_for("static", filename="uploads/" + fname)})
 
 
 @app.route("/admin/backup", methods=["GET", "POST"])
