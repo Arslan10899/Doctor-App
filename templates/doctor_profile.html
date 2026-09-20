@@ -16,7 +16,7 @@
             <div class="profile-card">
                 <div class="profile-head">
                     <div class="avatar-lg">
-                        {% if doc['image_url'] %}<img src="{{ doc['image_url'] }}" alt="{{ doc['name'] }}">{% elif doc['image'] %}<img src="{{ url_for('static', filename='img/' ~ doc['image']) }}" alt="{{ doc['name'] }}">{% else %}{{ doc['name'].replace('Dr. ', '')[0] }}{% endif %}
+                        {% if doc['image_url'] %}<img src="{{ doc['image_url'] }}" alt="{{ doc['name'] }}">{% elif doc['image'] %}<img src="{{ url_for('static', filename='img/' ~ doc['image']) }}" alt="{{ doc['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ doc['name'] }}">{% endif %}
                     </div>
                     <div style="text-align:left;">
                         <h1>{{ doc['name'] }}</h1>
@@ -166,7 +166,7 @@
                     {% for d in similar %}
                         <a class="mini-doctor" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
                             <div class="doctor-avatar">
-                                {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                                {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ d['name'] }}">{% endif %}
                             </div>
                             <div>
                                 <h4>{{ d['name'] }}</h4>
