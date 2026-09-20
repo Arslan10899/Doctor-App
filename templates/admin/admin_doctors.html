@@ -1,0 +1,42 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Doctors{% endblock %}
+{% block title %}Doctors{% endblock %}
+{% block content %}
+<div class="actions-top">
+    <a class="btn btn-primary" href="{{ url_for('admin_doctor_add') }}">+ Add Doctor</a>
+</div>
+<div class="card">
+    <h2>All Doctors ({{ doctors|length }})</h2>
+    {% if doctors %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th><th>Specialty</th><th>City</th><th>Hospital / Clinic</th>
+                <th>Fee</th><th>Experience</th><th>Rating</th><th>Status</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in doctors %}
+            <tr>
+                <td>{{ d['name'] }}</td>
+                <td>{{ d['specialty_name'] }}</td>
+                <td>{{ d['city_name'] }}</td>
+                <td>{{ d['hospital_name'] or '—' }}</td>
+                <td>Rs. {{ '{:,}'.format(d['fee']) }}</td>
+                <td>{{ d['experience'] }} yrs</td>
+                <td>{{ d['rating'] }}</td>
+                <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
+                <td>
+                    <form class="inline" method="post" action="{{ url_for('admin_doctor_delete', doctor_id=d['id']) }}" onsubmit="return confirm('Delete {{ d['name'] }}?')">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">No doctors found.</div>
+    {% endif %}
+</div>
+{% endblock %}

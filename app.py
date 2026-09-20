@@ -13,6 +13,9 @@ app = Flask(__name__)
 app.secret_key = "doctor-app-super-secret-key-2026"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin123"
+
 
 @app.context_processor
 def inject_globals():
@@ -275,6 +278,12 @@ def init_db():
             content TEXT NOT NULL,
             rating INTEGER DEFAULT 5
         );
+
+        CREATE TABLE admins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        );
         """
     )
 
@@ -305,6 +314,7 @@ def init_db():
             "INSERT INTO reviews (patient_name, content, rating) VALUES (?, ?, ?)",
             (r[0], r[1], r[2]),
         )
+    cur.execute("INSERT INTO admins (username, password) VALUES (?, ?)", (ADMIN_USERNAME, ADMIN_PASSWORD))
 
     # Give all doctors about text + PMDC
     cur.execute("SELECT id, name FROM doctors")
@@ -339,6 +349,14 @@ FEMALE_IMAGES = ["f1", "f2", "f3", "f4", "f5", "f7", "f8", "f9", "f10", "f11", "
 def migrate(db):
     """Add new columns to an existing database without wiping data."""
     cur = db.cursor()
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS admins ("
+        " id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        " username TEXT UNIQUE NOT NULL,"
+        " password TEXT NOT NULL)"
+    )
+    if not cur.execute("SELECT id FROM admins LIMIT 1").fetchone():
+        cur.execute("INSERT INTO admins (username, password) VALUES (?, ?)", (ADMIN_USERNAME, ADMIN_PASSWORD))
     assign_doctor_images(cur)
     db.commit()
     db.close()
@@ -768,6 +786,230 @@ def contact():
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html"), 404
+
+
+# ---------------------------------------------------------------------------
+# Admin panel
+# ---------------------------------------------------------------------------
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not session.get("admin_logged_in"):
+            flash("Please login to access the admin panel.", "warning")
+            return redirect(url_for("admin_login"))
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        row = query("SELECT * FROM admins WHERE username=?", (username,), one=True)
+        if row and row["password"] == password:
+            session["admin_logged_in"] = True
+            session["admin_name"] = row["username"]
+            session.permanent = True
+            flash("Welcome to Admin Panel, " + row["username"] + "!", "success")
+            return redirect(url_for("admin_dashboard"))
+        flash("Invalid username or password.", "danger")
+    return render_template("admin/admin_login.html")
+
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin_logged_in", None)
+    session.pop("admin_name", None)
+    flash("Logged out of admin panel.", "info")
+    return redirect(url_for("index"))
+
+
+@app.route("/admin")
+@admin_required
+def admin_dashboard():
+    counts = {
+        "doctors": query("SELECT COUNT(*) c FROM doctors")[0]["c"],
+        "hospitals": query("SELECT COUNT(*) c FROM hospitals")[0]["c"],
+        "specialties": query("SELECT COUNT(*) c FROM specialties")[0]["c"],
+        "cities": query("SELECT COUNT(*) c FROM cities")[0]["c"],
+        "patients": query("SELECT COUNT(*) c FROM patients")[0]["c"],
+        "appointments": query("SELECT COUNT(*) c FROM appointments")[0]["c"],
+        "online": query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"],
+    }
+    recent = query(
+        "SELECT d.id, d.name, d.fee, d.online, s.name AS specialty_name, c.name AS city_name "
+        "FROM doctors d "
+        "JOIN specialties s ON d.specialty_id=s.id "
+        "JOIN cities c ON d.city_id=c.id "
+        "ORDER BY d.id DESC LIMIT 8"
+    )
+    return render_template("admin/admin_dashboard.html", counts=counts, recent=recent)
+
+
+@app.route("/admin/doctors")
+@admin_required
+def admin_doctors_list():
+    doctors = query(
+        "SELECT d.*, s.name AS specialty_name, c.name AS city_name, h.name AS hospital_name "
+        "FROM doctors d "
+        "JOIN specialties s ON d.specialty_id=s.id "
+        "JOIN cities c ON d.city_id=c.id "
+        "LEFT JOIN hospitals h ON d.hospital_id=h.id "
+        "ORDER BY d.id DESC"
+    )
+    return render_template("admin/admin_doctors.html", doctors=doctors)
+
+
+@app.route("/admin/doctors/delete/<int:doctor_id>", methods=["POST"])
+@admin_required
+def admin_doctor_delete(doctor_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("DELETE FROM appointments WHERE doctor_id=?", (doctor_id,))
+    cur.execute("DELETE FROM doctors WHERE id=?", (doctor_id,))
+    db.commit()
+    flash("Doctor removed.", "info")
+    return redirect(url_for("admin_doctors_list"))
+
+
+@app.route("/admin/doctors/add", methods=["GET", "POST"])
+@admin_required
+def admin_doctor_add():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        specialty = request.form.get("specialty", "").strip()
+        city = request.form.get("city", "").strip()
+        hospital_name = request.form.get("hospital", "").strip()
+        online = 1 if request.form.get("online") else 0
+        try:
+            fee = float(request.form.get("fee") or 0)
+            experience = int(request.form.get("experience") or 0)
+            rating = min(float(request.form.get("rating") or 4.5), 5.0)
+            reviews = int(request.form.get("reviews") or 0)
+        except ValueError:
+            rating, fee, experience, reviews = 4.5, 0, 0, 0
+        mbbs = request.form.get("mbbs", "").strip() or "MBBS"
+        fellowship = request.form.get("fellowship", "").strip()
+
+        sp = query("SELECT id FROM specialties WHERE name=?", (specialty,), one=True)
+        ct = query("SELECT id FROM cities WHERE name=?", (city,), one=True)
+        if not name:
+            flash("Doctor name is required.", "danger")
+        elif not sp:
+            flash("Please choose a valid specialty.", "danger")
+        elif not ct:
+            flash("Please choose a valid city.", "danger")
+        else:
+            db = get_db()
+            cur = db.cursor()
+            hospital_id = None
+            if hospital_name:
+                hosp = query("SELECT id FROM hospitals WHERE name=?", (hospital_name,), one=True)
+                if hosp:
+                    hospital_id = hosp["id"]
+                else:
+                    cur.execute(
+                        "INSERT INTO hospitals (name, city_id, address, phone, rating) VALUES (?,?,?,?,?)",
+                        (hospital_name, ct["id"], "", "", 5.0),
+                    )
+                    hospital_id = cur.lastrowid
+            cur.execute(
+                "INSERT INTO doctors (name, specialty_id, city_id, hospital_id, fee, experience, rating, reviews, mbbs, fellowship, online, pmdc, about, image) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)",
+                (name, sp["id"], ct["id"], hospital_id, fee, experience, rating, reviews,
+                 mbbs, fellowship, online, f"PMDC-{83000 + (id(name) + len(name)) % 9000}",
+                 f"{name} is a highly-qualified and experienced specialist practicing in Pakistan. "
+                 f"With a strong academic background and years of clinical experience, they provide "
+                 f"compassionate, evidence-based care to every patient."),
+            )
+            assign_doctor_images(cur)
+            db.commit()
+            flash(name + " added successfully!", "success")
+            return redirect(url_for("admin_doctors_list"))
+
+    specialties = query("SELECT * FROM specialties ORDER BY name")
+    hospitals = query("SELECT * FROM hospitals ORDER BY name")
+    return render_template(
+        "admin/admin_doctor_add.html",
+        specialties=specialties,
+        hospitals=hospitals,
+        cities=CITIES,
+    )
+
+
+@app.route("/admin/hospitals", methods=["GET", "POST"])
+@admin_required
+def admin_hospitals():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        city = request.form.get("city", "").strip()
+        address = request.form.get("address", "").strip()
+        phone = request.form.get("phone", "").strip()
+        try:
+            rating = min(float(request.form.get("rating") or 4.5), 5.0)
+        except ValueError:
+            rating = 4.5
+        ct = query("SELECT id FROM cities WHERE name=?", (city,), one=True)
+        if name and ct:
+            execute("INSERT INTO hospitals (name, city_id, address, phone, rating) VALUES (?,?,?,?,?)",
+                    (name, ct["id"], address, phone, rating))
+            flash(name + " added successfully!", "success")
+        else:
+            flash("Hospital/clinic name and a valid city are required.", "danger")
+        return redirect(url_for("admin_hospitals"))
+    hospitals = query(
+        "SELECT h.*, c.name AS city_name FROM hospitals h JOIN cities c ON h.city_id=c.id ORDER BY h.id DESC"
+    )
+    return render_template("admin/admin_hospitals.html", hospitals=hospitals, cities=CITIES)
+
+
+@app.route("/admin/hospitals/delete/<int:hospital_id>", methods=["POST"])
+@admin_required
+def admin_hospital_delete(hospital_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("UPDATE doctors SET hospital_id=NULL WHERE hospital_id=?", (hospital_id,))
+    cur.execute("DELETE FROM hospitals WHERE id=?", (hospital_id,))
+    db.commit()
+    flash("Hospital/clinic removed.", "info")
+    return redirect(url_for("admin_hospitals"))
+
+
+@app.route("/admin/lookups", methods=["GET", "POST"])
+@admin_required
+def admin_lookups():
+    if request.method == "POST":
+        action = request.form.get("action")
+        if action == "city":
+            name = request.form.get("name", "").strip()
+            if not name:
+                flash("City name is required.", "warning")
+            elif query("SELECT id FROM cities WHERE name=?", (name,), one=True):
+                flash("City already exists.", "warning")
+            else:
+                execute("INSERT INTO cities (name) VALUES (?)", (name,))
+                if name not in CITIES:
+                    CITIES.append(name)
+                flash("City '" + name + "' added.", "success")
+        elif action == "specialty":
+            name = request.form.get("name", "").strip()
+            if not name:
+                flash("Specialty name is required.", "warning")
+            elif query("SELECT id FROM specialties WHERE name=?", (name,), one=True):
+                flash("Specialty already exists.", "warning")
+            else:
+                execute("INSERT INTO specialties (name) VALUES (?)", (name,))
+                if name not in SPECIALTIES:
+                    SPECIALTIES.append(name)
+                flash("Specialty '" + name + "' added.", "success")
+        return redirect(url_for("admin_lookups"))
+    return render_template(
+        "admin/admin_lookups.html",
+        cities=query("SELECT * FROM cities ORDER BY name"),
+        specialties=query("SELECT * FROM specialties ORDER BY name"),
+    )
 
 
 init_db()

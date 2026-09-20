@@ -1,0 +1,79 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Add Doctor{% endblock %}
+{% block title %}Add Doctor{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Add New Doctor</h2>
+    <form method="post">
+        <label class="flabel">Doctor Name *</label>
+        <input type="text" name="name" placeholder="e.g. Dr. Hassan Ali" required>
+
+        <div class="frow">
+            <div>
+                <label class="flabel">Specialty *</label>
+                <select name="specialty" required>
+                    {% for sp in specialties %}
+                        <option value="{{ sp['name'] }}">{{ sp['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="flabel">City *</label>
+                <select name="city" required>
+                    {% for c in cities %}
+                        <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <label class="flabel">Hospital / Clinic</label>
+        <input type="text" name="hospital" list="hospList" placeholder="Select or type a new hospital / clinic">
+        <datalist id="hospList">
+            {% for h in hospitals %}
+                <option value="{{ h['name'] }}"></option>
+            {% endfor %}
+        </datalist>
+
+        <div class="frow3">
+            <div>
+                <label class="flabel">Fee (Rs.)</label>
+                <input type="number" name="fee" min="0" step="50" value="1500" placeholder="1500">
+            </div>
+            <div>
+                <label class="flabel">Experience (years)</label>
+                <input type="number" name="experience" min="0" value="5">
+            </div>
+            <div>
+                <label class="flabel">Rating (0-5)</label>
+                <input type="number" name="rating" min="0" max="5" step="0.1" value="4.5">
+            </div>
+        </div>
+
+        <div class="frow">
+            <div>
+                <label class="flabel">Qualifications</label>
+                <input type="text" name="mbbs" placeholder="e.g. MBBS, FCPS">
+            </div>
+            <div>
+                <label class="flabel">Fellowship</label>
+                <input type="text" name="fellowship" placeholder="e.g. FCPS Dermatology">
+            </div>
+        </div>
+
+        <div class="frow">
+            <div>
+                <label class="flabel">Reviews Count</label>
+                <input type="number" name="reviews" min="0" value="0">
+            </div>
+            <div class="check-inline">
+                <input type="checkbox" name="online" value="1" id="online">
+                <label for="online" class="flabel" style="margin:0;">Available for Online Consultation</label>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save Doctor</button>
+        <a class="btn btn-outline" href="{{ url_for('admin_doctors_list') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

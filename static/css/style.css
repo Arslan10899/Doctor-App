@@ -489,6 +489,7 @@ input, select, textarea { font-family: inherit; }
     transition: transform .45s ease;
 }
 .service-card:hover .service-img img { transform: scale(1.08); }
+.service-img img[src*="consult-online"] { object-position: top; }
 .service-img::after {
     content: "";
     position: absolute;

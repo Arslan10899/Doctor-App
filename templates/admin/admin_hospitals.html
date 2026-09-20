@@ -1,0 +1,74 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Hospitals &amp; Clinics{% endblock %}
+{% block title %}Hospitals &amp; Clinics{% endblock %}
+{% block content %}
+<div class="actions-top">
+    <a class="btn btn-primary" href="#addForm">+ Add Hospital / Clinic</a>
+</div>
+
+<div class="card" id="addForm">
+    <h2>Add Hospital / Clinic</h2>
+    <form method="post">
+        <div class="frow">
+            <div>
+                <label class="flabel">Name *</label>
+                <input type="text" name="name" placeholder="e.g. City Care Clinic" required>
+            </div>
+            <div>
+                <label class="flabel">City *</label>
+                <select name="city" required>
+                    {% for c in cities %}
+                        <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="frow">
+            <div>
+                <label class="flabel">Address</label>
+                <input type="text" name="address" placeholder="Street, Area">
+            </div>
+            <div class="frow" style="grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                    <label class="flabel">Phone</label>
+                    <input type="text" name="phone" placeholder="0xx-xxxxxxx">
+                </div>
+                <div>
+                    <label class="flabel">Rating</label>
+                    <input type="number" name="rating" min="0" max="5" step="0.1" value="4.5">
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save Hospital / Clinic</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>All Hospitals &amp; Clinics ({{ hospitals|length }})</h2>
+    {% if hospitals %}
+    <table class="table">
+        <thead>
+            <tr><th>Name</th><th>City</th><th>Address</th><th>Phone</th><th>Rating</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for h in hospitals %}
+            <tr>
+                <td>{{ h['name'] }}</td>
+                <td>{{ h['city_name'] }}</td>
+                <td>{{ h['address'] or '—' }}</td>
+                <td>{{ h['phone'] or '—' }}</td>
+                <td>{{ h['rating'] }}</td>
+                <td>
+                    <form class="inline" method="post" action="{{ url_for('admin_hospital_delete', hospital_id=h['id']) }}" onsubmit="return confirm('Delete {{ h['name'] }}?')">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">No hospitals or clinics yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

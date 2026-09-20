@@ -1,0 +1,43 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Cities &amp; Specialties{% endblock %}
+{% block title %}Cities &amp; Specialties{% endblock %}
+{% block content %}
+<div class="frow">
+    <div class="card">
+        <h2>Add City</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="city">
+            <label class="flabel">City Name</label>
+            <input type="text" name="name" placeholder="e.g. Sialkot" required>
+            <button class="btn btn-primary" type="submit">Add City</button>
+        </form>
+    </div>
+    <div class="card">
+        <h2>Add Specialty</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="specialty">
+            <label class="flabel">Specialty Name</label>
+            <input type="text" name="name" placeholder="e.g. Homeopath" required>
+            <button class="btn btn-primary" type="submit">Add Specialty</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Cities ({{ cities|length }})</h2>
+    <table class="table">
+        {% for c in cities %}
+        <tr><td>{{ c['name'] }}</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h2>Specialties ({{ specialties|length }})</h2>
+    <table class="table">
+        {% for s in specialties %}
+        <tr><td>{{ s['name'] }}</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

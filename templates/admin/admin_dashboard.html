@@ -1,0 +1,43 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="grid-stats">
+    <div class="stat-card"><div class="num">{{ counts.doctors }}</div><div class="lbl">Doctors</div></div>
+    <div class="stat-card"><div class="num">{{ counts.online }}</div><div class="lbl">Online Doctors</div></div>
+    <div class="stat-card"><div class="num">{{ counts.hospitals }}</div><div class="lbl">Hospitals &amp; Clinics</div></div>
+    <div class="stat-card"><div class="num">{{ counts.specialties }}</div><div class="lbl">Specialties</div></div>
+    <div class="stat-card"><div class="num">{{ counts.cities }}</div><div class="lbl">Cities</div></div>
+    <div class="stat-card"><div class="num">{{ counts.patients }}</div><div class="lbl">Patients</div></div>
+    <div class="stat-card"><div class="num">{{ counts.appointments }}</div><div class="lbl">Appointments</div></div>
+</div>
+
+<div class="actions-top">
+    <a class="btn btn-primary" href="{{ url_for('admin_doctor_add') }}">+ Add Doctor</a>
+    <a class="btn btn-outline" href="{{ url_for('admin_hospitals') }}">+ Add Hospital / Clinic</a>
+    <a class="btn btn-outline" href="{{ url_for('admin_lookups') }}">+ Add City / Specialty</a>
+</div>
+
+<div class="card">
+    <h2>Recently Added Doctors</h2>
+    <table class="table">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Specialty</th><th>City</th><th>Fee</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for d in recent %}
+            <tr>
+                <td>{{ d['id'] }}</td>
+                <td>{{ d['name'] }}</td>
+                <td>{{ d['specialty_name'] }}</td>
+                <td>{{ d['city_name'] }}</td>
+                <td>Rs. {{ '{:,}'.format(d['fee']) }}</td>
+                <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty">No doctors yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
