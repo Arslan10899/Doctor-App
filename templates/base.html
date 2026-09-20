@@ -38,12 +38,12 @@
             </a>
 
             <nav class="main-nav" id="mainNav">
-                <a href="{{ url_for('doctors') }}" class="nav-link">Find Doctors</a>
-                <a href="{{ url_for('specialties_page') }}" class="nav-link">Specialties</a>
-                <a href="{{ url_for('conditions_page') }}" class="nav-link">Conditions</a>
-                <a href="{{ url_for('hospitals') }}" class="nav-link">Hospitals</a>
-                <a href="{{ url_for('about') }}" class="nav-link">About Us</a>
-                <a href="{{ url_for('contact') }}" class="nav-link">Contact</a>
+                <a href="{{ url_for('doctors') }}" class="nav-link{% if request.endpoint == 'doctors' %} active{% endif %}">Find Doctors</a>
+                <a href="{{ url_for('specialties_page') }}" class="nav-link{% if request.endpoint == 'specialties_page' %} active{% endif %}">Specialties</a>
+                <a href="{{ url_for('conditions_page') }}" class="nav-link{% if request.endpoint == 'conditions_page' %} active{% endif %}">Conditions</a>
+                <a href="{{ url_for('hospitals') }}" class="nav-link{% if request.endpoint == 'hospitals' %} active{% endif %}">Hospitals</a>
+                <a href="{{ url_for('about') }}" class="nav-link{% if request.endpoint == 'about' %} active{% endif %}">About Us</a>
+                <a href="{{ url_for('contact') }}" class="nav-link{% if request.endpoint == 'contact' %} active{% endif %}">Contact</a>
             </nav>
 
             <div class="header-actions">
