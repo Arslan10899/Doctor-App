@@ -54,8 +54,10 @@
             <td>{{ a['title'] or '—' }}</td>
             <td>{{ a['content'] }}</td>
             <td>
-                <button class="btn btn-sm" type="button"
-                        onclick="openAnnouncementEdit({{ a['id'] }}, {{ a['title']|tojson }}, {{ a['content']|tojson }})">Edit</button>
+                <button class="btn btn-sm annn-edit" type="button"
+                        data-id="{{ a['id'] }}"
+                        data-title="{{ a['title'] or '' }}"
+                        data-content="{{ a['content'] }}">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="announcements">
@@ -77,8 +79,10 @@
             <td>{{ c['title'] or '—' }}</td>
             <td>{% if c['image_url'] %}<img src="{{ c['image_url'] }}" style="width:60px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
             <td>
-                <button class="btn btn-sm" type="button"
-                        onclick="openCarouselEdit({{ c['id'] }}, {{ c['title']|tojson }}, {{ c['image_url']|tojson }})">Edit</button>
+                <button class="btn btn-sm car-edit" type="button"
+                        data-id="{{ c['id'] }}"
+                        data-title="{{ c['title'] or '' }}"
+                        data-image="{{ c['image_url'] }}">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="carousel_images">
@@ -110,12 +114,41 @@
     </div>
 </div>
 <script>
-function openCarouselEdit(id, title, image) {
-    document.getElementById('carousel-id').value = id;
-    document.getElementById('carousel-title').value = title || '';
-    document.getElementById('carousel-image').value = image || '';
-    document.getElementById('carouselModal').style.display = 'flex';
-}
+document.addEventListener('DOMContentLoaded', function() {
+    function h2t(html) {
+        var t = document.createElement('textarea');
+        t.innerHTML = html;
+        return t.value;
+    }
+    document.querySelectorAll('.annn-edit').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var m = document.getElementById('announcementModal');
+            document.getElementById('announcement-id').value = b.getAttribute('data-id');
+            document.getElementById('announcement-title').value = h2t(b.getAttribute('data-title') || '');
+            document.getElementById('announcement-content').value = h2t(b.getAttribute('data-content') || '');
+            m.style.display = 'flex';
+        });
+    });
+    document.querySelectorAll('.car-edit').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var m = document.getElementById('carouselModal');
+            document.getElementById('carousel-id').value = b.getAttribute('data-id');
+            document.getElementById('carousel-title').value = h2t(b.getAttribute('data-title') || '');
+            document.getElementById('carousel-image').value = h2t(b.getAttribute('data-image') || '');
+            m.style.display = 'flex';
+        });
+    });
+    document.querySelectorAll('.notif-edit').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var m = document.getElementById('notificationModal');
+            document.getElementById('notification-id').value = b.getAttribute('data-id');
+            document.getElementById('notification-title').value = h2t(b.getAttribute('data-title') || '');
+            document.getElementById('notification-description').value = h2t(b.getAttribute('data-desc') || '');
+            document.getElementById('notification-image').value = h2t(b.getAttribute('data-image') || '');
+            m.style.display = 'flex';
+        });
+    });
+});
 </script>
 
 <!-- Announcement edit modal -->
@@ -158,22 +191,6 @@ function openCarouselEdit(id, title, image) {
     </div>
 </div>
 <script>
-function openAnnouncementEdit(id, title, content) {
-    document.getElementById('announcement-id').value = id;
-    document.getElementById('announcement-title').value = title || '';
-    document.getElementById('announcement-content').value = content || '';
-    document.getElementById('announcementModal').style.display = 'flex';
-}
-function openNotificationEdit(id, title, desc, image) {
-    document.getElementById('notification-id').value = id;
-    document.getElementById('notification-title').value = title || '';
-    document.getElementById('notification-description').value = desc || '';
-    document.getElementById('notification-image').value = image || '';
-    document.getElementById('notificationModal').style.display = 'flex';
-}
-</script>
-
-<script>
 (function() {
     var browseBtn = document.getElementById('carousel-browse-btn');
     var browseFile = document.getElementById('carousel-browse-file');
@@ -213,8 +230,11 @@ function openNotificationEdit(id, title, desc, image) {
             <td>{{ n['title'] }}</td>
             <td>{{ n['description'] or '—' }}</td>
             <td>
-                <button class="btn btn-sm" type="button"
-                        onclick="openNotificationEdit({{ n['id'] }}, {{ n['title']|tojson }}, {{ n['description']|tojson }}, {{ n['image_url']|tojson }})">Edit</button>
+                <button class="btn btn-sm notif-edit" type="button"
+                        data-id="{{ n['id'] }}"
+                        data-title="{{ n['title'] }}"
+                        data-desc="{{ n['description'] or '' }}"
+                        data-image="{{ n['image_url'] or '' }}">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="notifications">
