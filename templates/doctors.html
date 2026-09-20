@@ -28,6 +28,7 @@
         <label style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;">
             <input type="checkbox" name="online" value="1" {% if online %}checked{% endif %}> Online only
         </label>
+        <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
     {% if doctors %}
@@ -83,12 +84,6 @@
 <script>
     (function () {
         var form = document.getElementById('filterForm');
-        var q = form.querySelector('[name="q"]');
-        var timer = null;
-        q.addEventListener('input', function () {
-            clearTimeout(timer);
-            timer = setTimeout(function () { form.submit(); }, 450);
-        });
         form.querySelectorAll('select, input[type="checkbox"]').forEach(function (el) {
             el.addEventListener('change', function () { form.submit(); });
         });

@@ -1349,6 +1349,50 @@ input, select, textarea { font-family: inherit; }
     border-right: 1px solid rgba(45, 212, 191, .18);
 }
 .announcement-item:first-child { border-left: 1px solid rgba(45, 212, 191, .18); }
+
+/* ===== Live search autocomplete ===== */
+.ac-wrap { position: relative; flex: 1; }
+.ac-wrap input { width: 100%; }
+.ac-box {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: #fff;
+    border: 1px solid rgba(12, 52, 68, .18);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(12, 52, 68, .22);
+    padding: 6px;
+    max-height: 320px;
+    overflow-y: auto;
+    text-align: left;
+}
+.ac-item {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    line-height: 1.35;
+}
+.ac-item:hover { background: rgba(13, 148, 136, .08); }
+.ac-type {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+.ac-type-doctor { background: #0d9488; }
+.ac-type-specialty { background: #7c3aed; }
+.ac-type-hospital { background: #2563eb; }
+.ac-name { color: #0c3444; font-weight: 700; font-size: 14px; vertical-align: middle; }
+.ac-sub { font-size: 12px; color: #64748b; padding-left: 4px; }
 .announcement-title {
     background: linear-gradient(135deg, rgba(45, 212, 191, .2), rgba(45, 212, 191, .12));
     border: 1px solid rgba(45, 212, 191, .45);
