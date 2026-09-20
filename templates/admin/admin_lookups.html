@@ -110,10 +110,43 @@ function startSpecEdit(id) {
     var curIcon = iconCell.querySelector('img') ? iconCell.querySelector('img').src : '';
     nameCell.innerHTML = '<input type="text" id="spec-input-name-' + id + '" value="' + esc(curName) + '">';
     urduCell.innerHTML = '<input type="text" id="spec-input-urdu-' + id + '" dir="rtl" placeholder="Urdu name" value="' + esc(curUrdu) + '">';
-    iconCell.innerHTML = '<input type="text" id="spec-input-icon-' + id + '" placeholder="Icon URL" value="' + esc(curIcon) + '">';
+    iconCell.innerHTML = '<input type="text" id="spec-input-icon-' + id + '" placeholder="Icon URL" value="' + esc(curIcon) + '">' +
+        '<div style="display:flex;gap:6px;align-items:center;margin-top:4px;">' +
+        '<button class="btn btn-sm" type="button" onclick="document.getElementById(\'spec-browse-file-' + id + '\').click();">Browse &amp; Upload</button>' +
+        '<input type="file" id="spec-browse-file-' + id + '" accept="image/*" style="display:none;">' +
+        '<span id="spec-upload-status-' + id + '" style="font-size:12px;color:#1f8b8b;"></span>' +
+        '</div>';
+    document.getElementById('spec-browse-file-' + id).addEventListener('change', function() { uploadSpecIcon(id); });
     document.getElementById('spec-edit-btn-' + id).style.display = 'none';
     document.getElementById('spec-save-btn-' + id).style.display = 'inline-flex';
     document.getElementById('spec-cancel-btn-' + id).style.display = 'inline-flex';
+}
+function uploadSpecIcon(id) {
+    var file = document.getElementById('spec-browse-file-' + id);
+    var iconInput = document.getElementById('spec-input-icon-' + id);
+    var status = document.getElementById('spec-upload-status-' + id);
+    if (!file.files.length) { return; }
+    var fd = new FormData();
+    fd.append('file', file.files[0]);
+    if (status) status.textContent = 'Uploading...';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/admin/upload');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var res = JSON.parse(xhr.responseText);
+            if (res.ok) {
+                iconInput.value = res.url;
+                iconInput.removeAttribute('required');
+                if (status) status.textContent = 'Uploaded.';
+            } else {
+                if (status) status.textContent = 'Error: ' + (res.error || 'failed');
+            }
+        } else {
+            if (status) status.textContent = 'Upload failed.';
+        }
+    };
+    xhr.onerror = function() { if (status) status.textContent = 'Upload failed. Check server.'; };
+    xhr.send(fd);
 }
 function cancelSpecEdit(id) {
     var nameCell = document.getElementById('spec-name-' + id);
