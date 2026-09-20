@@ -11,6 +11,17 @@
             <input type="text" name="title" placeholder="e.g. Promotion">
             <label class="flabel">Content *</label>
             <textarea name="content" rows="2" required placeholder="Promotion text..."></textarea>
+            <div class="frow">
+                <div>
+                    <label class="flabel">Start Date &amp; Time</label>
+                    <input type="datetime-local" name="date_from">
+                </div>
+                <div>
+                    <label class="flabel">End Date &amp; Time</label>
+                    <input type="datetime-local" name="date_to">
+                </div>
+            </div>
+            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Khaali chorho to announcement hamesha chalti rahegi. Dates set karo to sirf us waqt show hogi.</p>
             <button class="btn btn-primary" type="submit">Add Announcement</button>
         </form>
     </div>
@@ -53,16 +64,25 @@
 <div class="card">
     <h2>Announcements ({{ announcements|length }})</h2>
     <table class="table">
-        <thead><tr><th>Title</th><th>Content</th><th></th></tr></thead>
+        <thead><tr><th>Title</th><th>Content</th><th>Schedule</th><th></th></tr></thead>
         {% for a in announcements %}
         <tr>
             <td>{{ a['title'] or '—' }}</td>
             <td>{{ a['content'] }}</td>
             <td>
+                {% if a['date_from'] or a['date_to'] %}
+                    {{ (a['date_from'] or 'Now')[:16] }} → {{ (a['date_to'] or 'Forever')[:16] }}
+                {% else %}
+                    <span class="tag tag-on">Always</span>
+                {% endif %}
+            </td>
+            <td>
                 <button class="btn btn-sm annn-edit" type="button"
                         data-id="{{ a['id'] }}"
                         data-title="{{ a['title'] or '' }}"
-                        data-content="{{ a['content'] }}">Edit</button>
+                        data-content="{{ a['content'] }}"
+                        data-date-from="{{ a['date_from'] or '' }}"
+                        data-date-to="{{ a['date_to'] or '' }}">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="announcements">
@@ -136,6 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('announcement-id').value = b.getAttribute('data-id');
             document.getElementById('announcement-title').value = h2t(b.getAttribute('data-title') || '');
             document.getElementById('announcement-content').value = h2t(b.getAttribute('data-content') || '');
+            document.getElementById('announcement-date-from').value = b.getAttribute('data-date-from') || '';
+            document.getElementById('announcement-date-to').value = b.getAttribute('data-date-to') || '';
             m.style.display = 'flex';
         });
     });
@@ -172,6 +194,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="text" name="title" id="announcement-title" placeholder="e.g. Promotion">
             <label class="flabel">Content *</label>
             <textarea name="content" id="announcement-content" rows="2" required></textarea>
+            <div class="frow">
+                <div>
+                    <label class="flabel">Start Date &amp; Time</label>
+                    <input type="datetime-local" name="date_from" id="announcement-date-from">
+                </div>
+                <div>
+                    <label class="flabel">End Date &amp; Time</label>
+                    <input type="datetime-local" name="date_to" id="announcement-date-to">
+                </div>
+            </div>
+            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Khaali chhorho to announcement hamesha chalti rahegi.</p>
             <div style="display:flex;gap:10px;margin-top:6px;">
                 <button class="btn btn-primary" type="submit">Save Changes</button>
                 <button class="btn" type="button" onclick="document.getElementById('announcementModal').style.display='none';">Cancel</button>

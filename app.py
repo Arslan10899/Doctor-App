@@ -563,6 +563,40 @@ def recommend_doctors(limit=6):
 # Routes
 # ---------------------------------------------------------------------------
 
+def _parse_ann_dt(val):
+    if not val:
+        return None
+    val = val.strip()
+    for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(val.replace("+00:00", "").replace("+0000", ""), fmt)
+        except ValueError:
+            continue
+    return None
+
+def _active_announcements():
+    all_ann = query("SELECT * FROM announcements ORDER BY id DESC")
+    now = datetime.now()
+    active = []
+    last_always = None
+    for a in all_ann:
+        d_from = _parse_ann_dt(a["date_from"])
+        d_to = _parse_ann_dt(a["date_to"])
+        if not a["date_from"] and not a["date_to"]:
+            if last_always is None:
+                last_always = a
+            continue
+        if d_from and now < d_from:
+            continue
+        if d_to and now > d_to:
+            continue
+        active.append(a)
+    if active:
+        return active
+    if last_always:
+        return [last_always]
+    return []
+
 @app.route("/")
 def index():
     specialties = query("SELECT * FROM specialties ORDER BY name")
@@ -579,12 +613,7 @@ def index():
     }
     featured = recommend_doctors(6)
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
-    announcements = query(
-        "SELECT * FROM announcements WHERE (title LIKE '%Medical Camp%' OR content LIKE '%Medical Camp%') "
-        "ORDER BY id DESC LIMIT 1"
-    )
-    if not announcements:
-        announcements = query("SELECT * FROM announcements ORDER BY id DESC LIMIT 1")
+    announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC LIMIT 6")
     return render_template(
         "index.html",
@@ -1405,9 +1434,11 @@ def admin_content():
         if section == "announcement":
             title = request.form.get("title", "").strip()
             content = request.form.get("content", "").strip()
+            date_from = request.form.get("date_from", "").strip() or None
+            date_to = request.form.get("date_to", "").strip() or None
             if content:
                 execute("INSERT INTO announcements (title, content, date_from, date_to) VALUES (?,?,?,?)",
-                        (title or None, content, None, None))
+                        (title or None, content, date_from, date_to))
                 flash("Announcement added.", "success")
         elif section == "carousel":
             title = request.form.get("title", "").strip()
@@ -1438,9 +1469,11 @@ def admin_content():
             aid = request.form.get("id", type=int)
             title = request.form.get("title", "").strip()
             content = request.form.get("content", "").strip()
+            date_from = request.form.get("date_from", "").strip() or None
+            date_to = request.form.get("date_to", "").strip() or None
             if aid and content:
-                execute("UPDATE announcements SET title=?, content=? WHERE id=?",
-                        (title or None, content, aid))
+                execute("UPDATE announcements SET title=?, content=?, date_from=?, date_to=? WHERE id=?",
+                        (title or None, content, date_from, date_to, aid))
                 flash("Announcement updated.", "success")
             else:
                 flash("Announcement content is required.", "warning")
