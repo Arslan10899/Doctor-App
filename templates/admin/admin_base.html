@@ -88,7 +88,7 @@
         <a class="side-link {% if request.endpoint == 'admin_content' %}active{% endif %}" href="{{ url_for('admin_content') }}">Content (Carousel/Announcements)</a>
         <a class="side-link {% if request.endpoint == 'admin_backup' %}active{% endif %}" href="{{ url_for('admin_backup') }}">Backup &amp; Restore</a>
         <a class="side-link {% if request.endpoint == 'admin_admins' %}active{% endif %}" href="{{ url_for('admin_admins') }}">Admins</a>
-        <a class="side-link bottom" href="{{ url_for('index') }}">View Website</a>
+        <a class="side-link bottom" href="{{ url_for('index') }}" target="_blank" rel="noopener">View Website</a>
         <a class="side-link bottom" href="{{ url_for('admin_logout') }}">Logout</a>
     </aside>
     <div class="main">
