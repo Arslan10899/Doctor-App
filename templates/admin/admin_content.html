@@ -64,9 +64,9 @@
 <div class="card">
     <h2>Announcements ({{ announcements|length }})</h2>
     <table class="table">
-        <thead><tr><th>Title</th><th>Content</th><th>Schedule</th><th></th></tr></thead>
+        <thead><tr><th>Title</th><th>Content</th><th>Schedule</th><th>Status</th><th></th></tr></thead>
         {% for a in announcements %}
-        <tr>
+        <tr{% if not a['active'] %} style="opacity:.55;"{% endif %}>
             <td>{{ a['title'] or '—' }}</td>
             <td>{{ a['content'] }}</td>
             <td>
@@ -75,6 +75,13 @@
                 {% else %}
                     <span class="tag tag-on">Always</span>
                 {% endif %}
+            </td>
+            <td>
+                <label class="toggle-switch" title="{{ 'Click to OFF' if a['active'] else 'Click to ON' }}">
+                    <input type="checkbox" class="ann-toggle" data-id="{{ a['id'] }}" {% if a['active'] %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-state">{{ 'ON' if a['active'] else 'OFF' }}</span>
             </td>
             <td>
                 <button class="btn btn-sm annn-edit" type="button"
@@ -150,6 +157,26 @@ document.addEventListener('DOMContentLoaded', function() {
         t.innerHTML = html;
         return t.value;
     }
+    document.querySelectorAll('.ann-toggle').forEach(function(chk) {
+        chk.addEventListener('change', function() {
+            var id = chk.getAttribute('data-id');
+            var val = chk.checked ? '1' : '0';
+            chk.disabled = true;
+            var fd = new FormData();
+            fd.append('section', 'announcement_toggle');
+            fd.append('id', id);
+            fd.append('active', val);
+            fetch('{{ url_for("admin_content") }}', { method: 'POST', body: fd })
+                .then(function(r) { return r.text(); })
+                .then(function() {
+                    chk.disabled = false;
+                    var state = chk.closest('td').querySelector('.toggle-state');
+                    if (state) state.textContent = chk.checked ? 'ON' : 'OFF';
+                    chk.closest('tr').style.opacity = chk.checked ? '1' : '.55';
+                })
+                .catch(function() { chk.checked = !chk.checked; chk.disabled = false; alert('Toggle failed. Try again.'); });
+        });
+    });
     document.querySelectorAll('.annn-edit').forEach(function(b) {
         b.addEventListener('click', function() {
             var m = document.getElementById('announcementModal');

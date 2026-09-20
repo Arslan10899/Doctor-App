@@ -459,6 +459,7 @@ def migrate(db):
             content TEXT,
             date_from TEXT,
             date_to TEXT,
+            active INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS carousel_images (
@@ -480,6 +481,9 @@ def migrate(db):
 
     if not cur.execute("SELECT id FROM cities WHERE name='Dera Ismail Khan'").fetchone():
         cur.execute("INSERT INTO cities (name) VALUES (?)", ("Dera Ismail Khan",))
+    authority = cur.execute("PRAGMA table_info(announcements)")
+    if "active" not in [r[1] for r in authority.fetchall()]:
+        cur.execute("ALTER TABLE announcements ADD COLUMN active INTEGER DEFAULT 1")
     assign_doctor_images(cur)
     db.commit()
     db.close()
@@ -575,7 +579,7 @@ def _parse_ann_dt(val):
     return None
 
 def _active_announcements():
-    all_ann = query("SELECT * FROM announcements ORDER BY id DESC")
+    all_ann = query("SELECT * FROM announcements WHERE active=1 ORDER BY id DESC")
     now = datetime.now()
     active = []
     for a in all_ann:
@@ -1497,6 +1501,12 @@ def admin_content():
                 flash("Announcement updated.", "success")
             else:
                 flash("Announcement content is required.", "warning")
+        elif section == "announcement_toggle":
+            aid = request.form.get("id", type=int)
+            val = 1 if request.form.get("active") == "1" else 0
+            if aid:
+                execute("UPDATE announcements SET active=? WHERE id=?", (val, aid))
+                flash("Announcement " + ("enabled." if val else "disabled."), "success")
         elif section == "notification_edit":
             nid = request.form.get("id", type=int)
             title = request.form.get("title", "").strip()
