@@ -20,7 +20,7 @@
                 <div style="display:flex;gap:24px;margin-top:10px;">
                     <span class="rating">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        <strong>{{ hospital['rating'] }}</strong>
+                        <strong>{{ hospital['rating']|round|int }}</strong>
                     </span>
                     <span><strong>{{ doctors|length }}</strong> doctors</span>
                 </div>
@@ -90,7 +90,7 @@
                         <div class="doctor-meta">
                             <span>
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="#f5a623"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                {{ d['rating'] }}
+                                {{ d['rating']|round|int }}
                             </span>
                             <span>{{ d['reviews'] }} reviews</span>
                             <span>{{ d['experience'] }} yrs exp</span>
