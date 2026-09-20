@@ -15,6 +15,13 @@
             <div class="hero-content">
                 <h1>Find and Book the Best Doctors near you</h1>
                 <p class="hero-sub">Search for doctors, hospitals, specialties and book in-clinic or video consultations instantly.</p>
+                {% if announcements %}
+                <div class="hero-announce" style="display:flex;flex-direction:column;gap:6px;margin:14px 0 4px;">
+                    {% for a in announcements %}
+                        <span class="hero-announce-item">{{ a['content'] }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
                     <div class="search-row">
@@ -39,17 +46,6 @@
 </section>
 
 <!-- ================= ANNOUNCEMENTS ================= -->
-{% if announcements %}
-<section class="announcement-bar">
-    <div class="container">
-        <div class="announcement-list">
-            {% for a in announcements %}
-                <span class="announcement-item">{{ a['content'] }}</span>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endif %}
 
 <!-- ================= CAROUSEL ================= -->
 {% if carousel %}

@@ -1309,6 +1309,22 @@ input, select, textarea { font-family: inherit; }
 }
 .announcement-item::before { content: "?"; color: #2dd4bf; font-size: 11px; }
 
+/* ===== Hero announcements (under heading) ===== */
+.hero-announce-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(45, 212, 191, .1);
+    border: 1px solid rgba(45, 212, 191, .35);
+    color: #0c3444;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+.hero-announce-item::before { content: "?"; color: #0d9488; font-size: 12px; flex: none; }
+
 /* ===== Hero slider ===== */
 .hero-slider {
     position: relative;

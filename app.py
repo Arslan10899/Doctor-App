@@ -580,8 +580,11 @@ def index():
     featured = recommend_doctors(6)
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = query(
-        "SELECT * FROM announcements ORDER BY id DESC LIMIT 3"
+        "SELECT * FROM announcements WHERE (title LIKE '%Medical Camp%' OR content LIKE '%Medical Camp%') "
+        "ORDER BY id DESC LIMIT 1"
     )
+    if not announcements:
+        announcements = query("SELECT * FROM announcements ORDER BY id DESC LIMIT 1")
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC LIMIT 6")
     return render_template(
         "index.html",
