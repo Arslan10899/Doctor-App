@@ -596,7 +596,7 @@ def index():
         featured=featured,
         online_count=online_count,
         conditions=CONDITIONS,
-        cities=query("SELECT name FROM cities ORDER BY name"),
+        cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")],
         announcements=announcements,
         carousel=carousel,
         notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
