@@ -40,6 +40,11 @@
             <td>{{ a['name'] or '—' }}</td>
             <td>{{ a['email'] or '—' }}</td>
             <td>
+                <button class="btn btn-sm admin-edit" type="button"
+                        data-id="{{ a['id'] }}"
+                        data-username="{{ a['username'] }}"
+                        data-name="{{ a['name'] or '' }}"
+                        data-email="{{ a['email'] or '' }}">Edit</button>
                 <form class="inline" method="post" action="{{ url_for('admin_admin_delete', admin_id=a['id']) }}" onsubmit="return confirm('Delete admin {{ a['username'] }}?')">
                     <button class="btn btn-danger btn-sm" type="submit">Delete</button>
                 </form>
@@ -48,4 +53,58 @@
         {% endfor %}
     </table>
 </div>
+
+<!-- Admin edit modal -->
+<div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
+        <h2 style="font-size:17px;margin-bottom:16px;">Edit Admin</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="admin_edit">
+            <input type="hidden" name="id" id="admin-id">
+            <div class="frow">
+                <div>
+                    <label class="flabel">Username *</label>
+                    <input type="text" name="username" id="admin-username" required>
+                </div>
+                <div>
+                    <label class="flabel">New Password (optional)</label>
+                    <input type="text" name="password" id="admin-password" placeholder="Leave blank to keep">
+                </div>
+            </div>
+            <div class="frow">
+                <div>
+                    <label class="flabel">Full Name</label>
+                    <input type="text" name="name" id="admin-name">
+                </div>
+                <div>
+                    <label class="flabel">Email</label>
+                    <input type="email" name="email" id="admin-email">
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:6px;">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <button class="btn" type="button" onclick="document.getElementById('adminModal').style.display='none';">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function h2t(html) {
+        var t = document.createElement('textarea');
+        t.innerHTML = html;
+        return t.value;
+    }
+    document.querySelectorAll('.admin-edit').forEach(function(b) {
+        b.addEventListener('click', function() {
+            document.getElementById('admin-id').value = b.getAttribute('data-id');
+            document.getElementById('admin-username').value = h2t(b.getAttribute('data-username') || '');
+            document.getElementById('admin-name').value = h2t(b.getAttribute('data-name') || '');
+            document.getElementById('admin-email').value = h2t(b.getAttribute('data-email') || '');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('adminModal').style.display = 'flex';
+        });
+    });
+});
+</script>
 {% endblock %}

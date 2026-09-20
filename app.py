@@ -1330,18 +1330,44 @@ def admin_hospital_delete(hospital_id):
 @admin_required
 def admin_admins():
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip()
-        if not username or not password:
-            flash("Username and password are required.", "danger")
-        elif query("SELECT id FROM admins WHERE username=? OR email=?", (username, email), one=True):
-            flash("An admin with that username/email already exists.", "danger")
+        action = request.form.get("action", "").strip()
+        if action == "admin_edit":
+            aid = request.form.get("id", type=int)
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            name = request.form.get("name", "").strip()
+            email = request.form.get("email", "").strip()
+            row = query("SELECT * FROM admins WHERE id=?", (aid,), one=True) if aid else None
+            if not row:
+                flash("Admin not found.", "danger")
+            elif not username:
+                flash("Username is required.", "danger")
+            elif query("SELECT id FROM admins WHERE id!=? AND (username=? OR email=?)", (aid, username, email), one=True):
+                flash("Another admin already uses that username/email.", "danger")
+            else:
+                if password:
+                    execute("UPDATE admins SET username=?, password=?, name=?, email=? WHERE id=?",
+                            (username, password, name or None, email or None, aid))
+                    flash("Admin updated.", "success")
+                else:
+                    execute("UPDATE admins SET username=?, name=?, email=? WHERE id=?",
+                            (username, name or None, email or None, aid))
+                    flash("Admin updated (password unchanged).", "success")
+                if session.get("admin_logged_in") and session.get("admin_name") == row["name"]:
+                    session["admin_name"] = name or username
         else:
-            execute("INSERT INTO admins (username, password, name, email) VALUES (?,?,?,?)",
-                    (username, password, name or None, email or None))
-            flash("Admin '" + username + "' added.", "success")
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            name = request.form.get("name", "").strip()
+            email = request.form.get("email", "").strip()
+            if not username or not password:
+                flash("Username and password are required.", "danger")
+            elif query("SELECT id FROM admins WHERE username=? OR email=?", (username, email), one=True):
+                flash("An admin with that username/email already exists.", "danger")
+            else:
+                execute("INSERT INTO admins (username, password, name, email) VALUES (?,?,?,?)",
+                        (username, password, name or None, email or None))
+                flash("Admin '" + username + "' added.", "success")
         return redirect(url_for("admin_admins"))
     return render_template("admin/admin_admins.html", admins=query("SELECT * FROM admins ORDER BY id"))
 
