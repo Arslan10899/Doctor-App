@@ -1326,6 +1326,17 @@ input, select, textarea { font-family: inherit; }
     box-shadow: 0 0 24px rgba(20, 184, 166, .6);
     clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
 }
+.announce-tag {
+    animation: tag-color-flow 3s linear infinite;
+}
+.announce-tag svg { animation: inherit; }
+@keyframes tag-color-flow {
+    0% { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, .6); }
+    25% { color: #fef08a; text-shadow: 0 0 8px rgba(250, 204, 21, .5); }
+    50% { color: #fdba74; text-shadow: 0 0 8px rgba(249, 115, 22, .5); }
+    75% { color: #fca5a5; text-shadow: 0 0 8px rgba(239, 68, 68, .5); }
+    100% { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, .6); }
+}
 .announcement-list {
     display: flex;
     gap: 0;
