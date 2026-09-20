@@ -84,24 +84,123 @@ def assign_image(db, cur, doctor_id, first_name, gender):
     return name
 
 
-def import_backup():
-    if not BACKUP_PATH:
-        print("Backup file not found. Looked for firestore_backup.json in:")
-        print("  - " + os.path.join(BASE_DIR, "firestore_backup.json"))
-        print("  - " + os.path.dirname(BASE_DIR) + "/Aazaz/firestore_backup.json")
-        print("  - " + os.path.expanduser("~/firestore_backup.json"))
-        print("  - /home/DoctorApp/firestore_backup.json")
-        print("Upload firestore_backup.json next to import_backup.py (i.e. in the project folder), then re-run this script.")
-        raise SystemExit(1)
+def build_export(db_path=None):
+    """Build a Firestore-shaped backup dict from the current SQLite DB.
 
-    with open(BACKUP_PATH, encoding="utf-8") as fh:
-        data = json.load(fh)
+    Output matches the format run_import() accepts, so an export can be
+    re-imported later (round-trip safe). Returns the top-level dict.
+    """
+    db = sqlite3.connect(db_path or DB_PATH)
+    db.row_factory = sqlite3.Row
+    cur = db.cursor()
 
+    def rows(t, extra=""):
+        try:
+            return [dict(r) for r in cur.execute(f"SELECT * FROM {t} {extra}").fetchall()]
+        except sqlite3.Error:
+            return []
+
+    cities = rows("cities")
+    specialties = rows("specialties")
+    hospitals = rows("hospitals")
+    doctors = rows("doctors")
+    clinics = rows("clinics")
+    admins = rows("admins")
+    carousel = rows("carousel_images")
+    announcements = rows("announcements")
+    notifications = rows("notifications")
+
+    cmap = {r["id"]: r["name"] for r in cities}
+    smap = {r["id"]: r["name"] for r in specialties}
+    hmap = {r["id"]: r["name"] for r in hospitals}
+    clinics_by_doc = {}
+    for r in rows("clinics"):
+        clinics_by_doc.setdefault(r["doctor_id"], []).append(r)
+
+    out = {}
+    out["cities"] = {f"c{i}": {"name": r["name"]} for i, r in enumerate(cities)}
+    out["specialties"] = {
+        f"s{i}": {"name": r["name"], "urduName": r.get("urdu_name") or "", "iconUrl": r.get("icon") or ""}
+        for i, r in enumerate(specialties)
+    }
+    out["hospitals"] = {
+        f"h{i}": {
+            "hospitalName": r["name"],
+            "hospitalCity": cmap.get(r["city_id"], ""),
+            "otSchedules": json.loads(r["ot_schedules"]) if r.get("ot_schedules") else [],
+        }
+        for i, r in enumerate(hospitals)
+    }
+    out["doctors"] = {}
+    for i, r in enumerate(doctors):
+        clinics_list = []
+        for c in clinics_by_doc.get(r["id"], []):
+            clinics_list.append({
+                "clinicName": c.get("clinic_name") or "",
+                "address": c.get("address") or "",
+                "timings": json.loads(c["timings"]) if c.get("timings") else {},
+            })
+        d = {
+            "doctorName": r["name"],
+            "urduName": r.get("urdu_name") or "",
+            "specialty": smap.get(r["specialty_id"], ""),
+            "city": cmap.get(r["city_id"], ""),
+            "fee": str(r.get("fee") or "") if r.get("fee") else "",
+            "experience": r.get("experience_text") or (str(r.get("experience") or "") + " years"),
+            "rating": r.get("rating"),
+            "gender": r.get("gender") or "Male",
+            "phone": r.get("phone") or "",
+            "whatsappNumber": r.get("whatsapp_number") or "",
+            "qualification": r.get("qualification") or "",
+            "diseases": r.get("diseases") or "",
+            "doctorsMessage": r.get("doctor_message") or "",
+            "sehatCardEmpaneled": r.get("sehat_card") or "",
+            "imageUrl": r.get("image_url") or "",
+            "views": r.get("views") or 0,
+            "totalCalls": r.get("total_calls") or 0,
+            "clinics": clinics_list,
+            "otSchedule": json.loads(r["ot_schedule"]) if r.get("ot_schedule") else [],
+        }
+        if r.get("opd_map"):
+            try:
+                d["opdMap"] = json.loads(r["opd_map"])
+            except (ValueError, TypeError):
+                d["opdMap"] = r["opd_map"]
+        out["doctors"][f"d{i}"] = d
+    out["admins"] = {
+        f"a{i}": {"username": r.get("username") or "", "email": r.get("email") or "",
+                  "name": r.get("name") or "", "password": r.get("password") or ""}
+        for i, r in enumerate(admins)
+    }
+    out["carousel_images"] = {
+        f"ci{i}": {"title": r.get("title") or "", "imageUrl": r.get("image_url") or "",
+                   "from": r.get("date_from"), "to": r.get("date_to")}
+        for i, r in enumerate(carousel)
+    }
+    out["commercial_texts"] = {
+        f"ct{i}": {"title": r.get("title") or "", "content": r.get("content") or "",
+                   "from": r.get("date_from"), "to": r.get("date_to")}
+        for i, r in enumerate(announcements)
+    }
+    out["notifications"] = {
+        f"n{i}": {"title": r.get("title") or "", "description": r.get("description") or "",
+                  "imageUrl": r.get("image_url") or ""}
+        for i, r in enumerate(notifications)
+    }
+    db.close()
+    return out
+
+
+def run_import(data, db_path=None):
+    """Import parsed backup data dict into the SQLite DB. Returns {table: count}.
+
+    Reused by import_backup.py (CLI) and the admin panel (/admin/backup/import).
+    """
     # Import app schema by running init_db + migrate in-process
     import app
     app.init_db()
 
-    db = sqlite3.connect(DB_PATH)
+    db = sqlite3.connect(db_path or DB_PATH)
     db.row_factory = sqlite3.Row
     cur = db.cursor()
 
@@ -292,7 +391,7 @@ def import_backup():
     default_flags = False
     for a in data.get("admins", {}).values():
         email = (a.get("email") or "").strip()
-        username = (email or a.get("name") or "admin").strip()
+        username = (a.get("username") or email or a.get("name") or "admin").strip()
         # derive a short unique username
         uname = username
         if uname in seen_usernames:
@@ -329,6 +428,23 @@ def import_backup():
               ["doctors", "hospitals", "specialties", "cities", "clinics", "admins",
                "carousel_images", "announcements", "notifications"]}
     db.close()
+    return counts
+
+
+def import_backup():
+    if not BACKUP_PATH:
+        print("Backup file not found. Looked for firestore_backup.json in:")
+        print("  - " + os.path.join(BASE_DIR, "firestore_backup.json"))
+        print("  - " + os.path.dirname(BASE_DIR) + "/Aazaz/firestore_backup.json")
+        print("  - " + os.path.expanduser("~/firestore_backup.json"))
+        print("  - /home/DoctorApp/firestore_backup.json")
+        print("Upload firestore_backup.json next to import_backup.py (i.e. in the project folder), then re-run this script.")
+        raise SystemExit(1)
+
+    with open(BACKUP_PATH, encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    counts = run_import(data)
     print("Import complete:")
     for k, v in counts.items():
         print(f"  {k}: {v}")

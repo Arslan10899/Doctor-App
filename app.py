@@ -1,10 +1,12 @@
 import os
 import re
+import json
 import sqlite3
 from datetime import datetime, date, timedelta
 from functools import wraps
 
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, g, abort
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, g, abort, Response
+from werkzeug.utils import secure_filename
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
@@ -1403,6 +1405,57 @@ def admin_content():
         carousel=query("SELECT * FROM carousel_images ORDER BY id DESC"),
         notifications=query("SELECT * FROM notifications ORDER BY id DESC"),
     )
+
+
+@app.route("/admin/backup", methods=["GET", "POST"])
+@admin_required
+def admin_backup():
+    """Import a firestore_backup.json / exported backup, or download a backup of the DB."""
+    if request.method == "POST":
+        action = request.form.get("action")
+        uploaded = request.files.get("backup_file")
+        if action == "import" and uploaded and uploaded.filename:
+            fname = secure_filename(uploaded.filename) or "backup.json"
+            if not fname.endswith(".json"):
+                flash("Please upload a .json backup file.", "warning")
+                return redirect(url_for("admin_backup"))
+            try:
+                raw = uploaded.read().decode("utf-8-sig")
+                data = json.loads(raw)
+            except Exception as exc:
+                flash("Could not parse the uploaded file as JSON: " + str(exc), "danger")
+                return redirect(url_for("admin_backup"))
+            flash("Backup imported — all doctors/hospitals/specialties replaced.", "info")
+            try:
+                from import_backup import run_import
+                counts = run_import(data)
+                summary = ", ".join(f"{t}: {n}" for t, n in counts.items())
+                flash("Import complete. " + summary, "success")
+            except Exception as exc:
+                db = get_db()
+                db.rollback()
+                flash("Import failed: " + str(exc), "danger")
+        elif action == "export":
+            try:
+                from import_backup import build_export
+                export_data = build_export()
+            except Exception:
+                export_data = {}
+            blob = json.dumps(export_data, ensure_ascii=False, indent=2).encode("utf-8")
+            fname = "doctorapp_backup_%s.json" % date.today().isoformat()
+            return Response(
+                blob,
+                mimetype="application/json",
+                headers={"Content-Disposition": f"attachment; filename={fname}"},
+            )
+        return redirect(url_for("admin_backup"))
+    totals = {
+        "doctors": query("SELECT COUNT(*) c FROM doctors")[0]["c"],
+        "hospitals": query("SELECT COUNT(*) c FROM hospitals")[0]["c"],
+        "specialties": query("SELECT COUNT(*) c FROM specialties")[0]["c"],
+        "clinics": query("SELECT COUNT(*) c FROM clinics")[0]["c"],
+    }
+    return render_template("admin/admin_backup.html", totals=totals)
 
 
 @app.route("/admin/lookups", methods=["GET", "POST"])

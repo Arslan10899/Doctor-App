@@ -86,6 +86,7 @@
         <a class="side-link {% if request.endpoint == 'admin_hospitals' %}active{% endif %}" href="{{ url_for('admin_hospitals') }}">Hospitals &amp; Clinics</a>
         <a class="side-link {% if request.endpoint == 'admin_lookups' %}active{% endif %}" href="{{ url_for('admin_lookups') }}">Cities &amp; Specialties</a>
         <a class="side-link {% if request.endpoint == 'admin_content' %}active{% endif %}" href="{{ url_for('admin_content') }}">Content (Carousel/Announcements)</a>
+        <a class="side-link {% if request.endpoint == 'admin_backup' %}active{% endif %}" href="{{ url_for('admin_backup') }}">Backup &amp; Restore</a>
         <a class="side-link {% if request.endpoint == 'admin_admins' %}active{% endif %}" href="{{ url_for('admin_admins') }}">Admins</a>
         <a class="side-link bottom" href="{{ url_for('index') }}">View Website</a>
         <a class="side-link bottom" href="{{ url_for('admin_logout') }}">Logout</a>

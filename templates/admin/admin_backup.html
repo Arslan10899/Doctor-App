@@ -1,0 +1,58 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Backup &amp; Restore{% endblock %}
+{% block title %}Backup &amp; Restore{% endblock %}
+{% block content %}
+
+<div class="frow" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+    <div class="stat-card">
+        <div class="num">{{ totals['doctors'] }}</div>
+        <div class="lbl">Doctors</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ totals['hospitals'] }}</div>
+        <div class="lbl">Hospitals</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ totals['specialties'] }}</div>
+        <div class="lbl">Specialties</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ totals['clinics'] }}</div>
+        <div class="lbl">Clinics</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Export current database</h2>
+    <p style="color:#6b7280;font-size:13.5px;margin-bottom:12px;">
+        Download all doctors, hospitals, specialties, clinics, cities, admins and content as a <strong>JSON backup</strong>.
+        Use this file later to restore the site, or keep it as a safety copy.
+    </p>
+    <form method="post">
+        <input type="hidden" name="action" value="export">
+        <button class="btn btn-primary" type="submit">&#8595; Download Backup (.json)</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Import a backup</h2>
+    <p style="color:#6b7280;font-size:13.5px;margin-bottom:12px;">
+        Upload a <strong>.json</strong> backup file. This will <strong>replace all existing doctors,
+        hospitals, specialties, cities, clinics, admins and content</strong> with the file's data
+        (appointments &amp; patients are kept). Perfect for restoring the site from a backup.
+    </p>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="import">
+        <div style="margin-bottom:12px;">
+            <input type="file" name="backup_file" accept=".json,application/json" required
+                   style="padding:10px;border:1px solid #d7dee3;border-radius:10px;width:100%;">
+        </div>
+        <button class="btn btn-primary" type="submit">&#8593; Upload &amp; Import Backup</button>
+    </form>
+    <div class="empty" style="margin-top:14px;font-size:12.5px;">
+        Tip: The import expects a backup created by the <strong>Export</strong> button above,
+        or a Firestore backup with keys like <code>doctors</code>, <code>hospitals</code>,
+        <code>specialties</code>, <code>clinics</code>, <code>admins</code>.
+    </div>
+</div>
+{% endblock %}
