@@ -12,7 +12,7 @@
     </span>
     <div class="announcement-list">
         {% for a in announcements %}
-            <span class="announcement-item"><span class="announcement-title">{{ a['title'] or '' }}</span>{{ a['content'] }}</span>
+            <span class="announcement-item">{% if a['title'] %}<span class="announcement-title">{{ a['title'] }}</span>{% endif %}<span class="announcement-content">{{ a['content'] }}</span></span>
         {% endfor %}
     </div>
 </section>

@@ -1349,6 +1349,8 @@ input, select, textarea { font-family: inherit; }
     border-right: 1px solid rgba(45, 212, 191, .18);
 }
 .announcement-item:first-child { border-left: 1px solid rgba(45, 212, 191, .18); }
+.announcement-title { order: 1; flex-shrink: 0; }
+.announcement-content { order: 2; }
 
 /* ===== Live search autocomplete ===== */
 .ac-wrap { position: relative; flex: 1; }
