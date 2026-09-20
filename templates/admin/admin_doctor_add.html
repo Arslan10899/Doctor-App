@@ -126,7 +126,7 @@
 
         <h2 style="font-size:15px;margin:18px 0 10px;">Clinics &amp; Timings</h2>
         <p style="font-size:12.5px;color:#6b7280;margin-bottom:10px;">
-            Timings ka format: <code>{"Monday - پیر ": {"open": "2:00 PM", "close": "8:00 PM", "isClosed": false}}</code> (valid JSON).
+            Clinic add karein aur har din ke open / close times select karein. Zaroorat na ho to clinic chhor dein.
         </p>
         <div id="clinicRows">
             {% if edit_mode and clinics %}
@@ -142,8 +142,9 @@
                             <input type="text" name="clinic_address" value="{{ cl['address'] or '' }}">
                         </div>
                     </div>
-                    <label class="flabel">Timings (JSON)</label>
-                    <textarea name="clinic_timings" rows="2" class="clinic-timings">{{ cl['timings'] or '' }}</textarea>
+                    <label class="flabel">Weekly Timings</label>
+                    <div class="clinic-days"></div>
+                    <textarea name="clinic_timings" class="clinic-timings" style="display:none;">{{ cl['timings'] or '' }}</textarea>
                     <button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>
                 </div>
                 {% endfor %}
@@ -159,8 +160,9 @@
                             <input type="text" name="clinic_address">
                         </div>
                     </div>
-                    <label class="flabel">Timings (JSON)</label>
-                    <textarea name="clinic_timings" rows="2" class="clinic-timings"></textarea>
+                    <label class="flabel">Weekly Timings</label>
+                    <div class="clinic-days"></div>
+                    <textarea name="clinic_timings" class="clinic-timings" style="display:none;"></textarea>
                     <button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>
                 </div>
             {% endif %}
@@ -208,6 +210,82 @@
             file.addEventListener('change', function() { uploadToInput(file, url, status); });
         }
     })();
+    var DAYS = [
+        { key: 'Monday - پیر', en: 'Monday', ur: 'پیر' },
+        { key: 'Tuesday - منگل', en: 'Tuesday', ur: 'منگل' },
+        { key: 'Wednesday - بدھ', en: 'Wednesday', ur: 'بدھ' },
+        { key: 'Thursday - جمعرات', en: 'Thursday', ur: 'جمعرات' },
+        { key: 'Friday - جمعہ', en: 'Friday', ur: 'جمعہ' },
+        { key: 'Saturday - ہفتہ', en: 'Saturday', ur: 'ہفتہ' },
+        { key: 'Sunday - اتوار', en: 'Sunday', ur: 'اتوار' }
+    ];
+    function timeTo12h(val) {
+        if (!val) { return ''; }
+        var m = val.match(/^(\d{1,2}):(\d{2})\s*([AP]M)?$/i);
+        if (!m) { return val; }
+        var h = parseInt(m[1], 10), mi = m[2], ap = (m[3] || '').toUpperCase();
+        if (!ap) { ap = h >= 12 ? 'PM' : 'AM'; h = h === 12 ? 0 : (h % 12); }
+        h = h % 12; if (h === 0) { h = 12; }
+        return h + ':' + mi + ' ' + ap;
+    }
+    function timeTo24h(val) {
+        if (!val) { return ''; }
+        var m = val.match(/^(\d{1,2}):(\d{2})\s*([AP]M)?$/i);
+        if (!m) { return ''; }
+        var h = parseInt(m[1], 10), mi = m[2], ap = (m[3] || '').toUpperCase();
+        if (ap === 'PM' && h !== 12) { h += 12; }
+        if (ap === 'AM' && h === 12) { h = 0; }
+        return (h < 10 ? '0' + h : h) + ':' + mi;
+    }
+    function parseTimings(str) {
+        if (!str) { return {}; }
+        try { return JSON.parse(str); } catch (e) { return {}; }
+    }
+    function buildDayRow(day) {
+        var row = document.createElement('div');
+        row.className = 'clinic-day-row';
+        row.innerHTML =
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 0;border-top:1px dashed #e2e8ee;">' +
+                '<div style="width:150px;font-size:13px;font-weight:600;">' + day.en + ' <span style="color:#94a3b8;font-weight:400;">{' + day.ur + '}</span></div>' +
+                '<label style="font-size:12px;color:#475569;">Open: <input type="time" class="doc-open"></label>' +
+                '<label style="font-size:12px;color:#475569;">Close: <input type="time" class="doc-close"></label>' +
+                '<label style="font-size:12px;color:#475569;display:flex;align-items:center;gap:4px;"><input type="checkbox" class="doc-closed"> Closed</label>' +
+            '</div>';
+        return row;
+    }
+    function renderDays(container, timings) {
+        container.innerHTML = '';
+        var t = parseTimings(timings);
+        DAYS.forEach(function (day) {
+            var val = null;
+            Object.keys(t).forEach(function (k) {
+                if (k.trim() === day.key.trim()) { val = t[k]; }
+            });
+            if (!val) { val = {}; }
+            var row = buildDayRow(day);
+            var open = row.querySelector('.doc-open'), close = row.querySelector('.doc-close'), closed = row.querySelector('.doc-closed');
+            if (val.open) { open.value = timeTo24h(val.open); }
+            if (val.close) { close.value = timeTo24h(val.close); }
+            if (val.isClosed) { closed.checked = true; }
+            container.appendChild(row);
+        });
+    }
+    function collectTimings(container) {
+        var out = {};
+        Array.prototype.forEach.call(container.querySelectorAll('.clinic-day-row'), function (row) {
+            var idx = container.querySelectorAll('.clinic-day-row');
+            var days = DAYS;
+            var index = Array.prototype.indexOf.call(container.querySelectorAll('.clinic-day-row'), row);
+            var day = days[index];
+            var open = timeTo12h(row.querySelector('.doc-open').value);
+            var close = timeTo12h(row.querySelector('.doc-close').value);
+            var closed = row.querySelector('.doc-closed').checked;
+            if (open || close || closed) {
+                out[day.key] = { open: open, close: close, isClosed: closed };
+            }
+        });
+        return JSON.stringify(out);
+    }
     function clinicRow(name, addr, timings) {
         var d = document.createElement('div');
         d.className = 'clinic-row';
@@ -221,9 +299,11 @@
                 '<div><label class="flabel">Clinic Name</label><input type="text" name="clinic_name" value="' + (name || '') + '"></div>' +
                 '<div><label class="flabel">Address</label><input type="text" name="clinic_address" value="' + (addr || '') + '"></div>' +
             '</div>' +
-            '<label class="flabel">Timings (JSON)</label>' +
-            '<textarea name="clinic_timings" rows="2" class="clinic-timings">' + (timings || '') + '</textarea>' +
+            '<label class="flabel">Weekly Timings</label>' +
+            '<div class="clinic-days"></div>' +
+            '<textarea name="clinic_timings" class="clinic-timings" style="display:none;">' + (timings || '') + '</textarea>' +
             '<button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>';
+        renderDays(d.querySelector('.clinic-days'), timings || '');
         return d;
     }
     document.getElementById('addClinic').addEventListener('click', function () {
@@ -233,6 +313,18 @@
         if (e.target.classList.contains('remove-clinic')) {
             e.target.closest('.clinic-row').remove();
         }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.clinic-row .clinic-days').forEach(function (c) {
+            var p = c.closest('.clinic-row');
+            renderDays(c, (p.querySelector('.clinic-timings').value) || '');
+        });
+    });
+    document.querySelector('form').addEventListener('submit', function () {
+        document.querySelectorAll('.clinic-row').forEach(function (row) {
+            var days = row.querySelector('.clinic-days');
+            row.querySelector('.clinic-timings').value = collectTimings(days) || '';
+        });
     });
 </script>
 {% endblock %}
