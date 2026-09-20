@@ -801,12 +801,12 @@ input, select, textarea { font-family: inherit; }
 .doctor-spec { color: var(--primary); font-weight: 600; font-size: 14px; margin: 2px 0 4px; }
 .doctor-loc { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-muted); }
 .doctor-online {
-    position: absolute;
-    top: 18px; right: 18px;
     display: inline-flex; align-items: center; gap: 5px;
     background: #ecfdf5; color: #059669;
-    font-size: 12px; font-weight: 700;
-    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 6px;
 }
 .doctor-card-body { padding: 16px 22px; flex: 1; }
 .doctor-meta { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; }
@@ -1360,8 +1360,6 @@ input, select, textarea { font-family: inherit; }
     border-right: 1px solid rgba(45, 212, 191, .18);
 }
 .announcement-item:first-child { border-left: 1px solid rgba(45, 212, 191, .18); }
-.announcement-title { order: 1; flex-shrink: 0; }
-.announcement-content { order: 2; }
 
 /* ===== Live search autocomplete ===== */
 .ac-wrap { position: relative; flex: 1; }

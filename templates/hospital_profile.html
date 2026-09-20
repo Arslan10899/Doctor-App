@@ -74,15 +74,12 @@
         <div class="doctor-grid">
             {% for d in doctors %}
                 <a class="doctor-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
-                    {% if d['online'] %}
-                        <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>
-                    {% endif %}
                     <div class="doctor-card-top">
                         <div class="doctor-avatar">
                             {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
                         </div>
                         <div>
-                            <h3>{{ d['name'] }}</h3>
+                            <h3>{{ d['name'] }}{% if d['online'] %} <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>{% endif %}</h3>
                             <p class="doctor-spec">{{ d['specialty_name'] }}</p>
                         </div>
                     </div>

@@ -191,15 +191,12 @@
         <div class="doctor-grid">
             {% for d in featured %}
                 <a class="doctor-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
-                    {% if d['online'] %}
-                        <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>
-                    {% endif %}
                     <div class="doctor-card-top">
                         <div class="doctor-avatar">
                             {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
                         </div>
                         <div>
-                            <h3>{{ d['name'] }}</h3>
+                            <h3>{{ d['name'] }}{% if d['online'] %} <span class="doctor-online"><span class="dot" style="width:6px;height:6px;background:#059669;border-radius:50%;display:inline-block;"></span> Online</span>{% endif %}</h3>
                             <p class="doctor-spec">{{ d['specialty_name'] }}{% if d['urdu_name'] %} <span title="{{ d['urdu_name'] }}">({{ d['urdu_name'] }})</span>{% endif %}</p>
                             <p class="doctor-loc">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -214,7 +211,6 @@
                                 {{ d['rating']|round(1) }}
                             </span>
                             <span>{{ d['experience_text'] or (d['experience']|string + ' yrs') }}</span>
-                            {% if d['whatsapp_number'] %}<span style="color:#059669;font-weight:700;">WhatsApp</span>{% endif %}
                         </div>
                     </div>
                     <div class="doctor-card-foot">
