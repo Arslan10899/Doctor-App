@@ -15,6 +15,10 @@
     .sidebar .brand img { width: 42px; height: 42px; flex: none; }
     .brand-name { font-size: 17px; font-weight: 800; line-height: 1.2; white-space: nowrap; }
     .brand-sub { font-size: 11.5px; color: #8fd0cc; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+    .sidebar .collapse-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 9px; background: rgba(255, 255, 255, .1); color: #d7e8ec; cursor: pointer; margin: 0 0 18px 8px; transition: background .18s, margin .2s ease; flex: none; }
+    .sidebar .collapse-btn:hover { background: rgba(255, 255, 255, .2); }
+    .sidebar .collapse-btn svg { width: 19px; height: 19px; }
+    .sidebar.collapsed .collapse-btn { margin-left: 0; }
     .side-link { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 9px; font-weight: 600; font-size: 14px; color: #d7e8ec; transition: background .18s; white-space: nowrap; }
     .side-link svg { width: 20px; height: 20px; flex: none; }
     .side-link:hover { background: rgba(255, 255, 255, .1); }
@@ -28,8 +32,6 @@
     .sidebar.collapsed .lbl { display: none; }
     .main { flex: 1; margin-left: 232px; padding: 26px 34px 40px; min-width: 0; transition: margin-left .22s ease; }
     .main.side-collapsed { margin-left: 74px; }
-    .toggle-area { text-align: center; margin-bottom: 20px; }
-    .toggle-area button { background: rgba(255,255,255,.08); border: none; color: #8fd0cc; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; }
     .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
     .topbar h1 { font-size: 22px; font-weight: 800; }
     .topbar .who { font-size: 13.5px; color: #6b7280; }
@@ -86,7 +88,6 @@
         .side-link { padding: 13px; justify-content: center; }
         .main, .main.side-collapsed { margin-left: 62px; padding: 18px; }
         .frow, .frow3 { grid-template-columns: 1fr; }
-        .toggle-area button { display: none; }
     }
 </style>
 </head>
@@ -100,7 +101,9 @@
                 <span class="brand-sub">ADMIN PANEL</span>
             </span>
         </a>
-        <div class="toggle-area"><button type="button" onclick="toggleSidebar()">&#9776; Collapse</button></div>
+        <button type="button" class="collapse-btn" onclick="toggleSidebar();" title="Collapse / Expand Menu" aria-label="Toggle Sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        </button>
         <a class="side-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
             <span class="lbl">Dashboard</span>
