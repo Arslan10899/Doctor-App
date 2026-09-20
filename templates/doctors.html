@@ -39,7 +39,7 @@
                     {% endif %}
                     <div class="doctor-card-top">
                         <div class="doctor-avatar">
-                            {% if d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
+                            {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% elif d['image'] %}<img src="{{ url_for('static', filename='img/' ~ d['image']) }}" alt="{{ d['name'] }}">{% else %}{{ d['name'].replace('Dr. ', '')[0] }}{% endif %}
                         </div>
                         <div>
                             <h3>{{ d['name'] }}</h3>

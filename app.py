@@ -1065,6 +1065,7 @@ def admin_doctor_add():
             rating, fee, experience, reviews = 4.5, 0, 0, 0
         mbbs = request.form.get("mbbs", "").strip() or "MBBS"
         fellowship = request.form.get("fellowship", "").strip()
+        image_url = request.form.get("image_url", "").strip()
 
         sp = query("SELECT id FROM specialties WHERE name=?", (specialty,), one=True)
         ct = query("SELECT id FROM cities WHERE name=?", (city,), one=True)
@@ -1092,15 +1093,16 @@ def admin_doctor_add():
             cur.execute(
                 "INSERT INTO doctors (name, urdu_name, specialty_id, city_id, hospital_id, fee, experience, "
                 "experience_text, rating, reviews, gender, phone, whatsapp_number, qualification, diseases, "
-                "doctor_message, sehat_card, mbbs, fellowship, online, about, image) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)",
+                "doctor_message, sehat_card, mbbs, fellowship, online, about, image, image_url) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,?)",
                 (name, urdu_name or None, sp["id"], ct["id"], hospital_id, fee, experience,
                  f"{experience} years" if experience else None, rating, reviews, gender,
                  phone or None, whatsapp or None, qualification or None, diseases or None,
                  doctor_message or None, sehat_card or None, mbbs, fellowship, online,
                  f"{name} is a highly-qualified and experienced specialist practicing in Pakistan. "
                  f"With a strong academic background and years of clinical experience, they provide "
-                 f"compassionate, evidence-based care to every patient."),
+                 f"compassionate, evidence-based care to every patient.",
+                 image_url or None),
             )
             doctor_id = cur.lastrowid
             assign_doctor_images(cur)
@@ -1172,6 +1174,7 @@ def admin_doctor_edit(doctor_id):
             rating, fee, experience, reviews = 4.5, 0, 0, 0
         mbbs = request.form.get("mbbs", "").strip() or "MBBS"
         fellowship = request.form.get("fellowship", "").strip()
+        image_url = request.form.get("image_url", "").strip()
 
         sp = query("SELECT id FROM specialties WHERE name=?", (specialty or doc["specialty_name"],), one=True)
         ct = query("SELECT id FROM cities WHERE name=?", (city or doc["city_name"],), one=True)
@@ -1196,11 +1199,11 @@ def admin_doctor_edit(doctor_id):
                 "UPDATE doctors SET name=?, urdu_name=?, specialty_id=?, city_id=?, hospital_id=?, "
                 "fee=?, experience=?, experience_text=?, rating=?, reviews=?, gender=?, phone=?, "
                 "whatsapp_number=?, qualification=?, diseases=?, doctor_message=?, sehat_card=?, "
-                "mbbs=?, fellowship=?, online=? WHERE id=?",
+                "mbbs=?, fellowship=?, online=?, image_url=? WHERE id=?",
                 (name, urdu_name or None, sp["id"], ct["id"], hospital_id, fee, experience,
                  f"{experience} years" if experience else None, rating, reviews, gender,
                  phone or None, whatsapp or None, qualification or None, diseases or None,
-                 doctor_message or None, sehat_card or None, mbbs, fellowship, online, doctor_id),
+                 doctor_message or None, sehat_card or None, mbbs, fellowship, online, image_url or None, doctor_id),
             )
             cur.execute("DELETE FROM clinics WHERE doctor_id=?", (doctor_id,))
             clinic_names = request.form.getlist("clinic_name")

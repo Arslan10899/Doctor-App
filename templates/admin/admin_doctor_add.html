@@ -11,6 +11,14 @@
         <label class="flabel">Urdu Name</label>
         <input type="text" name="urdu_name" value="{{ edoc['urdu_name'] if edoc and edoc['urdu_name'] else '' }}" placeholder="e.g. ڈاکٹر حسن علی" dir="rtl">
 
+        <label class="flabel">Profile Image</label>
+        <input type="text" name="image_url" id="doc-profile-image" value="{{ edoc['image_url'] if edoc and edoc['image_url'] else '' }}" placeholder="Image URL ya upar Browse se upload karein">
+        <div style="display:flex;gap:8px;align-items:center;margin:0 0 4px;">
+            <button class="btn btn-sm" type="button" id="doc-browse-btn">Browse &amp; Upload</button>
+            <input type="file" id="doc-browse-file" accept="image/*" style="display:none;">
+            <span id="doc-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+        </div>
+
         <div class="frow">
             <div>
                 <label class="flabel">Specialty *</label>
@@ -167,6 +175,39 @@
 </div>
 
 <script>
+    function uploadToInput(fileInput, urlInput, statusEl) {
+        if (!fileInput.files.length) { return; }
+        var fd = new FormData();
+        fd.append('file', fileInput.files[0]);
+        if (statusEl) statusEl.textContent = 'Uploading...';
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/admin/upload');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                if (res.ok) {
+                    urlInput.value = res.url;
+                    if (statusEl) statusEl.textContent = 'Uploaded.';
+                } else {
+                    if (statusEl) statusEl.textContent = 'Error: ' + (res.error || 'failed');
+                }
+            } else {
+                if (statusEl) statusEl.textContent = 'Upload failed.';
+            }
+        };
+        xhr.onerror = function() { if (statusEl) statusEl.textContent = 'Upload failed. Check server.'; };
+        xhr.send(fd);
+    }
+    (function() {
+        var btn = document.getElementById('doc-browse-btn');
+        var file = document.getElementById('doc-browse-file');
+        var url = document.getElementById('doc-profile-image');
+        var status = document.getElementById('doc-upload-status');
+        if (btn && file && url) {
+            btn.addEventListener('click', function() { file.click(); });
+            file.addEventListener('change', function() { uploadToInput(file, url, status); });
+        }
+    })();
     function clinicRow(name, addr, timings) {
         var d = document.createElement('div');
         d.className = 'clinic-row';
