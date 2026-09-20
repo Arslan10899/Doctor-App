@@ -43,7 +43,7 @@
                         </div>
                         <div>
                             <h3>{{ d['name'] }}</h3>
-                            <p class="doctor-spec">{{ d['specialty_name'] }}</p>
+                            <p class="doctor-spec">{{ d['specialty_name'] }}{% if d['urdu_name'] %} <span title="{{ d['urdu_name'] }}">({{ d['urdu_name'] }})</span>{% endif %}</p>
                             <p class="doctor-loc">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                                 {{ d['city_name'] }}{% if d['hospital_name'] %} - {{ d['hospital_name'] }}{% endif %}
@@ -56,12 +56,12 @@
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="#f5a623"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                                 {{ d['rating'] }}
                             </span>
-                            <span>{{ d['reviews'] }} reviews</span>
-                            <span>{{ d['experience'] }} yrs exp</span>
+                            <span>{{ d['experience_text'] or (d['experience']|string + ' yrs') }}</span>
+                            {% if d['whatsapp_number'] %}<span style="color:#059669;font-weight:700;">WhatsApp</span>{% endif %}
                         </div>
                     </div>
                     <div class="doctor-card-foot">
-                        <span class="fee">Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult</span>
+                        <span class="fee">{% if d['fee'] %}Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult{% else %}<strong>Fee on call</strong>{% endif %}</span>
                         <span class="btn btn-primary btn-sm">Book Now</span>
                     </div>
                 </a>

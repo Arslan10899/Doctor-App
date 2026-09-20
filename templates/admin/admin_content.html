@@ -1,0 +1,105 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Content{% endblock %}
+{% block title %}Content Management{% endblock %}
+{% block content %}
+<div class="frow">
+    <div class="card">
+        <h2>Add Announcement</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="announcement">
+            <label class="flabel">Title</label>
+            <input type="text" name="title" placeholder="e.g. Promotion">
+            <label class="flabel">Content *</label>
+            <textarea name="content" rows="2" required placeholder="Promotion text..."></textarea>
+            <button class="btn btn-primary" type="submit">Add Announcement</button>
+        </form>
+    </div>
+    <div class="card">
+        <h2>Add Carousel Slide</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="carousel">
+            <label class="flabel">Title</label>
+            <input type="text" name="title" placeholder="e.g. 22">
+            <label class="flabel">Image URL *</label>
+            <input type="text" name="image_url" placeholder="https://...jpg" required>
+            <button class="btn btn-primary" type="submit">Add Slide</button>
+        </form>
+    </div>
+    <div class="card">
+        <h2>Add Notification</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="notification">
+            <label class="flabel">Title *</label>
+            <input type="text" name="title" placeholder="e.g. New Notification">
+            <label class="flabel">Description</label>
+            <textarea name="description" rows="2" placeholder="Description..."></textarea>
+            <label class="flabel">Image URL</label>
+            <input type="text" name="image_url" placeholder="https://...jpg">
+            <button class="btn btn-primary" type="submit">Add Notification</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Announcements ({{ announcements|length }})</h2>
+    <table class="table">
+        <thead><tr><th>Title</th><th>Content</th><th></th></tr></thead>
+        {% for a in announcements %}
+        <tr>
+            <td>{{ a['title'] or '—' }}</td>
+            <td>{{ a['content'] }}</td>
+            <td>
+                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                    <input type="hidden" name="section" value="delete">
+                    <input type="hidden" name="table" value="announcements">
+                    <input type="hidden" name="id" value="{{ a['id'] }}">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h2>Carousel Slides ({{ carousel|length }})</h2>
+    <table class="table">
+        <thead><tr><th>Title</th><th>Image</th><th></th></tr></thead>
+        {% for c in carousel %}
+        <tr>
+            <td>{{ c['title'] or '—' }}</td>
+            <td>{% if c['image_url'] %}<img src="{{ c['image_url'] }}" style="width:60px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
+            <td>
+                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                    <input type="hidden" name="section" value="delete">
+                    <input type="hidden" name="table" value="carousel_images">
+                    <input type="hidden" name="id" value="{{ c['id'] }}">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h2>Notifications ({{ notifications|length }})</h2>
+    <table class="table">
+        <thead><tr><th>Title</th><th>Description</th><th></th></tr></thead>
+        {% for n in notifications %}
+        <tr>
+            <td>{{ n['title'] }}</td>
+            <td>{{ n['description'] or '—' }}</td>
+            <td>
+                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                    <input type="hidden" name="section" value="delete">
+                    <input type="hidden" name="table" value="notifications">
+                    <input type="hidden" name="id" value="{{ n['id'] }}">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

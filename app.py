@@ -19,7 +19,12 @@ ADMIN_PASSWORD = "admin123"
 
 @app.context_processor
 def inject_globals():
-    return {"cities": CITIES, "all_specialties": SPECIALTIES, "current_year": 2026}
+    try:
+        cities = [r["name"] for r in query("SELECT name FROM cities ORDER BY name")]
+        specs = [r["name"] for r in query("SELECT name FROM specialties ORDER BY name")]
+    except Exception:
+        cities, specs = CITIES, SPECIALTIES
+    return {"cities": cities, "all_specialties": specs, "current_year": 2026}
 
 
 # ---------------------------------------------------------------------------
@@ -59,7 +64,7 @@ def execute(sql, args=()):
 # Schema + seed
 # ---------------------------------------------------------------------------
 
-CITIES = ["Dera Ismail Khan", "Karachi", "Lahore", "Islamabad", "Rawalpindi", "Multan", "Peshawar", "Quetta", "Faisalabad"]
+CITIES = ["Dera Ismail Khan", "Karachi", "Lahore", "Islamabad", "Rawalpindi", "Multan", "Peshawar", "Quetta", "Faisalabad", "Bannu", "Tank", "Wana", "Paharpur, D.I.Khan", "Mianwali", "Gujranwala, Punjab"]
 
 SPECIALTIES = [
     "Dermatologist", "Gynecologist", "Urologist", "Gastroenterologist", "Neurologist",
@@ -211,7 +216,9 @@ def init_db():
 
         CREATE TABLE specialties (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL
+            name TEXT UNIQUE NOT NULL,
+            urdu_name TEXT,
+            icon TEXT
         );
 
         CREATE TABLE hospitals (
@@ -221,28 +228,52 @@ def init_db():
             address TEXT,
             phone TEXT,
             rating REAL DEFAULT 0,
+            ot_schedules TEXT,
             FOREIGN KEY (city_id) REFERENCES cities(id)
         );
 
         CREATE TABLE doctors (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            urdu_name TEXT,
             specialty_id INTEGER NOT NULL,
             city_id INTEGER NOT NULL,
             hospital_id INTEGER,
             fee INTEGER DEFAULT 0,
             experience INTEGER DEFAULT 0,
+            experience_text TEXT,
             rating REAL DEFAULT 0,
             reviews INTEGER DEFAULT 0,
+            gender TEXT,
+            phone TEXT,
+            whatsapp_number TEXT,
+            qualification TEXT,
+            diseases TEXT,
+            doctor_message TEXT,
+            sehat_card TEXT,
+            views INTEGER DEFAULT 0,
+            total_calls INTEGER DEFAULT 0,
+            image_url TEXT,
             mbbs TEXT,
             fellowship TEXT,
             online INTEGER DEFAULT 0,
             pmdc TEXT,
             about TEXT,
             image TEXT,
+            ot_schedule TEXT,
+            opd_map TEXT,
             FOREIGN KEY (specialty_id) REFERENCES specialties(id),
             FOREIGN KEY (city_id) REFERENCES cities(id),
             FOREIGN KEY (hospital_id) REFERENCES hospitals(id)
+        );
+
+        CREATE TABLE clinics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            doctor_id INTEGER NOT NULL,
+            clinic_name TEXT,
+            address TEXT,
+            timings TEXT,
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
         );
 
         CREATE TABLE patients (
@@ -282,28 +313,45 @@ def init_db():
         CREATE TABLE admins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            name TEXT,
+            email TEXT
+        );
+
+        CREATE TABLE announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            content TEXT,
+            date_from TEXT,
+            date_to TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE carousel_images (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            image_url TEXT,
+            date_from TEXT,
+            date_to TEXT,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            description TEXT,
+            image_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
     )
 
     for c in CITIES:
-        cur.execute("INSERT INTO cities (name) VALUES (?)", (c,))
+        if not cur.execute("SELECT id FROM cities WHERE name=?", (c,)).fetchone():
+            cur.execute("INSERT INTO cities (name) VALUES (?)", (c,))
     for s in SPECIALTIES:
-        cur.execute("INSERT INTO specialties (name) VALUES (?)", (s,))
-    for h in HOSPITALS:
-        cur.execute(
-            "INSERT INTO hospitals (name, city_id, address, phone, rating) VALUES (?, "
-            "(SELECT id FROM cities WHERE name=?), ?, ?, ?)",
-            (h[0], h[1], h[2], h[3], h[4]),
-        )
-    for d in DOCTORS:
-        cur.execute(
-            "INSERT INTO doctors (name, specialty_id, city_id, hospital_id, fee, experience, rating, reviews, mbbs, fellowship, online) "
-            "VALUES (?, (SELECT id FROM specialties WHERE name=?), (SELECT id FROM cities WHERE name=?), "
-            "(SELECT id FROM hospitals WHERE name=? AND city_id=(SELECT id FROM cities WHERE name=?)), ?, ?, ?, ?, ?, ?, ?)",
-            (d[0], d[1], d[2], d[3], d[2], d[4], d[5], d[6], d[7], d[8], d[9], d[10]),
-        )
+        if not cur.execute("SELECT id FROM specialties WHERE name=?", (s,)).fetchone():
+            cur.execute("INSERT INTO specialties (name) VALUES (?)", (s,))
     for p in PATIENTS:
         cur.execute(
             "INSERT INTO patients (username, email, password, full_name, gender, phone) VALUES (?, ?, ?, ?, ?, ?)",
@@ -347,16 +395,89 @@ FEMALE_IMAGES = ["f1", "f2", "f3", "f4", "f5", "f7", "f8", "f9", "f10", "f11", "
 
 
 def migrate(db):
-    """Add new columns to an existing database without wiping data."""
+    """Add new columns/tables to an existing database without wiping data."""
     cur = db.cursor()
     cur.execute(
         "CREATE TABLE IF NOT EXISTS admins ("
         " id INTEGER PRIMARY KEY AUTOINCREMENT,"
         " username TEXT UNIQUE NOT NULL,"
-        " password TEXT NOT NULL)"
+        " password TEXT NOT NULL,"
+        " name TEXT,"
+        " email TEXT)"
     )
     if not cur.execute("SELECT id FROM admins LIMIT 1").fetchone():
         cur.execute("INSERT INTO admins (username, password) VALUES (?, ?)", (ADMIN_USERNAME, ADMIN_PASSWORD))
+
+    cols = [r[1] for r in cur.execute("PRAGMA table_info(doctors)").fetchall()]
+    for col, ddl in {
+        "urdu_name": "TEXT",
+        "experience_text": "TEXT",
+        "gender": "TEXT",
+        "phone": "TEXT",
+        "whatsapp_number": "TEXT",
+        "qualification": "TEXT",
+        "diseases": "TEXT",
+        "doctor_message": "TEXT",
+        "sehat_card": "TEXT",
+        "views": "INTEGER DEFAULT 0",
+        "total_calls": "INTEGER DEFAULT 0",
+        "image_url": "TEXT",
+        "ot_schedule": "TEXT",
+        "opd_map": "TEXT",
+    }.items():
+        if col not in cols:
+            cur.execute(f"ALTER TABLE doctors ADD COLUMN {col} {ddl}")
+
+    scols = [r[1] for r in cur.execute("PRAGMA table_info(specialties)").fetchall()]
+    for col, ddl in {"urdu_name": "TEXT", "icon": "TEXT"}.items():
+        if col not in scols:
+            cur.execute(f"ALTER TABLE specialties ADD COLUMN {col} {ddl}")
+
+    hcols = [r[1] for r in cur.execute("PRAGMA table_info(hospitals)").fetchall()]
+    if "ot_schedules" not in hcols:
+        cur.execute("ALTER TABLE hospitals ADD COLUMN ot_schedules TEXT")
+
+    acols = [r[1] for r in cur.execute("PRAGMA table_info(admins)").fetchall()]
+    for col, ddl in {"name": "TEXT", "email": "TEXT"}.items():
+        if col not in acols:
+            cur.execute(f"ALTER TABLE admins ADD COLUMN {col} {ddl}")
+
+    cur.executescript("""
+        CREATE TABLE IF NOT EXISTS clinics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            doctor_id INTEGER NOT NULL,
+            clinic_name TEXT,
+            address TEXT,
+            timings TEXT,
+            FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
+        );
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            content TEXT,
+            date_from TEXT,
+            date_to TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS carousel_images (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            image_url TEXT,
+            date_from TEXT,
+            date_to TEXT,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            description TEXT,
+            image_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
+    if not cur.execute("SELECT id FROM cities WHERE name='Dera Ismail Khan'").fetchone():
+        cur.execute("INSERT INTO cities (name) VALUES (?)", ("Dera Ismail Khan",))
     assign_doctor_images(cur)
     db.commit()
     db.close()
@@ -443,16 +564,11 @@ def recommend_doctors(limit=6):
 @app.route("/")
 def index():
     specialties = query("SELECT * FROM specialties ORDER BY name")
-    hospitals_lhr = query(
-        "SELECT * FROM hospitals WHERE city_id=(SELECT id FROM cities WHERE name='Lahore') ORDER BY rating DESC LIMIT 6"
+    top_hospitals = query(
+        "SELECT h.*, c.name AS city_name, (SELECT COUNT(*) FROM doctors WHERE hospital_id=h.id) AS doctor_count "
+        "FROM hospitals h JOIN cities c ON h.city_id=c.id ORDER BY h.rating DESC LIMIT 6"
     )
-    hospitals_khi = query(
-        "SELECT * FROM hospitals WHERE city_id=(SELECT id FROM cities WHERE name='Karachi') ORDER BY rating DESC LIMIT 6"
-    )
-    hospitals_isb = query(
-        "SELECT * FROM hospitals WHERE city_id=(SELECT id FROM cities WHERE name='Islamabad') ORDER BY rating DESC LIMIT 6"
-    )
-    top_specialties = query("SELECT * FROM specialties LIMIT 14")
+    top_specialties = query("SELECT * FROM specialties ORDER BY (SELECT COUNT(*) FROM doctors WHERE specialty_id=specialties.id) DESC LIMIT 14")
     reviews = query("SELECT * FROM reviews")
     stats = {
         "doctors": query("SELECT COUNT(*) c FROM doctors")[0]["c"],
@@ -461,19 +577,27 @@ def index():
     }
     featured = recommend_doctors(6)
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
+    announcements = query(
+        "SELECT * FROM announcements ORDER BY id DESC LIMIT 3"
+    )
+    carousel = query("SELECT * FROM carousel_images ORDER BY id DESC LIMIT 6")
     return render_template(
         "index.html",
         specialties=specialties,
-        hospitals_lhr=hospitals_lhr,
-        hospitals_khi=hospitals_khi,
-        hospitals_isb=hospitals_isb,
+        top_hospitals=top_hospitals,
+        hospitals_lhr=top_hospitals,
+        hospitals_khi=top_hospitals,
+        hospitals_isb=top_hospitals,
         top_specialties=top_specialties,
         reviews=reviews,
         stats=stats,
         featured=featured,
         online_count=online_count,
         conditions=CONDITIONS,
-        cities=CITIES,
+        cities=query("SELECT name FROM cities ORDER BY name"),
+        announcements=announcements,
+        carousel=carousel,
+        notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
     )
 
 
@@ -512,7 +636,7 @@ def doctors():
         "doctors.html",
         doctors=results,
         specialties=specialties,
-        cities=CITIES,
+        cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")],
         city=city,
         specialty=specialty,
         search=search,
@@ -523,6 +647,7 @@ def doctors():
 
 @app.route("/doctor/<int:doctor_id>")
 def doctor_profile(doctor_id):
+    import json as _json
     doc = query(
         "SELECT d.*, s.name AS specialty_name, c.name AS city_name, h.name AS hospital_name, "
         "h.address AS hospital_address, h.phone AS hospital_phone "
@@ -535,6 +660,34 @@ def doctor_profile(doctor_id):
     )
     if not doc:
         abort(404)
+    clinics = query("SELECT * FROM clinics WHERE doctor_id=? ORDER BY id", (doctor_id,))
+    for cl in clinics:
+        cl_dict = dict(cl)
+        if cl_dict.get("timings"):
+            try:
+                cl_dict["timings_dict"] = _json.loads(cl_dict["timings"])
+            except ValueError:
+                cl_dict["timings_dict"] = None
+        else:
+            cl_dict["timings_dict"] = None
+        clinics[clinics.index(cl)] = cl_dict
+
+    opd_schedule = []
+    if doc["ot_schedule"]:
+        try:
+            opd_schedule = _json.loads(doc["ot_schedule"])
+        except ValueError:
+            opd_schedule = []
+    elif doc["opd_map"]:
+        try:
+            opd_map = _json.loads(doc["opd_map"])
+            if isinstance(opd_map, dict):
+                opd_schedule = [opd_map]
+            elif isinstance(opd_map, list):
+                opd_schedule = opd_map
+        except ValueError:
+            opd_schedule = []
+
     min_date = (date.today() + timedelta(days=1)).isoformat()
     similar = query(
         "SELECT d.*, s.name AS specialty_name, c.name AS city_name, h.name AS hospital_name "
@@ -546,7 +699,8 @@ def doctor_profile(doctor_id):
         (doc["specialty_id"], doctor_id),
     )
     return render_template(
-        "doctor_profile.html", doc=doc, similar=similar, min_date=min_date
+        "doctor_profile.html", doc=doc, similar=similar, min_date=min_date,
+        clinics=clinics, opd_schedule=opd_schedule,
     )
 
 
@@ -559,11 +713,12 @@ def hospitals():
         + ("WHERE c.name=?" if city else "WHERE 1=1") + " ORDER BY h.rating DESC",
         ((city,) if city else ()),
     )
-    return render_template("hospitals.html", hospitals=results, cities=CITIES, city=city)
+    return render_template("hospitals.html", hospitals=results, cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")], city=city)
 
 
 @app.route("/hospital/<int:hospital_id>")
 def hospital_profile(hospital_id):
+    import json as _json
     hosp = query(
         "SELECT h.*, c.name AS city_name FROM hospitals h JOIN cities c ON h.city_id=c.id WHERE h.id=?",
         (hospital_id,),
@@ -571,12 +726,20 @@ def hospital_profile(hospital_id):
     )
     if not hosp:
         abort(404)
+    hospital_ot = []
+    if hosp["ot_schedules"]:
+        try:
+            parsed = _json.loads(hosp["ot_schedules"])
+            if isinstance(parsed, list):
+                hospital_ot = parsed
+        except ValueError:
+            hospital_ot = []
     docs = query(
         "SELECT d.*, s.name AS specialty_name FROM doctors d "
         "JOIN specialties s ON d.specialty_id = s.id WHERE d.hospital_id=? ORDER BY d.rating DESC",
         (hospital_id,),
     )
-    return render_template("hospital_profile.html", hospital=hosp, doctors=docs)
+    return render_template("hospital_profile.html", hospital=hosp, doctors=docs, hospital_ot=hospital_ot)
 
 
 @app.route("/specialties")
@@ -807,12 +970,12 @@ def admin_login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        row = query("SELECT * FROM admins WHERE username=?", (username,), one=True)
+        row = query("SELECT * FROM admins WHERE username=? OR email=?", (username, username), one=True)
         if row and row["password"] == password:
             session["admin_logged_in"] = True
-            session["admin_name"] = row["username"]
+            session["admin_name"] = row["name"] or row["username"]
             session.permanent = True
-            flash("Welcome to Admin Panel, " + row["username"] + "!", "success")
+            flash("Welcome to Admin Panel, " + (row["name"] or row["username"]) + "!", "success")
             return redirect(url_for("admin_dashboard"))
         flash("Invalid username or password.", "danger")
     return render_template("admin/admin_login.html")
@@ -837,6 +1000,7 @@ def admin_dashboard():
         "patients": query("SELECT COUNT(*) c FROM patients")[0]["c"],
         "appointments": query("SELECT COUNT(*) c FROM appointments")[0]["c"],
         "online": query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"],
+        "clinics": query("SELECT COUNT(*) c FROM clinics")[0]["c"],
     }
     recent = query(
         "SELECT d.id, d.name, d.fee, d.online, s.name AS specialty_name, c.name AS city_name "
@@ -879,9 +1043,16 @@ def admin_doctor_delete(doctor_id):
 def admin_doctor_add():
     if request.method == "POST":
         name = request.form.get("name", "").strip()
+        urdu_name = request.form.get("urdu_name", "").strip()
         specialty = request.form.get("specialty", "").strip()
         city = request.form.get("city", "").strip()
-        hospital_name = request.form.get("hospital", "").strip()
+        gender = request.form.get("gender", "Male").strip()
+        phone = request.form.get("phone", "").strip()
+        whatsapp = request.form.get("whatsapp", "").strip()
+        qualification = request.form.get("qualification", "").strip()
+        diseases = request.form.get("diseases", "").strip()
+        doctor_message = request.form.get("doctor_message", "").strip()
+        sehat_card = request.form.get("sehat_card", "").strip()
         online = 1 if request.form.get("online") else 0
         try:
             fee = float(request.form.get("fee") or 0)
@@ -904,6 +1075,7 @@ def admin_doctor_add():
         else:
             db = get_db()
             cur = db.cursor()
+            hospital_name = request.form.get("hospital", "").strip()
             hospital_id = None
             if hospital_name:
                 hosp = query("SELECT id FROM hospitals WHERE name=?", (hospital_name,), one=True)
@@ -911,20 +1083,43 @@ def admin_doctor_add():
                     hospital_id = hosp["id"]
                 else:
                     cur.execute(
-                        "INSERT INTO hospitals (name, city_id, address, phone, rating) VALUES (?,?,?,?,?)",
-                        (hospital_name, ct["id"], "", "", 5.0),
+                        "INSERT INTO hospitals (name, city_id, phone, rating) VALUES (?,?,?,?)",
+                        (hospital_name, ct["id"], phone, 5.0),
                     )
                     hospital_id = cur.lastrowid
             cur.execute(
-                "INSERT INTO doctors (name, specialty_id, city_id, hospital_id, fee, experience, rating, reviews, mbbs, fellowship, online, pmdc, about, image) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)",
-                (name, sp["id"], ct["id"], hospital_id, fee, experience, rating, reviews,
-                 mbbs, fellowship, online, f"PMDC-{83000 + (id(name) + len(name)) % 9000}",
+                "INSERT INTO doctors (name, urdu_name, specialty_id, city_id, hospital_id, fee, experience, "
+                "experience_text, rating, reviews, gender, phone, whatsapp_number, qualification, diseases, "
+                "doctor_message, sehat_card, mbbs, fellowship, online, about, image) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)",
+                (name, urdu_name or None, sp["id"], ct["id"], hospital_id, fee, experience,
+                 f"{experience} years" if experience else None, rating, reviews, gender,
+                 phone or None, whatsapp or None, qualification or None, diseases or None,
+                 doctor_message or None, sehat_card or None, mbbs, fellowship, online,
                  f"{name} is a highly-qualified and experienced specialist practicing in Pakistan. "
                  f"With a strong academic background and years of clinical experience, they provide "
                  f"compassionate, evidence-based care to every patient."),
             )
+            doctor_id = cur.lastrowid
             assign_doctor_images(cur)
+            db.commit()
+            import json as _json
+            clinic_names = request.form.getlist("clinic_name")
+            clinic_addresses = request.form.getlist("clinic_address")
+            clinic_timings = request.form.getlist("clinic_timings")
+            for cname, caddr, ctim in zip(clinic_names, clinic_addresses, clinic_timings):
+                if not (cname.strip() or caddr.strip() or ctim.strip()):
+                    continue
+                timings = None
+                try:
+                    parsed = _json.loads(ctim)
+                    timings = _json.dumps(parsed, ensure_ascii=False) if isinstance(parsed, dict) else None
+                except (ValueError, TypeError):
+                    timings = None
+                cur.execute(
+                    "INSERT INTO clinics (doctor_id, clinic_name, address, timings) VALUES (?,?,?,?)",
+                    (doctor_id, cname.strip() or None, caddr.strip() or None, timings),
+                )
             db.commit()
             flash(name + " added successfully!", "success")
             return redirect(url_for("admin_doctors_list"))
@@ -935,13 +1130,112 @@ def admin_doctor_add():
         "admin/admin_doctor_add.html",
         specialties=specialties,
         hospitals=hospitals,
-        cities=CITIES,
+        cities=query("SELECT name FROM cities ORDER BY name"),
+        edoc=None, edit_mode=False,
+    )
+
+
+@app.route("/admin/doctors/edit/<int:doctor_id>", methods=["GET", "POST"])
+@admin_required
+def admin_doctor_edit(doctor_id):
+    import json as _json
+    doc = query("SELECT d.*, s.name AS specialty_name, c.name AS city_name, h.name AS hospital_name "
+                "FROM doctors d "
+                "JOIN specialties s ON d.specialty_id=s.id "
+                "JOIN cities c ON d.city_id=c.id "
+                "LEFT JOIN hospitals h ON d.hospital_id=h.id WHERE d.id=?", (doctor_id,), one=True)
+    if not doc:
+        abort(404)
+    clinics = query("SELECT * FROM clinics WHERE doctor_id=? ORDER BY id", (doctor_id,))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        urdu_name = request.form.get("urdu_name", "").strip()
+        specialty = request.form.get("specialty", "").strip()
+        city = request.form.get("city", "").strip()
+        gender = request.form.get("gender", "Male").strip()
+        phone = request.form.get("phone", "").strip()
+        whatsapp = request.form.get("whatsapp", "").strip()
+        qualification = request.form.get("qualification", "").strip()
+        diseases = request.form.get("diseases", "").strip()
+        doctor_message = request.form.get("doctor_message", "").strip()
+        sehat_card = request.form.get("sehat_card", "").strip()
+        online = 1 if request.form.get("online") else 0
+        try:
+            fee = float(request.form.get("fee") or 0)
+            experience = int(request.form.get("experience") or 0)
+            rating = min(float(request.form.get("rating") or 4.5), 5.0)
+            reviews = int(request.form.get("reviews") or 0)
+        except ValueError:
+            rating, fee, experience, reviews = 4.5, 0, 0, 0
+        mbbs = request.form.get("mbbs", "").strip() or "MBBS"
+        fellowship = request.form.get("fellowship", "").strip()
+
+        sp = query("SELECT id FROM specialties WHERE name=?", (specialty or doc["specialty_name"],), one=True)
+        ct = query("SELECT id FROM cities WHERE name=?", (city or doc["city_name"],), one=True)
+        if not name:
+            flash("Doctor name is required.", "danger")
+        else:
+            db = get_db()
+            cur = db.cursor()
+            hospital_name = request.form.get("hospital", "").strip()
+            hospital_id = None
+            if hospital_name:
+                hosp = query("SELECT id FROM hospitals WHERE name=?", (hospital_name,), one=True)
+                if hosp:
+                    hospital_id = hosp["id"]
+                else:
+                    cur.execute(
+                        "INSERT INTO hospitals (name, city_id, phone, rating) VALUES (?,?,?,?)",
+                        (hospital_name, ct["id"], phone, 5.0),
+                    )
+                    hospital_id = cur.lastrowid
+            cur.execute(
+                "UPDATE doctors SET name=?, urdu_name=?, specialty_id=?, city_id=?, hospital_id=?, "
+                "fee=?, experience=?, experience_text=?, rating=?, reviews=?, gender=?, phone=?, "
+                "whatsapp_number=?, qualification=?, diseases=?, doctor_message=?, sehat_card=?, "
+                "mbbs=?, fellowship=?, online=? WHERE id=?",
+                (name, urdu_name or None, sp["id"], ct["id"], hospital_id, fee, experience,
+                 f"{experience} years" if experience else None, rating, reviews, gender,
+                 phone or None, whatsapp or None, qualification or None, diseases or None,
+                 doctor_message or None, sehat_card or None, mbbs, fellowship, online, doctor_id),
+            )
+            cur.execute("DELETE FROM clinics WHERE doctor_id=?", (doctor_id,))
+            clinic_names = request.form.getlist("clinic_name")
+            clinic_addresses = request.form.getlist("clinic_address")
+            clinic_timings = request.form.getlist("clinic_timings")
+            for cname, caddr, ctim in zip(clinic_names, clinic_addresses, clinic_timings):
+                if not (cname.strip() or caddr.strip() or ctim.strip()):
+                    continue
+                timings = None
+                try:
+                    parsed = _json.loads(ctim)
+                    timings = _json.dumps(parsed, ensure_ascii=False) if isinstance(parsed, dict) else None
+                except (ValueError, TypeError):
+                    timings = None
+                cur.execute(
+                    "INSERT INTO clinics (doctor_id, clinic_name, address, timings) VALUES (?,?,?,?)",
+                    (doctor_id, cname.strip() or None, caddr.strip() or None, timings),
+                )
+            db.commit()
+            flash(name + " updated successfully!", "success")
+            return redirect(url_for("admin_doctors_list"))
+
+    specialties = query("SELECT * FROM specialties ORDER BY name")
+    hospitals = query("SELECT * FROM hospitals ORDER BY name")
+    return render_template(
+        "admin/admin_doctor_add.html",
+        specialties=specialties,
+        hospitals=hospitals,
+        cities=query("SELECT name FROM cities ORDER BY name"),
+        edoc=doc, edit_mode=True, clinics=clinics,
     )
 
 
 @app.route("/admin/hospitals", methods=["GET", "POST"])
 @admin_required
 def admin_hospitals():
+    import json as _json
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         city = request.form.get("city", "").strip()
@@ -951,10 +1245,16 @@ def admin_hospitals():
             rating = min(float(request.form.get("rating") or 4.5), 5.0)
         except ValueError:
             rating = 4.5
+        ot_schedules = request.form.get("ot_schedules", "").strip()
+        try:
+            ot_parsed = _json.loads(ot_schedules) if ot_schedules else None
+            ot_schedules = _json.dumps(ot_parsed, ensure_ascii=False) if isinstance(ot_parsed, list) else None
+        except (ValueError, TypeError):
+            ot_schedules = None
         ct = query("SELECT id FROM cities WHERE name=?", (city,), one=True)
         if name and ct:
-            execute("INSERT INTO hospitals (name, city_id, address, phone, rating) VALUES (?,?,?,?,?)",
-                    (name, ct["id"], address, phone, rating))
+            execute("INSERT INTO hospitals (name, city_id, address, phone, rating, ot_schedules) VALUES (?,?,?,?,?,?)",
+                    (name, ct["id"], address, phone, rating, ot_schedules))
             flash(name + " added successfully!", "success")
         else:
             flash("Hospital/clinic name and a valid city are required.", "danger")
@@ -962,7 +1262,54 @@ def admin_hospitals():
     hospitals = query(
         "SELECT h.*, c.name AS city_name FROM hospitals h JOIN cities c ON h.city_id=c.id ORDER BY h.id DESC"
     )
-    return render_template("admin/admin_hospitals.html", hospitals=hospitals, cities=CITIES)
+    return render_template(
+        "admin/admin_hospitals.html",
+        hospitals=hospitals,
+        cities=query("SELECT name FROM cities ORDER BY name"),
+    )
+
+
+@app.route("/admin/hospitals/edit/<int:hospital_id>", methods=["GET", "POST"])
+@admin_required
+def admin_hospital_edit(hospital_id):
+    import json as _json
+    hosp = query(
+        "SELECT h.*, c.name AS city_name FROM hospitals h JOIN cities c ON h.city_id=c.id WHERE h.id=?",
+        (hospital_id,),
+        one=True,
+    )
+    if not hosp:
+        abort(404)
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        city = request.form.get("city", "").strip()
+        address = request.form.get("address", "").strip()
+        phone = request.form.get("phone", "").strip()
+        try:
+            rating = min(float(request.form.get("rating") or hosp["rating"] or 4.5), 5.0)
+        except ValueError:
+            rating = hosp["rating"] or 4.5
+        ot_schedules = request.form.get("ot_schedules", "").strip()
+        try:
+            ot_parsed = _json.loads(ot_schedules) if ot_schedules else None
+            ot_schedules = _json.dumps(ot_parsed, ensure_ascii=False) if isinstance(ot_parsed, list) else None
+        except (ValueError, TypeError):
+            ot_schedules = None
+        ct = query("SELECT id FROM cities WHERE name=?", (city,), one=True)
+        if name and ct:
+            execute(
+                "UPDATE hospitals SET name=?, city_id=?, address=?, phone=?, rating=?, ot_schedules=? WHERE id=?",
+                (name, ct["id"], address, phone, rating, ot_schedules, hospital_id),
+            )
+            flash(name + " updated successfully!", "success")
+        else:
+            flash("Hospital/clinic name and a valid city are required.", "danger")
+        return redirect(url_for("admin_hospitals"))
+    return render_template(
+        "admin/admin_hospital_edit.html",
+        hospital=hosp,
+        cities=query("SELECT name FROM cities ORDER BY name"),
+    )
 
 
 @app.route("/admin/hospitals/delete/<int:hospital_id>", methods=["POST"])
@@ -975,6 +1322,87 @@ def admin_hospital_delete(hospital_id):
     db.commit()
     flash("Hospital/clinic removed.", "info")
     return redirect(url_for("admin_hospitals"))
+
+
+@app.route("/admin/admins", methods=["GET", "POST"])
+@admin_required
+def admin_admins():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        if not username or not password:
+            flash("Username and password are required.", "danger")
+        elif query("SELECT id FROM admins WHERE username=? OR email=?", (username, email), one=True):
+            flash("An admin with that username/email already exists.", "danger")
+        else:
+            execute("INSERT INTO admins (username, password, name, email) VALUES (?,?,?,?)",
+                    (username, password, name or None, email or None))
+            flash("Admin '" + username + "' added.", "success")
+        return redirect(url_for("admin_admins"))
+    return render_template("admin/admin_admins.html", admins=query("SELECT * FROM admins ORDER BY id"))
+
+
+@app.route("/admin/admins/delete/<int:admin_id>", methods=["POST"])
+@admin_required
+def admin_admin_delete(admin_id):
+    row = query("SELECT * FROM admins WHERE id=?", (admin_id,), one=True)
+    if not row:
+        abort(404)
+    if session.get("admin_name") == row["name"] and session.get("admin_logged_in"):
+        flash("You cannot delete your own account.", "warning")
+    else:
+        cur_total = query("SELECT COUNT(*) c FROM admins")[0]["c"]
+        if cur_total <= 1:
+            flash("Cannot delete the last remaining admin.", "warning")
+        else:
+            execute("DELETE FROM admins WHERE id=?", (admin_id,))
+            flash("Admin removed.", "info")
+    return redirect(url_for("admin_admins"))
+
+
+@app.route("/admin/content", methods=["GET", "POST"])
+@admin_required
+def admin_content():
+    import json as _json
+    if request.method == "POST":
+        section = request.form.get("section")
+        if section == "announcement":
+            title = request.form.get("title", "").strip()
+            content = request.form.get("content", "").strip()
+            if content:
+                execute("INSERT INTO announcements (title, content, date_from, date_to) VALUES (?,?,?,?)",
+                        (title or None, content, None, None))
+                flash("Announcement added.", "success")
+        elif section == "carousel":
+            title = request.form.get("title", "").strip()
+            image_url = request.form.get("image_url", "").strip()
+            if image_url:
+                execute("INSERT INTO carousel_images (title, image_url, date_from, date_to) VALUES (?,?,?,?)",
+                        (title or None, image_url, None, None))
+                flash("Carousel slide added.", "success")
+        elif section == "notification":
+            title = request.form.get("title", "").strip()
+            description = request.form.get("description", "").strip()
+            image_url = request.form.get("image_url", "").strip()
+            if title:
+                execute("INSERT INTO notifications (title, description, image_url) VALUES (?,?,?)",
+                        (title, description or None, image_url or None))
+                flash("Notification added.", "success")
+        elif section == "delete":
+            table = request.form.get("table", "")
+            cid = request.form.get("id", type=int)
+            if table in ("announcements", "carousel_images", "notifications") and cid:
+                execute(f"DELETE FROM {table} WHERE id=?", (cid,))
+                flash("Item removed.", "info")
+        return redirect(url_for("admin_content"))
+    return render_template(
+        "admin/admin_content.html",
+        announcements=query("SELECT * FROM announcements ORDER BY id DESC"),
+        carousel=query("SELECT * FROM carousel_images ORDER BY id DESC"),
+        notifications=query("SELECT * FROM notifications ORDER BY id DESC"),
+    )
 
 
 @app.route("/admin/lookups", methods=["GET", "POST"])
@@ -995,15 +1423,35 @@ def admin_lookups():
                 flash("City '" + name + "' added.", "success")
         elif action == "specialty":
             name = request.form.get("name", "").strip()
+            urdu = request.form.get("urdu_name", "").strip()
+            icon = request.form.get("icon", "").strip()
             if not name:
                 flash("Specialty name is required.", "warning")
             elif query("SELECT id FROM specialties WHERE name=?", (name,), one=True):
                 flash("Specialty already exists.", "warning")
             else:
-                execute("INSERT INTO specialties (name) VALUES (?)", (name,))
+                execute("INSERT INTO specialties (name, urdu_name, icon) VALUES (?,?,?)", (name, urdu or None, icon or None))
                 if name not in SPECIALTIES:
                     SPECIALTIES.append(name)
                 flash("Specialty '" + name + "' added.", "success")
+        elif action == "city_delete":
+            cid = request.form.get("id", type=int)
+            if cid:
+                cnt = query("SELECT COUNT(*) c FROM doctors WHERE city_id=?", (cid,), one=True)["c"]
+                if cnt:
+                    flash(f"Cannot delete: {cnt} doctor(s) use this city.", "warning")
+                else:
+                    execute("DELETE FROM cities WHERE id=?", (cid,))
+                    flash("City removed.", "info")
+        elif action == "specialty_delete":
+            sid = request.form.get("id", type=int)
+            if sid:
+                cnt = query("SELECT COUNT(*) c FROM doctors WHERE specialty_id=?", (sid,), one=True)["c"]
+                if cnt:
+                    flash(f"Cannot delete: {cnt} doctor(s) use this specialty.", "warning")
+                else:
+                    execute("DELETE FROM specialties WHERE id=?", (sid,))
+                    flash("Specialty removed.", "info")
         return redirect(url_for("admin_lookups"))
     return render_template(
         "admin/admin_lookups.html",

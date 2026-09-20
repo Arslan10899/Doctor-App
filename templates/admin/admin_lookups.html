@@ -8,7 +8,7 @@
         <form method="post">
             <input type="hidden" name="action" value="city">
             <label class="flabel">City Name</label>
-            <input type="text" name="name" placeholder="e.g. Sialkot" required>
+            <input type="text" name="name" placeholder="e.g. Paharpur, D.I.Khan" required>
             <button class="btn btn-primary" type="submit">Add City</button>
         </form>
     </div>
@@ -16,8 +16,12 @@
         <h2>Add Specialty</h2>
         <form method="post">
             <input type="hidden" name="action" value="specialty">
-            <label class="flabel">Specialty Name</label>
-            <input type="text" name="name" placeholder="e.g. Homeopath" required>
+            <label class="flabel">Specialty Name (English) *</label>
+            <input type="text" name="name" placeholder="e.g. General Surgeon" required>
+            <label class="flabel">Urdu Name</label>
+            <input type="text" name="urdu_name" placeholder="e.g. کئی اقسام کی سرجری" dir="rtl">
+            <label class="flabel">Icon URL (optional)</label>
+            <input type="text" name="icon" placeholder="https://...png">
             <button class="btn btn-primary" type="submit">Add Specialty</button>
         </form>
     </div>
@@ -26,8 +30,18 @@
 <div class="card">
     <h2>Cities ({{ cities|length }})</h2>
     <table class="table">
+        <thead><tr><th>Name</th><th></th></tr></thead>
         {% for c in cities %}
-        <tr><td>{{ c['name'] }}</td></tr>
+        <tr>
+            <td>{{ c['name'] }}</td>
+            <td>
+                <form class="inline" method="post" onsubmit="return confirm('Delete city {{ c['name'] }}?')">
+                    <input type="hidden" name="action" value="city_delete">
+                    <input type="hidden" name="id" value="{{ c['id'] }}">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
         {% endfor %}
     </table>
 </div>
@@ -35,8 +49,20 @@
 <div class="card">
     <h2>Specialties ({{ specialties|length }})</h2>
     <table class="table">
+        <thead><tr><th>Name</th><th>Urdu Name</th><th>Icon</th><th></th></tr></thead>
         {% for s in specialties %}
-        <tr><td>{{ s['name'] }}</td></tr>
+        <tr>
+            <td>{{ s['name'] }}</td>
+            <td>{{ s['urdu_name'] or '—' }}</td>
+            <td>{% if s['icon'] %}<img src="{{ s['icon'] }}" style="width:26px;height:26px;object-fit:contain;">{% else %}—{% endif %}</td>
+            <td>
+                <form class="inline" method="post" onsubmit="return confirm('Delete specialty {{ s['name'] }}?')">
+                    <input type="hidden" name="action" value="specialty_delete">
+                    <input type="hidden" name="id" value="{{ s['id'] }}">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
         {% endfor %}
     </table>
 </div>

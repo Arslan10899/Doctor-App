@@ -11,22 +11,26 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Name</th><th>Specialty</th><th>City</th><th>Hospital / Clinic</th>
+                <th>Name</th><th>Specialty</th><th>City</th><th>Contact</th>
                 <th>Fee</th><th>Experience</th><th>Rating</th><th>Status</th><th></th>
             </tr>
         </thead>
         <tbody>
             {% for d in doctors %}
             <tr>
-                <td>{{ d['name'] }}</td>
+                <td>{{ d['name'] }}{% if d['urdu_name'] %}<br><small style="color:#6b7280;">{{ d['urdu_name'] }}</small>{% endif %}</td>
                 <td>{{ d['specialty_name'] }}</td>
                 <td>{{ d['city_name'] }}</td>
-                <td>{{ d['hospital_name'] or '—' }}</td>
-                <td>Rs. {{ '{:,}'.format(d['fee']) }}</td>
-                <td>{{ d['experience'] }} yrs</td>
+                <td>
+                    {% if d['phone'] %}<div style="font-size:12px;">{{ d['phone'] }}</div>{% endif %}
+                    {% if d['whatsapp_number'] %}<div style="font-size:12px;color:#059669;">WhatsApp</div>{% endif %}
+                </td>
+                <td>{{ 'Rs. %s'|format('{:,}'.format(d['fee'])) }}</td>
+                <td>{{ d['experience_text'] or (d['experience']|string + ' yrs') }}</td>
                 <td>{{ d['rating'] }}</td>
                 <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
                 <td>
+                    <a class="btn btn-outline btn-sm" href="{{ url_for('admin_doctor_edit', doctor_id=d['id']) }}">Edit</a>
                     <form class="inline" method="post" action="{{ url_for('admin_doctor_delete', doctor_id=d['id']) }}" onsubmit="return confirm('Delete {{ d['name'] }}?')">
                         <button class="btn btn-danger btn-sm" type="submit">Delete</button>
                     </form>

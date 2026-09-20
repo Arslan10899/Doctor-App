@@ -12,13 +12,13 @@
         <div class="frow">
             <div>
                 <label class="flabel">Name *</label>
-                <input type="text" name="name" placeholder="e.g. City Care Clinic" required>
+                <input type="text" name="name" placeholder="e.g. D.H.Q. Civil Hospital" required>
             </div>
             <div>
                 <label class="flabel">City *</label>
                 <select name="city" required>
                     {% for c in cities %}
-                        <option value="{{ c }}">{{ c }}</option>
+                        <option value="{{ c['name'] }}">{{ c['name'] }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -39,6 +39,8 @@
                 </div>
             </div>
         </div>
+        <label class="flabel">OPD Schedules (JSON)</label>
+        <textarea name="ot_schedules" rows="3" placeholder='[{"day": "Monday", "startTime": "08:00 AM", "endTime": "04:00 PM", "opdSpecialty": "General", "doctorName": "Dr. X"}]'></textarea>
         <button class="btn btn-primary" type="submit">Save Hospital / Clinic</button>
     </form>
 </div>
@@ -48,17 +50,18 @@
     {% if hospitals %}
     <table class="table">
         <thead>
-            <tr><th>Name</th><th>City</th><th>Address</th><th>Phone</th><th>Rating</th><th></th></tr>
+            <tr><th>Name</th><th>City</th><th>Phone</th><th>Rating</th><th>OPD Schedules</th><th></th></tr>
         </thead>
         <tbody>
             {% for h in hospitals %}
             <tr>
                 <td>{{ h['name'] }}</td>
                 <td>{{ h['city_name'] }}</td>
-                <td>{{ h['address'] or '—' }}</td>
                 <td>{{ h['phone'] or '—' }}</td>
                 <td>{{ h['rating'] }}</td>
+                <td>{% if h['ot_schedules'] %}Yes{% else %}—{% endif %}</td>
                 <td>
+                    <a class="btn btn-sm" href="{{ url_for('admin_hospital_edit', hospital_id=h['id']) }}" style="background:#eef2f6;color:#0c3444;">Edit</a>
                     <form class="inline" method="post" action="{{ url_for('admin_hospital_delete', hospital_id=h['id']) }}" onsubmit="return confirm('Delete {{ h['name'] }}?')">
                         <button class="btn btn-danger btn-sm" type="submit">Delete</button>
                     </form>

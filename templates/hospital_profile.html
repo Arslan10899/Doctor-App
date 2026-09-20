@@ -31,14 +31,42 @@
             <div class="qual-list">
                 <div class="qual-item">
                     <span class="q-icon">&#9998;</span>
-                    <span>{{ hospital['address'] }}</span>
+                    <span>{{ hospital['address'] or 'Not provided' }}</span>
                 </div>
                 <div class="qual-item">
                     <span class="q-icon">&#9742;</span>
-                    <span>{{ hospital['phone'] }}</span>
+                    <span>{{ hospital['phone'] or 'Not provided' }}</span>
                 </div>
             </div>
         </div>
+
+        {% if hospital_ot %}
+        <div class="about-section">
+            <h3>OPD Schedule</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+                <thead>
+                    <tr style="color:#6b7280;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.03em;">
+                        <th style="padding:6px 8px;">Day</th>
+                        <th style="padding:6px 8px;">Time</th>
+                        <th style="padding:6px 8px;">Specialty</th>
+                        <th style="padding:6px 8px;">Doctor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in hospital_ot %}
+                    <tr style="border-top:1px solid #eef1f4;">
+                        <td style="padding:7px 8px;font-weight:600;">{{ entry.get('day') or '—' }}</td>
+                        <td style="padding:7px 8px;">{{ entry.get('startTime') or '' }}{% if entry.get('endTime') %} - {{ entry.get('endTime') }}{% endif %}</td>
+                        <td style="padding:7px 8px;">{{ entry.get('opdSpecialty') or '—' }}</td>
+                        <td style="padding:7px 8px;">{{ entry.get('doctorName') or '—' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" style="padding:10px;color:#6b7280;">No OPD schedule listed yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
 
     <h2 style="font-size:22px;margin-bottom:16px;">Doctors at {{ hospital['name'] }}</h2>

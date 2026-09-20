@@ -1,19 +1,22 @@
 {% extends "admin/admin_base.html" %}
-{% block pagetitle %}Add Doctor{% endblock %}
-{% block title %}Add Doctor{% endblock %}
+{% block pagetitle %}{{ 'Edit Doctor' if edit_mode else 'Add Doctor' }}{% endblock %}
+{% block title %}{{ 'Edit Doctor' if edit_mode else 'Add Doctor' }}{% endblock %}
 {% block content %}
 <div class="card">
-    <h2>Add New Doctor</h2>
+    <h2>{{ 'Edit Doctor' if edit_mode else 'Add New Doctor' }}</h2>
     <form method="post">
         <label class="flabel">Doctor Name *</label>
-        <input type="text" name="name" placeholder="e.g. Dr. Hassan Ali" required>
+        <input type="text" name="name" value="{{ edoc['name'] if edoc else '' }}" placeholder="e.g. Dr. Hassan Ali" required>
+
+        <label class="flabel">Urdu Name</label>
+        <input type="text" name="urdu_name" value="{{ edoc['urdu_name'] if edoc and edoc['urdu_name'] else '' }}" placeholder="e.g. ڈاکٹر حسن علی" dir="rtl">
 
         <div class="frow">
             <div>
                 <label class="flabel">Specialty *</label>
                 <select name="specialty" required>
                     {% for sp in specialties %}
-                        <option value="{{ sp['name'] }}">{{ sp['name'] }}</option>
+                        <option value="{{ sp['name'] }}" {% if edoc and edoc['specialty_name'] == sp['name'] %}selected{% endif %}>{{ sp['name'] }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -21,59 +24,174 @@
                 <label class="flabel">City *</label>
                 <select name="city" required>
                     {% for c in cities %}
-                        <option value="{{ c }}">{{ c }}</option>
+                        <option value="{{ c['name'] }}" {% if edoc and edoc['city_name'] == c['name'] %}selected{% endif %}>{{ c['name'] }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
 
-        <label class="flabel">Hospital / Clinic</label>
-        <input type="text" name="hospital" list="hospList" placeholder="Select or type a new hospital / clinic">
-        <datalist id="hospList">
-            {% for h in hospitals %}
-                <option value="{{ h['name'] }}"></option>
-            {% endfor %}
-        </datalist>
+        <div class="frow">
+            <div>
+                <label class="flabel">Gender</label>
+                <select name="gender">
+                    {% for g in ['Male', 'Female', 'Other'] %}
+                        <option value="{{ g }}" {% if edoc and edoc['gender'] == g %}selected{% endif %}>{{ g }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="flabel">Hospital / Clinic (optional)</label>
+                <input type="text" name="hospital" list="hospList" value="{{ edoc['hospital_name'] if edoc and edoc['hospital_name'] else '' }}" placeholder="Select or type a new hospital / clinic">
+                <datalist id="hospList">
+                    {% for h in hospitals %}
+                        <option value="{{ h['name'] }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+        </div>
 
-        <div class="frow3">
+        <div class="frow">
+            <div>
+                <label class="flabel">Phone</label>
+                <input type="text" name="phone" value="{{ edoc['phone'] if edoc and edoc['phone'] else '' }}" placeholder="e.g. +923001234567">
+            </div>
+            <div>
+                <label class="flabel">WhatsApp Number</label>
+                <input type="text" name="whatsapp" value="{{ edoc['whatsapp_number'] if edoc and edoc['whatsapp_number'] else '' }}" placeholder="e.g. +923001234567">
+            </div>
+        </div>
+
+        <label class="flabel">Qualifications (full text)</label>
+        <input type="text" name="qualification" value="{{ edoc['qualification'] if edoc and edoc['qualification'] else '' }}" placeholder="e.g. M.B.B.S., F.C.P.S., General Surgery">
+
+        <div class="frow">
             <div>
                 <label class="flabel">Fee (Rs.)</label>
-                <input type="number" name="fee" min="0" step="50" value="1500" placeholder="1500">
+                <input type="number" name="fee" min="0" step="50" value="{{ edoc['fee'] if edoc else 1500 }}" placeholder="1500">
             </div>
             <div>
                 <label class="flabel">Experience (years)</label>
-                <input type="number" name="experience" min="0" value="5">
-            </div>
-            <div>
-                <label class="flabel">Rating (0-5)</label>
-                <input type="number" name="rating" min="0" max="5" step="0.1" value="4.5">
+                <input type="number" name="experience" min="0" value="{{ edoc['experience'] if edoc else 5 }}">
             </div>
         </div>
 
         <div class="frow">
             <div>
-                <label class="flabel">Qualifications</label>
-                <input type="text" name="mbbs" placeholder="e.g. MBBS, FCPS">
+                <label class="flabel">Rating (0-5)</label>
+                <input type="number" name="rating" min="0" max="5" step="0.1" value="{{ edoc['rating'] if edoc else 4.5 }}">
+            </div>
+            <div>
+                <label class="flabel">Reviews Count</label>
+                <input type="number" name="reviews" min="0" value="{{ edoc['reviews'] if edoc else 0 }}">
+            </div>
+        </div>
+
+        <div class="frow">
+            <div>
+                <label class="flabel">Diseases Treated</label>
+                <input type="text" name="diseases" value="{{ edoc['diseases'] if edoc and edoc['diseases'] else '' }}" placeholder="e.g. Fever, Headache, Hypertension">
+            </div>
+            <div>
+                <label class="flabel">Sehat Card Empaneled</label>
+                <input type="text" name="sehat_card" value="{{ edoc['sehat_card'] if edoc and edoc['sehat_card'] else '' }}" placeholder="e.g. Yes / No">
+            </div>
+        </div>
+
+        <label class="flabel">Doctor Message (appears on profile)</label>
+        <textarea name="doctor_message" rows="2" placeholder="e.g. Clinic visit se pehle confirm kar lein">{{ edoc['doctor_message'] if edoc and edoc['doctor_message'] else '' }}</textarea>
+
+        <div class="frow">
+            <div>
+                <label class="flabel">MBBS</label>
+                <input type="text" name="mbbs" value="{{ edoc['mbbs'] if edoc and edoc['mbbs'] else 'MBBS' }}" placeholder="MBBS">
             </div>
             <div>
                 <label class="flabel">Fellowship</label>
-                <input type="text" name="fellowship" placeholder="e.g. FCPS Dermatology">
+                <input type="text" name="fellowship" value="{{ edoc['fellowship'] if edoc and edoc['fellowship'] else '' }}" placeholder="e.g. FCPS Dermatology">
             </div>
         </div>
 
-        <div class="frow">
-            <div>
-                <label class="flabel">Reviews Count</label>
-                <input type="number" name="reviews" min="0" value="0">
-            </div>
-            <div class="check-inline">
-                <input type="checkbox" name="online" value="1" id="online">
-                <label for="online" class="flabel" style="margin:0;">Available for Online Consultation</label>
-            </div>
+        <div class="check-inline">
+            <input type="checkbox" name="online" value="1" id="online" {% if edoc and edoc['online'] %}checked{% endif %}>
+            <label for="online" class="flabel" style="margin:0;">Available for WhatsApp / Online Consultation</label>
         </div>
 
-        <button class="btn btn-primary" type="submit">Save Doctor</button>
-        <a class="btn btn-outline" href="{{ url_for('admin_doctors_list') }}">Cancel</a>
+        <h2 style="font-size:15px;margin:18px 0 10px;">Clinics &amp; Timings</h2>
+        <p style="font-size:12.5px;color:#6b7280;margin-bottom:10px;">
+            Timings ka format: <code>{"Monday - پیر ": {"open": "2:00 PM", "close": "8:00 PM", "isClosed": false}}</code> (valid JSON).
+        </p>
+        <div id="clinicRows">
+            {% if edit_mode and clinics %}
+                {% for cl in clinics %}
+                <div class="clinic-row" style="background:#f7fafb;border:1px solid #e2e8ee;border-radius:10px;padding:12px;margin-bottom:10px;">
+                    <div class="frow">
+                        <div>
+                            <label class="flabel">Clinic Name</label>
+                            <input type="text" name="clinic_name" value="{{ cl['clinic_name'] or '' }}">
+                        </div>
+                        <div>
+                            <label class="flabel">Address</label>
+                            <input type="text" name="clinic_address" value="{{ cl['address'] or '' }}">
+                        </div>
+                    </div>
+                    <label class="flabel">Timings (JSON)</label>
+                    <textarea name="clinic_timings" rows="2" class="clinic-timings">{{ cl['timings'] or '' }}</textarea>
+                    <button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="clinic-row" style="background:#f7fafb;border:1px solid #e2e8ee;border-radius:10px;padding:12px;margin-bottom:10px;">
+                    <div class="frow">
+                        <div>
+                            <label class="flabel">Clinic Name</label>
+                            <input type="text" name="clinic_name">
+                        </div>
+                        <div>
+                            <label class="flabel">Address</label>
+                            <input type="text" name="clinic_address">
+                        </div>
+                    </div>
+                    <label class="flabel">Timings (JSON)</label>
+                    <textarea name="clinic_timings" rows="2" class="clinic-timings"></textarea>
+                    <button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>
+                </div>
+            {% endif %}
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" id="addClinic">+ Add Another Clinic</button>
+
+        <div style="margin-top:24px;">
+            <button class="btn btn-primary" type="submit">{{ 'Save Changes' if edit_mode else 'Save Doctor' }}</button>
+            <a class="btn btn-outline" href="{{ url_for('admin_doctors_list') }}">Cancel</a>
+        </div>
     </form>
 </div>
+
+<script>
+    function clinicRow(name, addr, timings) {
+        var d = document.createElement('div');
+        d.className = 'clinic-row';
+        d.style.background = '#f7fafb';
+        d.style.border = '1px solid #e2e8ee';
+        d.style.borderRadius = '10px';
+        d.style.padding = '12px';
+        d.style.marginBottom = '10px';
+        d.innerHTML =
+            '<div class="frow">' +
+                '<div><label class="flabel">Clinic Name</label><input type="text" name="clinic_name" value="' + (name || '') + '"></div>' +
+                '<div><label class="flabel">Address</label><input type="text" name="clinic_address" value="' + (addr || '') + '"></div>' +
+            '</div>' +
+            '<label class="flabel">Timings (JSON)</label>' +
+            '<textarea name="clinic_timings" rows="2" class="clinic-timings">' + (timings || '') + '</textarea>' +
+            '<button type="button" class="btn btn-danger btn-sm remove-clinic">Remove Clinic</button>';
+        return d;
+    }
+    document.getElementById('addClinic').addEventListener('click', function () {
+        document.getElementById('clinicRows').appendChild(clinicRow('', '', ''));
+    });
+    document.getElementById('clinicRows').addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-clinic')) {
+            e.target.closest('.clinic-row').remove();
+        }
+    });
+</script>
 {% endblock %}

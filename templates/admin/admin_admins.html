@@ -1,0 +1,51 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Admins{% endblock %}
+{% block title %}Admin Accounts{% endblock %}
+{% block content %}
+<div class="card" id="addForm">
+    <h2>Add Admin</h2>
+    <form method="post">
+        <div class="frow">
+            <div>
+                <label class="flabel">Username *</label>
+                <input type="text" name="username" placeholder="e.g. azaz" required>
+            </div>
+            <div>
+                <label class="flabel">Password *</label>
+                <input type="text" name="password" placeholder="e.g. 12345678" required>
+            </div>
+        </div>
+        <div class="frow">
+            <div>
+                <label class="flabel">Full Name</label>
+                <input type="text" name="name" placeholder="e.g. Muhammad Aazaz ul haq">
+            </div>
+            <div>
+                <label class="flabel">Email</label>
+                <input type="email" name="email" placeholder="e.g. azaz@gmail.com">
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Add Admin</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>All Admins ({{ admins|length }})</h2>
+    <table class="table">
+        <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Email</th><th></th></tr></thead>
+        {% for a in admins %}
+        <tr>
+            <td>{{ a['id'] }}</td>
+            <td>{{ a['username'] }}</td>
+            <td>{{ a['name'] or '—' }}</td>
+            <td>{{ a['email'] or '—' }}</td>
+            <td>
+                <form class="inline" method="post" action="{{ url_for('admin_admin_delete', admin_id=a['id']) }}" onsubmit="return confirm('Delete admin {{ a['username'] }}?')">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
