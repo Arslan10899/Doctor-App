@@ -801,12 +801,12 @@ input, select, textarea { font-family: inherit; }
 .doctor-spec { color: var(--primary); font-weight: 600; font-size: 14px; margin: 2px 0 4px; }
 .doctor-loc { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-muted); }
 .doctor-online {
-    display: inline-flex; align-items: center; gap: 5px;
+    position: absolute;
+    top: 14px; right: 14px;
+    display: inline-flex; align-items: center; gap: 4px;
     background: #ecfdf5; color: #059669;
-    font-size: 11px; font-weight: 700;
-    padding: 2px 8px; border-radius: 999px;
-    vertical-align: middle;
-    margin-left: 6px;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
 }
 .doctor-card-body { padding: 16px 22px; flex: 1; }
 .doctor-meta { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; }
