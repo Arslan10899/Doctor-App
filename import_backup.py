@@ -6,7 +6,21 @@ import sqlite3
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
-BACKUP_PATH = os.path.join(os.path.dirname(BASE_DIR), "Aazaz", "firestore_backup.json")
+INI_PATH = "/tmp/does_not_exist"
+
+def find_backup():
+    candidates = [
+        os.path.join(BASE_DIR, "firestore_backup.json"),          # same folder as script
+        os.path.join(os.path.dirname(BASE_DIR), "Aazaz", "firestore_backup.json"),  # original local path
+        os.path.expanduser("~/firestore_backup.json"),
+        "/home/DoctorApp/firestore_backup.json",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return None
+
+BACKUP_PATH = find_backup()
 
 MALE_IMAGES = ["m1", "m2", "m3", "m4", "m5", "m6", "m11", "m12", "m13", "m14"]
 FEMALE_IMAGES = ["f1", "f2", "f3", "f4", "f5", "f7", "f8", "f9", "f10", "f11", "f12"]
@@ -71,8 +85,14 @@ def assign_image(db, cur, doctor_id, first_name, gender):
 
 
 def import_backup():
-    if not os.path.exists(BACKUP_PATH):
-        raise SystemExit(f"Backup file not found: {BACKUP_PATH}")
+    if not BACKUP_PATH:
+        print("Backup file not found. Looked for firestore_backup.json in:")
+        print("  - " + os.path.join(BASE_DIR, "firestore_backup.json"))
+        print("  - " + os.path.dirname(BASE_DIR) + "/Aazaz/firestore_backup.json")
+        print("  - " + os.path.expanduser("~/firestore_backup.json"))
+        print("  - /home/DoctorApp/firestore_backup.json")
+        print("Upload firestore_backup.json next to import_backup.py (i.e. in the project folder), then re-run this script.")
+        raise SystemExit(1)
 
     with open(BACKUP_PATH, encoding="utf-8") as fh:
         data = json.load(fh)
