@@ -32,9 +32,12 @@
     <table class="table">
         <thead><tr><th>Name</th><th></th></tr></thead>
         {% for c in cities %}
-        <tr>
-            <td>{{ c['name'] }}</td>
+        <tr id="city-{{ c['id'] }}">
+            <td id="city-name-{{ c['id'] }}">{{ c['name'] }}</td>
             <td>
+                <button class="btn btn-sm" id="city-edit-btn-{{ c['id'] }}" type="button" onclick="startCityEdit({{ c['id'] }})">Edit</button>
+                <button class="btn btn-sm" id="city-save-btn-{{ c['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveCity({{ c['id'] }})">Save</button>
+                <button class="btn btn-sm" id="city-cancel-btn-{{ c['id'] }}" type="button" style="display:none;" onclick="cancelCityEdit({{ c['id'] }})">Cancel</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete city {{ c['name'] }}?')">
                     <input type="hidden" name="action" value="city_delete">
                     <input type="hidden" name="id" value="{{ c['id'] }}">
@@ -51,11 +54,14 @@
     <table class="table">
         <thead><tr><th>Name</th><th>Urdu Name</th><th>Icon</th><th></th></tr></thead>
         {% for s in specialties %}
-        <tr>
-            <td>{{ s['name'] }}</td>
-            <td>{{ s['urdu_name'] or '—' }}</td>
-            <td>{% if s['icon'] %}<img src="{{ s['icon'] }}" style="width:26px;height:26px;object-fit:contain;">{% else %}—{% endif %}</td>
+        <tr id="spec-{{ s['id'] }}">
+            <td id="spec-name-{{ s['id'] }}">{{ s['name'] }}</td>
+            <td id="spec-urdu-{{ s['id'] }}">{{ s['urdu_name'] or '—' }}</td>
+            <td id="spec-icon-{{ s['id'] }}">{% if s['icon'] %}<img src="{{ s['icon'] }}" style="width:26px;height:26px;object-fit:contain;">{% else %}—{% endif %}</td>
             <td>
+                <button class="btn btn-sm" id="spec-edit-btn-{{ s['id'] }}" type="button" onclick="startSpecEdit({{ s['id'] }})">Edit</button>
+                <button class="btn btn-sm" id="spec-save-btn-{{ s['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveSpec({{ s['id'] }})">Save</button>
+                <button class="btn btn-sm" id="spec-cancel-btn-{{ s['id'] }}" type="button" style="display:none;" onclick="cancelSpecEdit({{ s['id'] }})">Cancel</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete specialty {{ s['name'] }}?')">
                     <input type="hidden" name="action" value="specialty_delete">
                     <input type="hidden" name="id" value="{{ s['id'] }}">
@@ -66,4 +72,86 @@
         {% endfor %}
     </table>
 </div>
+
+<script>
+function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function cellText(el) { return (el.innerText || '').trim(); }
+
+function startCityEdit(id) {
+    var nameCell = document.getElementById('city-name-' + id);
+    var cur = cellText(nameCell);
+    nameCell.innerHTML = '<input type="text" id="city-input-' + id + '" class="edit-name" value="' + esc(cur) + '">';
+    document.getElementById('city-edit-btn-' + id).style.display = 'none';
+    document.getElementById('city-save-btn-' + id).style.display = 'inline-flex';
+    document.getElementById('city-cancel-btn-' + id).style.display = 'inline-flex';
+    document.getElementById('city-input-' + id).focus();
+}
+function cancelCityEdit(id) {
+    document.getElementById('city-name-' + id).innerHTML = document.getElementById('city-name-' + id).getAttribute('data-orig') || '';
+    finishCityButtons(id);
+}
+function finishCityButtons(id) {
+    document.getElementById('city-edit-btn-' + id).style.display = 'inline-flex';
+    document.getElementById('city-save-btn-' + id).style.display = 'none';
+    document.getElementById('city-cancel-btn-' + id).style.display = 'none';
+}
+function saveCity(id) {
+    var name = document.getElementById('city-input-' + id).value.trim();
+    if (!name) { alert('City name is required.'); return; }
+    submitEdit('city_edit', id, name, '', '');
+}
+
+function startSpecEdit(id) {
+    var nameCell = document.getElementById('spec-name-' + id);
+    var urduCell = document.getElementById('spec-urdu-' + id);
+    var iconCell = document.getElementById('spec-icon-' + id);
+    var curName = cellText(nameCell);
+    var curUrdu = cellText(urduCell) === '\u2014' ? '' : cellText(urduCell);
+    var curIcon = iconCell.querySelector('img') ? iconCell.querySelector('img').src : '';
+    nameCell.innerHTML = '<input type="text" id="spec-input-name-' + id + '" value="' + esc(curName) + '">';
+    urduCell.innerHTML = '<input type="text" id="spec-input-urdu-' + id + '" dir="rtl" placeholder="Urdu name" value="' + esc(curUrdu) + '">';
+    iconCell.innerHTML = '<input type="text" id="spec-input-icon-' + id + '" placeholder="Icon URL" value="' + esc(curIcon) + '">';
+    document.getElementById('spec-edit-btn-' + id).style.display = 'none';
+    document.getElementById('spec-save-btn-' + id).style.display = 'inline-flex';
+    document.getElementById('spec-cancel-btn-' + id).style.display = 'inline-flex';
+}
+function cancelSpecEdit(id) {
+    var nameCell = document.getElementById('spec-name-' + id);
+    var urduCell = document.getElementById('spec-urdu-' + id);
+    nameCell.innerHTML = nameCell.getAttribute('data-orig') || nameCell.innerHTML;
+    urduCell.innerHTML = urduCell.getAttribute('data-orig') || urduCell.innerHTML;
+    document.getElementById('spec-edit-btn-' + id).style.display = 'inline-flex';
+    document.getElementById('spec-save-btn-' + id).style.display = 'none';
+    document.getElementById('spec-cancel-btn-' + id).style.display = 'none';
+}
+function saveSpec(id) {
+    var name = document.getElementById('spec-input-name-' + id).value.trim();
+    var urdu = document.getElementById('spec-input-urdu-' + id).value.trim();
+    var icon = document.getElementById('spec-input-icon-' + id).value.trim();
+    if (!name) { alert('Specialty name is required.'); return; }
+    submitEdit('specialty_edit', id, name, urdu, icon);
+}
+
+function submitEdit(action, id, name, urdu, icon) {
+    var f = document.createElement('form');
+    f.method = 'post';
+    f.style.display = 'none';
+    var inputs = [
+        { n: 'action', v: action },
+        { n: 'id', v: id },
+        { n: 'name', v: name },
+        { n: 'urdu_name', v: urdu },
+        { n: 'icon', v: icon },
+    ];
+    for (var i = 0; i < inputs.length; i++) {
+        var inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = inputs[i].n;
+        inp.value = inputs[i].v;
+        f.appendChild(inp);
+    }
+    document.body.appendChild(f);
+    f.submit();
+}
+</script>
 {% endblock %}

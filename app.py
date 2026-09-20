@@ -1487,6 +1487,17 @@ def admin_lookups():
                 if name not in SPECIALTIES:
                     SPECIALTIES.append(name)
                 flash("Specialty '" + name + "' added.", "success")
+        elif action == "city_edit":
+            cid = request.form.get("id", type=int)
+            name = request.form.get("name", "").strip()
+            if cid and name:
+                if query("SELECT id FROM cities WHERE name=? AND id<>?", (name, cid), one=True):
+                    flash("Another city already uses that name.", "warning")
+                else:
+                    execute("UPDATE cities SET name=? WHERE id=?", (name, cid))
+                    flash("City updated.", "success")
+            else:
+                flash("City name is required.", "warning")
         elif action == "city_delete":
             cid = request.form.get("id", type=int)
             if cid:
@@ -1496,6 +1507,19 @@ def admin_lookups():
                 else:
                     execute("DELETE FROM cities WHERE id=?", (cid,))
                     flash("City removed.", "info")
+        elif action == "specialty_edit":
+            sid = request.form.get("id", type=int)
+            name = request.form.get("name", "").strip()
+            urdu = request.form.get("urdu_name", "").strip()
+            icon = request.form.get("icon", "").strip()
+            if not sid or not name:
+                flash("Specialty name is required.", "warning")
+            elif query("SELECT id FROM specialties WHERE name=? AND id<>?", (name, sid), one=True):
+                flash("Another specialty already uses that name.", "warning")
+            else:
+                execute("UPDATE specialties SET name=?, urdu_name=?, icon=? WHERE id=?",
+                        (name, urdu or None, icon or None, sid))
+                flash("Specialty updated.", "success")
         elif action == "specialty_delete":
             sid = request.form.get("id", type=int)
             if sid:
