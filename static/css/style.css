@@ -819,7 +819,9 @@ input, select, textarea { font-family: inherit; }
     font-size: 14px;
     color: var(--primary);
     font-weight: 600;
-    direction: rtl;
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: plaintext;
     margin: 0 0 4px;
     line-height: 1.3;
 }
