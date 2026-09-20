@@ -3,13 +3,34 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="grid-stats">
-    <div class="stat-card"><div class="num">{{ counts.doctors }}</div><div class="lbl">Doctors</div></div>
-    <div class="stat-card"><div class="num">{{ counts.online }}</div><div class="lbl">Online Doctors</div></div>
-    <div class="stat-card"><div class="num">{{ counts.hospitals }}</div><div class="lbl">Hospitals &amp; Clinics</div></div>
-    <div class="stat-card"><div class="num">{{ counts.specialties }}</div><div class="lbl">Specialties</div></div>
-    <div class="stat-card"><div class="num">{{ counts.cities }}</div><div class="lbl">Cities</div></div>
-    <div class="stat-card"><div class="num">{{ counts.patients }}</div><div class="lbl">Patients</div></div>
-    <div class="stat-card"><div class="num">{{ counts.appointments }}</div><div class="lbl">Appointments</div></div>
+    <div class="stat-card sc-teal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div><div class="num">{{ counts.doctors }}</div><div class="lbl">Doctors</div></div>
+    </div>
+    <div class="stat-card sc-green">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+        <div><div class="num">{{ counts.online }}</div><div class="lbl">Online Doctors</div></div>
+    </div>
+    <div class="stat-card sc-indigo">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M8 7h8M8 11h8M8 15h4"/></svg></div>
+        <div><div class="num">{{ counts.hospitals }}</div><div class="lbl">Hospitals &amp; Clinics</div></div>
+    </div>
+    <div class="stat-card sc-purple">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg></div>
+        <div><div class="num">{{ counts.specialties }}</div><div class="lbl">Specialties</div></div>
+    </div>
+    <div class="stat-card sc-orange">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="num">{{ counts.cities }}</div><div class="lbl">Cities</div></div>
+    </div>
+    <div class="stat-card sc-pink">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="num">{{ counts.patients }}</div><div class="lbl">Patients</div></div>
+    </div>
+    <div class="stat-card sc-blue">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div><div class="num">{{ counts.appointments }}</div><div class="lbl">Appointments</div></div>
+    </div>
 </div>
 
 <div class="actions-top">

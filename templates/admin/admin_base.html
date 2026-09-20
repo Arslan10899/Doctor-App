@@ -29,10 +29,20 @@
     .flash-danger { background: #fdeaea; color: #dc2626; }
     .flash-warning { background: #fef4e6; color: #b45309; }
     .flash-info { background: #e7f2f8; color: #2563eb; }
-    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 4px 18px rgba(15, 40, 60, .06); }
-    .stat-card .num { font-size: 26px; font-weight: 800; color: #2a7f8e; }
-    .stat-card .lbl { font-size: 13px; color: #6b7280; margin-top: 2px; }
+    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 26px; }
+    .stat-card { position: relative; border-radius: 16px; padding: 20px; color: #fff; overflow: hidden; box-shadow: 0 8px 22px rgba(15, 40, 60, .14); display: flex; align-items: center; gap: 14px; min-height: 96px; }
+    .stat-card::after { content: ''; position: absolute; right: -22px; top: -22px; width: 88px; height: 88px; border-radius: 50%; background: rgba(255, 255, 255, .14); }
+    .stat-card .ico { width: 46px; height: 46px; flex: none; border-radius: 12px; background: rgba(255, 255, 255, .18); display: flex; align-items: center; justify-content: center; }
+    .stat-card .ico svg { width: 25px; height: 25px; }
+    .stat-card .num { font-size: 27px; font-weight: 800; line-height: 1.1; }
+    .stat-card .lbl { font-size: 12.5px; opacity: .92; font-weight: 600; margin-top: 2px; }
+    .sc-teal { background: linear-gradient(135deg, #0e7490, #2a7f8e); }
+    .sc-green { background: linear-gradient(135deg, #047857, #10b981); }
+    .sc-indigo { background: linear-gradient(135deg, #4338ca, #6366f1); }
+    .sc-purple { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .sc-orange { background: linear-gradient(135deg, #c2410c, #f97316); }
+    .sc-pink { background: linear-gradient(135deg, #be185d, #ec4899); }
+    .sc-blue { background: linear-gradient(135deg, #1d4ed8, #38bdf8); }
     .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 18px rgba(15, 40, 60, .06); margin-bottom: 18px; }
     .card h2 { font-size: 17px; margin-bottom: 14px; }
     .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; }
