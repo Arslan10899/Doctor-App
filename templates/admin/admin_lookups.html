@@ -21,7 +21,12 @@
             <label class="flabel">Urdu Name</label>
             <input type="text" name="urdu_name" placeholder="e.g. کئی اقسام کی سرجری" dir="rtl">
             <label class="flabel">Icon URL (optional)</label>
-            <input type="text" name="icon" placeholder="https://...png">
+            <input type="text" name="icon" id="add-spec-icon" placeholder="https://...png">
+            <div style="display:flex;gap:6px;align-items:center;margin:4px 0;">
+                <button class="btn btn-sm" type="button" id="add-spec-browse-btn">Browse &amp; Upload</button>
+                <input type="file" id="add-spec-browse-file" accept="image/*" style="display:none;">
+                <span id="add-spec-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+            </div>
             <button class="btn btn-primary" type="submit">Add Specialty</button>
         </form>
     </div>
@@ -121,32 +126,35 @@ function startSpecEdit(id) {
     document.getElementById('spec-save-btn-' + id).style.display = 'inline-flex';
     document.getElementById('spec-cancel-btn-' + id).style.display = 'inline-flex';
 }
-function uploadSpecIcon(id) {
-    var file = document.getElementById('spec-browse-file-' + id);
-    var iconInput = document.getElementById('spec-input-icon-' + id);
-    var status = document.getElementById('spec-upload-status-' + id);
-    if (!file.files.length) { return; }
+function uploadIconToInput(fileInput, urlInput, statusEl) {
+    if (!fileInput.files.length) { return; }
     var fd = new FormData();
-    fd.append('file', file.files[0]);
-    if (status) status.textContent = 'Uploading...';
+    fd.append('file', fileInput.files[0]);
+    if (statusEl) statusEl.textContent = 'Uploading...';
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/admin/upload');
     xhr.onload = function() {
         if (xhr.status === 200) {
             var res = JSON.parse(xhr.responseText);
             if (res.ok) {
-                iconInput.value = res.url;
-                iconInput.removeAttribute('required');
-                if (status) status.textContent = 'Uploaded.';
+                urlInput.value = res.url;
+                if (statusEl) statusEl.textContent = 'Uploaded.';
             } else {
-                if (status) status.textContent = 'Error: ' + (res.error || 'failed');
+                if (statusEl) statusEl.textContent = 'Error: ' + (res.error || 'failed');
             }
         } else {
-            if (status) status.textContent = 'Upload failed.';
+            if (statusEl) statusEl.textContent = 'Upload failed.';
         }
     };
-    xhr.onerror = function() { if (status) status.textContent = 'Upload failed. Check server.'; };
+    xhr.onerror = function() { if (statusEl) statusEl.textContent = 'Upload failed. Check server.'; };
     xhr.send(fd);
+}
+function uploadSpecIcon(id) {
+    uploadIconToInput(
+        document.getElementById('spec-browse-file-' + id),
+        document.getElementById('spec-input-icon-' + id),
+        document.getElementById('spec-upload-status-' + id)
+    );
 }
 function cancelSpecEdit(id) {
     var nameCell = document.getElementById('spec-name-' + id);
@@ -186,5 +194,16 @@ function submitEdit(action, id, name, urdu, icon) {
     document.body.appendChild(f);
     f.submit();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    var addBtn = document.getElementById('add-spec-browse-btn');
+    var addFile = document.getElementById('add-spec-browse-file');
+    var addIconInput = document.getElementById('add-spec-icon');
+    var addStatus = document.getElementById('add-spec-upload-status');
+    if (addBtn && addFile && addIconInput) {
+        addBtn.addEventListener('click', function() { addFile.click(); });
+        addFile.addEventListener('change', function() { uploadIconToInput(addFile, addIconInput, addStatus); });
+    }
+});
 </script>
 {% endblock %}
