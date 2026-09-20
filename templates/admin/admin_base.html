@@ -10,17 +10,26 @@
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef3f6; color: #2b2f38; }
     a { text-decoration: none; color: inherit; }
     .admin-wrap { display: flex; min-height: 100vh; }
-    .sidebar { width: 232px; background: #12303b; color: #fff; padding: 22px 14px 18px; display: flex; flex-direction: column; gap: 4px; position: fixed; top: 0; bottom: 0; }
-    .sidebar .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 24px; padding: 0 8px; }
-    .sidebar .brand img { width: 42px; height: 42px; }
-    .brand-name { font-size: 17px; font-weight: 800; line-height: 1.2; }
-    .brand-sub { font-size: 11.5px; color: #8fd0cc; font-weight: 600; letter-spacing: .04em; }
-    .side-link { display: block; padding: 11px 14px; border-radius: 9px; font-weight: 600; font-size: 14px; color: #d7e8ec; transition: background .18s; }
+    .sidebar { width: 232px; background: #12303b; color: #fff; padding: 22px 14px 18px; display: flex; flex-direction: column; gap: 4px; position: fixed; top: 0; bottom: 0; transition: width .22s ease; overflow: hidden; z-index: 20; }
+    .sidebar .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 24px; padding: 0 8px; cursor: pointer; user-select: none; }
+    .sidebar .brand img { width: 42px; height: 42px; flex: none; }
+    .brand-name { font-size: 17px; font-weight: 800; line-height: 1.2; white-space: nowrap; }
+    .brand-sub { font-size: 11.5px; color: #8fd0cc; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+    .side-link { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 9px; font-weight: 600; font-size: 14px; color: #d7e8ec; transition: background .18s; white-space: nowrap; }
+    .side-link svg { width: 20px; height: 20px; flex: none; }
     .side-link:hover { background: rgba(255, 255, 255, .1); }
     .side-link.active { background: #1f6572; color: #fff; }
     .side-link.bottom { margin-top: auto; background: rgba(255, 255, 255, .08); }
     .side-link.bottom:hover { background: rgba(255, 255, 255, .16); }
-    .main { flex: 1; margin-left: 232px; padding: 26px 34px 40px; min-width: 0; }
+    .side-link .lbl { transition: opacity .15s ease; }
+    .sidebar.collapsed { width: 74px; padding: 22px 10px 18px; }
+    .sidebar.collapsed .brand-name, .sidebar.collapsed .brand-sub { display: none; }
+    .sidebar.collapsed .side-link { justify-content: center; padding: 12px 0; gap: 0; }
+    .sidebar.collapsed .lbl { display: none; }
+    .main { flex: 1; margin-left: 232px; padding: 26px 34px 40px; min-width: 0; transition: margin-left .22s ease; }
+    .main.side-collapsed { margin-left: 74px; }
+    .toggle-area { text-align: center; margin-bottom: 20px; }
+    .toggle-area button { background: rgba(255,255,255,.08); border: none; color: #8fd0cc; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; }
     .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
     .topbar h1 { font-size: 22px; font-weight: 800; }
     .topbar .who { font-size: 13.5px; color: #6b7280; }
@@ -71,37 +80,69 @@
     .empty { text-align: center; color: #6b7280; padding: 26px; }
     .actions-top { display: flex; gap: 10px; margin-bottom: 16px; }
     @media (max-width: 820px) {
-        .sidebar { width: 62px; padding: 18px 8px; }
+        .sidebar, .sidebar.collapsed { width: 62px; padding: 18px 8px; }
         .sidebar .brand { flex-direction: column; }
-        .brand-name, .brand-sub, .side-link { font-size: 0; }
-        .side-link { padding: 13px; text-align: center; }
-        .main { margin-left: 62px; padding: 18px; }
+        .sidebar .brand-name, .sidebar .brand-sub, .sidebar .lbl { display: none; }
+        .side-link { padding: 13px; justify-content: center; }
+        .main, .main.side-collapsed { margin-left: 62px; padding: 18px; }
         .frow, .frow3 { grid-template-columns: 1fr; }
+        .toggle-area button { display: none; }
     }
 </style>
 </head>
 <body>
 <div class="admin-wrap">
-    <aside class="sidebar">
-        <a class="brand" href="{{ url_for('admin_dashboard') }}">
+    <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#" onclick="toggleSidebar(); return false;" title="Click to collapse / expand">
             <img src="{{ url_for('static', filename='img/app-icon.png') }}" alt="DoctorApp">
             <span>
                 <span class="brand-name">DoctorApp</span><br>
                 <span class="brand-sub">ADMIN PANEL</span>
             </span>
         </a>
-        <a class="side-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a class="side-link {% if request.endpoint == 'admin_doctors_list' %}active{% endif %}" href="{{ url_for('admin_doctors_list') }}">Doctors</a>
-        <a class="side-link {% if request.endpoint == 'admin_doctor_add' %}active{% endif %}" href="{{ url_for('admin_doctor_add') }}">Add Doctor</a>
-        <a class="side-link {% if request.endpoint == 'admin_hospitals' %}active{% endif %}" href="{{ url_for('admin_hospitals') }}">Hospitals &amp; Clinics</a>
-        <a class="side-link {% if request.endpoint == 'admin_lookups' %}active{% endif %}" href="{{ url_for('admin_lookups') }}">Cities &amp; Specialties</a>
-        <a class="side-link {% if request.endpoint == 'admin_content' %}active{% endif %}" href="{{ url_for('admin_content') }}">Content (Carousel/Announcements)</a>
-        <a class="side-link {% if request.endpoint == 'admin_backup' %}active{% endif %}" href="{{ url_for('admin_backup') }}">Backup &amp; Restore</a>
-        <a class="side-link {% if request.endpoint == 'admin_admins' %}active{% endif %}" href="{{ url_for('admin_admins') }}">Admins</a>
-        <a class="side-link bottom" href="{{ url_for('index') }}" target="_blank" rel="noopener">View Website</a>
-        <a class="side-link bottom" href="{{ url_for('admin_logout') }}">Logout</a>
+        <div class="toggle-area"><button type="button" onclick="toggleSidebar()">&#9776; Collapse</button></div>
+        <a class="side-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            <span class="lbl">Dashboard</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_doctors_list' %}active{% endif %}" href="{{ url_for('admin_doctors_list') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span class="lbl">Doctors</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_doctor_add' %}active{% endif %}" href="{{ url_for('admin_doctor_add') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            <span class="lbl">Add Doctor</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_hospitals' %}active{% endif %}" href="{{ url_for('admin_hospitals') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M8 7h8M8 11h8M8 15h4"/></svg>
+            <span class="lbl">Hospitals &amp; Clinics</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_lookups' %}active{% endif %}" href="{{ url_for('admin_lookups') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span class="lbl">Cities &amp; Specialties</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_content' %}active{% endif %}" href="{{ url_for('admin_content') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span class="lbl">Content</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_backup' %}active{% endif %}" href="{{ url_for('admin_backup') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="lbl">Backup &amp; Restore</span>
+        </a>
+        <a class="side-link {% if request.endpoint == 'admin_admins' %}active{% endif %}" href="{{ url_for('admin_admins') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="lbl">Admins</span>
+        </a>
+        <a class="side-link bottom" href="{{ url_for('index') }}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="lbl">View Website</span>
+        </a>
+        <a class="side-link bottom" href="{{ url_for('admin_logout') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span class="lbl">Logout</span>
+        </a>
     </aside>
-    <div class="main">
+    <div class="main" id="main">
         <div class="topbar">
             <h1>{% block title %}{% endblock %}</h1>
             <span class="who">Logged in as <b>{{ session.get('admin_name') }}</b></span>
@@ -114,5 +155,19 @@
         {% block content %}{% endblock %}
     </div>
 </div>
+<script>
+function toggleSidebar() {
+    var sb = document.getElementById('sidebar');
+    var mn = document.getElementById('main');
+    var collapsed = sb.classList.toggle('collapsed');
+    if (mn) mn.classList.toggle('side-collapsed', collapsed);
+    try { localStorage.setItem('adminSidebar', collapsed ? '1' : '0'); } catch (e) {}
+}
+(function() {
+    try {
+        if (localStorage.getItem('adminSidebar') === '1') { toggleSidebar(); }
+    } catch (e) {}
+})();
+</script>
 </body>
 </html>
