@@ -267,10 +267,13 @@ input, select, textarea { font-family: inherit; }
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    box-shadow: 0 10px 24px rgba(31, 101, 114, .35);
+    color: #fff;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    box-shadow: 0 10px 24px rgba(21, 128, 61, .35);
+    border: none;
 }
-.btn-search:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(31, 101, 114, .42); }
+.btn-search svg { fill: #fff; }
+.btn-search:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(21, 128, 61, .42); }
 
 .hero-visual { position: relative; display: flex; justify-content: flex-end; }
 .hero-doctor-card { position: relative; }
