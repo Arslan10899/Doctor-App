@@ -70,6 +70,8 @@
             <td>{{ c['title'] or '—' }}</td>
             <td>{% if c['image_url'] %}<img src="{{ c['image_url'] }}" style="width:60px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
             <td>
+                <button class="btn btn-sm" type="button"
+                        onclick="openCarouselEdit({{ c['id'] }}, {{ c['title']|tojson }}, {{ c['image_url']|tojson }})">Edit</button>
                 <form class="inline" method="post" onsubmit="return confirm('Delete?')">
                     <input type="hidden" name="section" value="delete">
                     <input type="hidden" name="table" value="carousel_images">
@@ -81,6 +83,33 @@
         {% endfor %}
     </table>
 </div>
+
+<!-- Carousel edit modal -->
+<div id="carouselModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
+        <h2 style="font-size:17px;margin-bottom:16px;">Edit Carousel Slide</h2>
+        <form method="post">
+            <input type="hidden" name="section" value="carousel_edit">
+            <input type="hidden" name="id" id="carousel-id">
+            <label class="flabel">Title</label>
+            <input type="text" name="title" id="carousel-title" placeholder="e.g. 22">
+            <label class="flabel">Image URL *</label>
+            <input type="text" name="image_url" id="carousel-image" placeholder="https://...jpg" required>
+            <div style="display:flex;gap:10px;margin-top:6px;">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <button class="btn" type="button" onclick="document.getElementById('carouselModal').style.display='none';">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+function openCarouselEdit(id, title, image) {
+    document.getElementById('carousel-id').value = id;
+    document.getElementById('carousel-title').value = title || '';
+    document.getElementById('carousel-image').value = image || '';
+    document.getElementById('carouselModal').style.display = 'flex';
+}
+</script>
 
 <div class="card">
     <h2>Notifications ({{ notifications|length }})</h2>

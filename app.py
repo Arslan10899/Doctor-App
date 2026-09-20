@@ -1384,6 +1384,16 @@ def admin_content():
                 execute("INSERT INTO carousel_images (title, image_url, date_from, date_to) VALUES (?,?,?,?)",
                         (title or None, image_url, None, None))
                 flash("Carousel slide added.", "success")
+        elif section == "carousel_edit":
+            cid = request.form.get("id", type=int)
+            title = request.form.get("title", "").strip()
+            image_url = request.form.get("image_url", "").strip()
+            if not cid or not image_url:
+                flash("Image URL is required to save a carousel slide.", "warning")
+            else:
+                execute("UPDATE carousel_images SET title=?, image_url=? WHERE id=?",
+                        (title or None, image_url, cid))
+                flash("Carousel slide updated.", "success")
         elif section == "notification":
             title = request.form.get("title", "").strip()
             description = request.form.get("description", "").strip()
