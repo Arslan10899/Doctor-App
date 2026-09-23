@@ -57,18 +57,20 @@
 {% if carousel %}
 <section class="section hero-slider-section" style="padding-top:0;padding-bottom:0;width:100%;">
     <div id="heroSlider" class="hero-slider">
-        <div class="slides-wrap">
-            {% for s in carousel %}
-            <div class="slide">
-                <div class="slide-card">
-                    <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}">
-                    {% if s['title'] %}<div class="slide-caption">{{ s['title'] }}</div>{% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
         <button class="car-nav prev" aria-label="Previous">&#8249;</button>
         <button class="car-nav next" aria-label="Next">&#8250;</button>
+        <div class="slider-viewport">
+            <div class="slides-wrap">
+                {% for s in carousel %}
+                <div class="slide">
+                    <div class="slide-card">
+                        <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}">
+                        {% if s['title'] %}<div class="slide-caption">{{ s['title'] }}</div>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
         <div class="slide-dots"></div>
     </div>
 </section>
