@@ -1419,7 +1419,7 @@ animation: none;
 .hero-slider-section {
     width: 100%;
     background: linear-gradient(180deg, #f6fafc, #eef7f8);
-    padding: 28px 0 34px;
+    padding: 28px 0 52px;
 }
 .hero-slider {
     position: relative;

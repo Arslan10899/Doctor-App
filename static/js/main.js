@@ -127,11 +127,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 go(current >= maxIndex ? 0 : current + 1);
             }, INTERVAL);
         }
+        function start() {
+            if (heroSlider._paused) return;
+            restart();
+        }
+        function stop() {
+            clearInterval(timer);
+            heroSlider._paused = true;
+        }
+        heroSlider.addEventListener("mouseenter", stop);
+        heroSlider.addEventListener("mouseleave", function () {
+            heroSlider._paused = false;
+            restart();
+        });
         buildDots();
         if (prevBtn) prevBtn.addEventListener("click", function () { go(current - 1); restart(); });
         if (nextBtn) nextBtn.addEventListener("click", function () { go(current + 1); restart(); });
         go(0);
-        timer = setInterval(function () { go(current >= maxIndex ? 0 : current + 1); }, INTERVAL);
+        start();
     }
 
     // Appointment type toggle
