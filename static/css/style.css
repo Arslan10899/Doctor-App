@@ -1156,22 +1156,37 @@ animation: none;
 .store-badge-light { background: #fff; color: #0f172a; border: 1px solid #d1d5db; }
 
 /* Colorful store badges */
+.store-badge { min-width: 190px; justify-content: flex-start; }
 .store-google {
-    background: linear-gradient(135deg, #1a73e8, #0f5cb8);
+    background: linear-gradient(135deg, #4285F4, #34A853 35%, #FBBC05 65%, #EA4335);
     color: #fff;
     border: none;
-    box-shadow: 0 8px 22px rgba(26, 115, 232, .35);
+    box-shadow: 0 8px 22px rgba(66, 133, 244, .35);
 }
 .store-google .badge-icon { color: #fff; }
-.store-google:hover { box-shadow: 0 14px 32px rgba(26, 115, 232, .45); }
+.store-google:hover { box-shadow: 0 14px 32px rgba(234, 67, 53, .4); }
 .store-apple {
-    background: linear-gradient(135deg, #ff9500, #ff6b00);
+    background: linear-gradient(135deg, #f94144, #f3722c 25%, #f9c74f 50%, #43aa8b 75%, #577590);
     color: #fff;
     border: none;
-    box-shadow: 0 8px 22px rgba(255, 149, 0, .35);
+    box-shadow: 0 8px 22px rgba(249, 65, 68, .35);
 }
 .store-apple .badge-icon { color: #fff; }
-.store-apple:hover { box-shadow: 0 14px 32px rgba(255, 107, 0, .45); }
+.store-apple:hover { box-shadow: 0 14px 32px rgba(87, 117, 144, .45); }
+
+/* Colorful app icon (footer logo) */
+.footer-logo .logo-icon {
+    background: linear-gradient(135deg, #0d9488, #f59e0b, #ef4444, #3b82f6, #8b5cf6);
+    background-size: 200% 200%;
+    animation: gradshift 6s ease infinite;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(15, 60, 80, .3);
+}
+@keyframes gradshift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
 /* ---------- Contact / misc ---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
