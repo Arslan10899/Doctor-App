@@ -1156,23 +1156,46 @@ animation: none;
 .store-badge-light { background: #fff; color: #0f172a; border: 1px solid #d1d5db; }
 
 /* Colorful store badges */
-.store-badge { min-width: 190px; justify-content: flex-start; }
-.store-google {
-    background: linear-gradient(135deg, #4285F4, #34A853 35%, #FBBC05 65%, #EA4335);
+.store-badges { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.store-pro {
+    min-width: 200px;
+    width: 100%;
+    max-width: 230px;
+    padding: 9px 18px;
+    background: #000;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 10px;
     color: #fff;
-    border: none;
-    box-shadow: 0 8px 22px rgba(66, 133, 244, .35);
+    gap: 14px;
+    justify-content: flex-start;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    cursor: pointer;
 }
-.store-google .badge-icon { color: #fff; }
-.store-google:hover { box-shadow: 0 14px 32px rgba(234, 67, 53, .4); }
-.store-apple {
-    background: linear-gradient(135deg, #f94144, #f3722c 25%, #f9c74f 50%, #43aa8b 75%, #577590);
-    color: #fff;
-    border: none;
-    box-shadow: 0 8px 22px rgba(249, 65, 68, .35);
+.store-pro .badge-icon { width: 30px; height: 30px; }
+.store-pro .badge-text { display: flex; flex-direction: column; line-height: 1.15; }
+.store-pro .badge-text small { font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; opacity: .85; font-weight: 500; }
+.store-pro .badge-text strong { font-size: 17px; font-weight: 700; letter-spacing: .01em; }
+.store-pro .badge-text .coming-soon {
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: #0d9488;
+    background: rgba(13,148,136,.15);
+    border: 1px solid rgba(13,148,136,.5);
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin-top: 4px;
+    width: fit-content;
 }
-.store-apple .badge-icon { color: #fff; }
-.store-apple:hover { box-shadow: 0 14px 32px rgba(87, 117, 144, .45); }
+.store-pro:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.45);
+    border-color: rgba(255,255,255,.5);
+}
+a.store-google:hover { border-color: #4285F4; box-shadow: 0 12px 28px rgba(66,133,244,.4); }
+span.store-apple { cursor: default; }
+span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
 
 /* Colorful app icon (footer logo) */
 .footer-logo .logo-icon {
