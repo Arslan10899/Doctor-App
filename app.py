@@ -477,6 +477,18 @@ def migrate(db):
             image_url TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS booking_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            doctor_name TEXT,
+            doctor_id INTEGER,
+            patient_name TEXT NOT NULL,
+            whatsapp TEXT,
+            mobile TEXT,
+            visit_type TEXT,
+            notes TEXT,
+            status TEXT DEFAULT 'new',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     """)
 
     if not cur.execute("SELECT id FROM cities WHERE name='Dera Ismail Khan'").fetchone():
@@ -675,6 +687,46 @@ def doctors():
         online=online,
         total=len(results),
     )
+
+
+@app.route("/api/doctors-list")
+def api_doctors_list():
+    q = request.args.get("q", "").strip()
+    if q:
+        like = f"%{q}%"
+        docs = query(
+            "SELECT d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name "
+            "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
+            "WHERE d.name LIKE ? ORDER BY d.rating DESC, d.reviews DESC LIMIT 8",
+            (like,),
+        )
+    else:
+        docs = query(
+            "SELECT d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name "
+            "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
+            "ORDER BY d.rating DESC, d.reviews DESC LIMIT 8"
+        )
+    return jsonify([dict(r) for r in docs])
+
+
+@app.route("/booking-request", methods=["POST"])
+def booking_request():
+    doctor_id = request.form.get("doctor_id", "").strip()
+    doctor_name = request.form.get("doctor_name", "").strip()
+    patient_name = request.form.get("patient_name", "").strip()
+    whatsapp = request.form.get("whatsapp", "").strip()
+    mobile = request.form.get("mobile", "").strip()
+    visit_type = request.form.get("visit_type", "").strip()
+    notes = request.form.get("notes", "").strip()
+    if not patient_name or not whatsapp:
+        return jsonify({"ok": False, "error": "Please enter your name and WhatsApp number."}), 400
+    execute(
+        "INSERT INTO booking_requests "
+        "(doctor_id, doctor_name, patient_name, whatsapp, mobile, visit_type, notes) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (doctor_id or None, doctor_name, patient_name, whatsapp, mobile, visit_type, notes),
+    )
+    return jsonify({"ok": True})
 
 
 @app.route("/api/search")
