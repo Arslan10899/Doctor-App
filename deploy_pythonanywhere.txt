@@ -1,19 +1,13 @@
-﻿PythonAnywhere par Doctor-App update (ek-ek command paste karo):
+﻿PythonAnywhere par latest update deploy karne ke liye:
+(Console > Bash mein ek-ek command paste karo)
 
-Step 1: Console > Bash kholna
-Step 2: Doctor-App folder mein jana
+1) Doctor-App folder mein jao:
 cd ~/Doctor-App
 
-Step 3: Latest code pull karna (GitHub se)
+2) GitHub se latest code pull karo:
 git pull origin main
 
-Step 4: Web App > Reload button dabao
-(Web tab > Reload)
+3) Phir Web tab mein jao aur apna web app ke liye "Reload" button dabao
 
-Step 5: Browser hard refresh (cache clear)
-Ctrl + Shift + R (ya F5 hard refresh)
-
-Optional (agar koi issue ho): Requirements update
-pip3 install -r requirements.txt --user
-
-Note: Database (database.db) Git ignore hai, PA par local DB same rahegi.
+4) Browser mein hard refresh karo (cache saaf karne ke liye):
+Ctrl + Shift + R
