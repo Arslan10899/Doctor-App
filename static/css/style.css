@@ -1452,10 +1452,12 @@ input, select, textarea { font-family: inherit; }
 .hero-announce-item::before { content: "?"; color: #0d9488; font-size: 12px; flex: none; }
 
 /* ===== Hero slider ===== */
+.hero-slider-section { width: 100%; }
 .hero-slider {
     position: relative;
     width: 100%;
-    height: clamp(240px, 38vw, 480px);
+    max-width: 100%;
+    height: clamp(200px, 30vw, 380px);
     background: #12303b;
 }
 .hero-slider .slides-wrap { position: absolute; inset: 0; }

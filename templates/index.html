@@ -55,21 +55,19 @@
 
 <!-- ================= CAROUSEL ================= -->
 {% if carousel %}
-<section class="section" style="padding-top:26px;">
-    <div class="container">
-        <div id="heroSlider" class="hero-slider" style="border-radius:18px;overflow:hidden;">
-            <div class="slides-wrap">
-                {% for s in carousel %}
-                <div class="slide {% if loop.first %}active{% endif %}" style="position:absolute;inset:0;opacity:0;transition:opacity .7s;">
-                    <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}" style="width:100%;height:100%;object-fit:contain;background:#111;">
-                    {% if s['title'] %}<div class="slide-caption">{{ s['title'] }}</div>{% endif %}
-                </div>
-                {% endfor %}
+<section class="section hero-slider-section" style="padding-top:0;padding-bottom:0;width:100%;">
+    <div id="heroSlider" class="hero-slider" style="width:100%;max-width:100%;border-radius:0;">
+        <div class="slides-wrap">
+            {% for s in carousel %}
+            <div class="slide {% if loop.first %}active{% endif %}" style="position:absolute;inset:0;opacity:0;transition:opacity .7s;">
+                <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}" style="width:100%;height:100%;object-fit:contain;background:#111;">
+                {% if s['title'] %}<div class="slide-caption">{{ s['title'] }}</div>{% endif %}
             </div>
-            <button class="prev" aria-label="Previous" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(0,0,0,.35);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;">&#8249;</button>
-            <button class="next" aria-label="Next" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(0,0,0,.35);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;">&#8250;</button>
-            <div class="slide-dots" style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:5;"></div>
+            {% endfor %}
         </div>
+        <button class="prev" aria-label="Previous" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(0,0,0,.35);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;">&#8249;</button>
+        <button class="next" aria-label="Next" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(0,0,0,.35);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;">&#8250;</button>
+        <div class="slide-dots" style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:5;"></div>
     </div>
 </section>
 {% endif %}
