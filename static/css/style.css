@@ -1155,6 +1155,24 @@ animation: none;
 .store-badge-dark .badge-icon { color: #fff; }
 .store-badge-light { background: #fff; color: #0f172a; border: 1px solid #d1d5db; }
 
+/* Colorful store badges */
+.store-google {
+    background: linear-gradient(135deg, #1a73e8, #0f5cb8);
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 22px rgba(26, 115, 232, .35);
+}
+.store-google .badge-icon { color: #fff; }
+.store-google:hover { box-shadow: 0 14px 32px rgba(26, 115, 232, .45); }
+.store-apple {
+    background: linear-gradient(135deg, #ff9500, #ff6b00);
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 22px rgba(255, 149, 0, .35);
+}
+.store-apple .badge-icon { color: #fff; }
+.store-apple:hover { box-shadow: 0 14px 32px rgba(255, 107, 0, .45); }
+
 /* ---------- Contact / misc ---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
 .contact-cards { display: flex; flex-direction: column; gap: 14px; }
