@@ -29,15 +29,6 @@
             </div>
             <div class="hero-content">
                 <h1>Find and Book the Best Doctors near you</h1>
-
-                <div class="hero-cta-box">
-                    <p class="hero-cta-text">Book Appointments with Trusted Doctors</p>
-                    <div class="hero-cta-actions">
-                        <a href="{{ url_for('doctors') }}" class="btn btn-primary btn-lg">Book an Appointment</a>
-                        <a href="#how-it-works" class="btn btn-outline btn-lg">How it works</a>
-                    </div>
-                </div>
-
                 <p class="hero-sub">Search for doctors, hospitals, specialties and book in-clinic or video consultations instantly.</p>
 
                 <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
@@ -57,6 +48,14 @@
                         <button type="submit" class="btn btn-search">Search</button>
                     </div>
                 </form>
+
+                <div class="hero-cta">
+                    <p class="hero-cta-text">Book Appointments with Trusted Doctors</p>
+                    <div class="hero-cta-actions">
+                        <a href="{{ url_for('doctors') }}" class="btn btn-primary btn-lg">Book an Appointment</a>
+                        <a href="#how-it-works" class="btn btn-outline btn-lg">How it works</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

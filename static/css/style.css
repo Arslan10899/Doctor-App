@@ -187,21 +187,22 @@ input, select, textarea { font-family: inherit; }
 .hero-content .hero-sub { margin-top: 8px; }
 .hero-content .hero-stats { margin-top: auto; padding-top: 30px; }
 
-/* Hero CTA box */
-.hero-cta-box {
-    margin-top: 22px;
-    background: rgba(255, 255, 255, .96);
-    border: 1px solid rgba(20, 80, 100, .12);
-    border-radius: 18px;
-    padding: 22px 24px;
-    box-shadow: 0 14px 40px rgba(15, 50, 70, .12);
+/* Hero CTA (below search) */
+.hero-cta {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px dashed rgba(20, 80, 100, .18);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
 }
 .hero-cta-text {
-    margin: 0 0 16px;
-    font-size: 20px;
+    margin: 0;
+    font-size: 17px;
     font-weight: 800;
     color: #0f172a;
-    letter-spacing: -.3px;
+    letter-spacing: -.2px;
 }
 .hero-cta-actions {
     display: flex;
@@ -210,9 +211,9 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-cta-actions .btn { border-radius: 12px; font-weight: 700; }
 @media (max-width: 640px) {
-    .hero-cta-box { padding: 18px; }
-    .hero-cta-text { font-size: 17px; }
-    .hero-cta-actions { flex-direction: column; }
+    .hero-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .hero-cta-text { font-size: 15.5px; }
+    .hero-cta-actions { flex-direction: column; width: 100%; }
     .hero-cta-actions .btn { width: 100%; text-align: center; }
 }
 .hero-badge {
