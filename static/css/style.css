@@ -1436,7 +1436,7 @@ animation: none;
 .hero-slider .slides-wrap {
     display: flex;
     transition: transform .6s cubic-bezier(.45, 0, .19, 1);
-    height: clamp(170px, 24vw, 300px);
+    height: clamp(120px, 17vw, 200px);
 }
 .hero-slider .slide {
     flex: 0 0 33.3333%;
@@ -1528,7 +1528,7 @@ animation: none;
 .slide-dots button.active { background: #0d9488; width: 22px; border-radius: 999px; }
 @media (max-width: 768px) {
     .hero-slider { padding: 0 30px; }
-    .hero-slider .slides-wrap { height: clamp(120px, 30vw, 180px); }
+    .hero-slider .slides-wrap { height: clamp(90px, 22vw, 140px); }
     .car-nav { width: 32px; height: 32px; font-size: 16px; }
     .car-nav.prev { left: 0; }
     .car-nav.next { right: 0; }
