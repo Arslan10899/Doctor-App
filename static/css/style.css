@@ -1522,3 +1522,7 @@ input, select, textarea { font-family: inherit; }
     font-weight: 800;
     vertical-align: middle;
 }
+
+/* Hide colored background/border for no-image avatars */
+.doctor-avatar.no-img, .avatar-lg.no-img { background: transparent; border: none; }
+.doctor-avatar.no-img img, .avatar-lg.no-img img { border-radius: 12px; }
