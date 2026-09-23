@@ -380,22 +380,6 @@ animation: none;
 .slide-arrow:hover { background: #1f6572; color: #fff; transform: translateY(-50%) scale(1.08); }
 .slide-arrow.prev { left: 10px; }
 .slide-arrow.next { right: 10px; }
-.slide-dots {
-    position: absolute;
-    bottom: 12px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 6px;
-    z-index: 4;
-}
-.slide-dots button {
-    width: 8px; height: 8px;
-    border: none; border-radius: 999px;
-    padding: 0;
-    background: rgba(255,255,255,.55);
-    cursor: pointer;
-    transition: all .25s;
-}
-.slide-dots button.active { width: 22px; background: #fff; }
 .hero-float {
     position: absolute;
     display: grid;
