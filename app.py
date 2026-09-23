@@ -612,7 +612,7 @@ def index():
     featured = recommend_doctors(6)
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
-    carousel = query("SELECT * FROM carousel_images ORDER BY id DESC LIMIT 6")
+    carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
     return render_template(
         "index.html",
         specialties=specialties,
