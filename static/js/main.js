@@ -84,73 +84,54 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Hero image slider (auto-play)
+    // Hero image slider (3 per view, auto-play)
     const heroSlider = document.getElementById("heroSlider");
     if (heroSlider) {
         const slides = heroSlider.querySelectorAll(".slide");
         const slidesWrap = heroSlider.querySelector(".slides-wrap");
         const dotsWrap = heroSlider.querySelector(".slide-dots");
-        const prevBtn = heroSlider.querySelector(".prev");
-        const nextBtn = heroSlider.querySelector(".next");
-        const progBar = heroSlider.querySelector(".slider-progress span");
+        const prevBtn = heroSlider.querySelector(".car-nav.prev");
+        const nextBtn = heroSlider.querySelector(".car-nav.next");
         const total = slides.length;
+        const STEP = total >= 3 ? 100 / 3 : 100;
+        const maxIndex = total >= 3 ? total - 3 : 0;
+        if (total < 3) heroSlider.classList.add("single-view");
         let current = 0;
         let timer = null;
-        const INTERVAL = 4000;
+        const INTERVAL = 3500;
 
-        slides.forEach(function (s, i) {
-            const dot = document.createElement("button");
-            dot.setAttribute("aria-label", "Go to slide " + (i + 1));
-            dot.addEventListener("click", function () {
-                go(i);
-                restart();
-            });
-            dotsWrap.appendChild(dot);
-        });
-        const dots = dotsWrap.querySelectorAll("button");
-
-        function resetProgress() {
-            if (!progBar) return;
-            progBar.style.transition = "none";
-            progBar.style.width = "0";
-            void progBar.offsetWidth;
-            progBar.style.transition = "width " + INTERVAL + "ms linear";
-            requestAnimationFrame(function () {
-                progBar.style.width = "100%";
-            });
+        function buildDots() {
+            const dotCount = maxIndex + 1;
+            dotsWrap.innerHTML = "";
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement("button");
+                dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+                dot.addEventListener("click", function () {
+                    go(i);
+                    restart();
+                });
+                dotsWrap.appendChild(dot);
+            }
         }
-
         function go(i) {
-            current = (i + total) % total;
-            slidesWrap.style.transform = "translateX(" + (-current * 100) + "%)";
+            current = Math.max(0, Math.min(i, maxIndex));
+            slidesWrap.style.transform = "translateX(" + (-current * STEP) + "%)";
+            const dots = dotsWrap.querySelectorAll("button");
             dots.forEach(function (d, idx) {
                 d.classList.toggle("active", idx === current);
             });
-            resetProgress();
         }
         function restart() {
             clearInterval(timer);
-            timer = setInterval(function () { go(current + 1); }, INTERVAL);
+            timer = setInterval(function () {
+                go(current >= maxIndex ? 0 : current + 1);
+            }, INTERVAL);
         }
+        buildDots();
         if (prevBtn) prevBtn.addEventListener("click", function () { go(current - 1); restart(); });
         if (nextBtn) nextBtn.addEventListener("click", function () { go(current + 1); restart(); });
-
-        let touchX = null;
-        heroSlider.addEventListener("touchstart", function (e) {
-            touchX = e.touches[0].clientX;
-        }, { passive: true });
-        heroSlider.addEventListener("touchend", function (e) {
-            if (touchX === null) return;
-            const dx = e.changedTouches[0].clientX - touchX;
-            if (Math.abs(dx) > 40) {
-                if (dx < 0) { go(current + 1); restart(); }
-                else { go(current - 1); restart(); }
-            }
-            touchX = null;
-        }, { passive: true });
-
         go(0);
-        timer = setInterval(function () { go(current + 1); }, INTERVAL);
+        timer = setInterval(function () { go(current >= maxIndex ? 0 : current + 1); }, INTERVAL);
     }
 
     // Appointment type toggle
