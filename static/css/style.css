@@ -1446,16 +1446,16 @@ animation: none;
 .hero-slider.single-view .slide { flex: 0 0 100%; }
 .slide-card {
     height: 100%;
-    background: #fff;
+    background: linear-gradient(135deg, #0d9488, #4db6ac 45%, #2bb3a6 70%, #0f766e);
     border-radius: 18px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 10px 30px rgba(20, 55, 75, 0.12);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: 3px;
-    background: linear-gradient(135deg, #0d9488, #4db6ac 45%, #2bb3a6 70%, #0f766e);
 }
 .slide-card::before {
     content: "";
@@ -1467,25 +1467,30 @@ animation: none;
 }
 .slide-card > * { position: relative; z-index: 1; }
 .slide-card img {
+    flex: 1;
+    min-height: 0;
     width: 100%;
-    height: 100%;
     object-fit: contain;
     background: linear-gradient(160deg, #fbfdfe, #eef6f7);
     display: block;
-    border-radius: 15px;
+    border-radius: 15px 15px 0 0;
 }
 .slide-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(20, 105, 120, 0.22); }
 .slide-card { transition: transform .3s ease, box-shadow .3s ease; }
 .slide-caption {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 26px 16px 12px;
-    background: linear-gradient(transparent, rgba(0,0,0,.55));
+    position: static;
+    left: auto; right: auto; bottom: auto;
+    padding: 8px 10px;
+    background: linear-gradient(135deg, #0d9488, #2bb3a6);
     color: #fff;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     text-align: center;
+    line-height: 1.3;
+    width: 100%;
+    margin: 0;
     border-radius: 0 0 15px 15px;
+    box-sizing: border-box;
 }
 .car-nav {
     position: absolute;
@@ -1534,7 +1539,8 @@ animation: none;
     .car-nav.next { right: 0; }
     .slide-dots { bottom: -20px; }
     .slide-card { border-radius: 12px; }
-    .slide-card img { border-radius: 9px; }
+    .slide-card img { border-radius: 9px 9px 0 0; }
+    .slide-caption { border-radius: 0 0 9px 9px; font-size: 11.5px; padding: 6px 8px; }
 }
 
 @media (max-width: 640px) {
