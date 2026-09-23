@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const heroSlider = document.getElementById("heroSlider");
     if (heroSlider) {
         const slides = heroSlider.querySelectorAll(".slide");
+        const slidesWrap = heroSlider.querySelector(".slides-wrap");
         const dotsWrap = heroSlider.querySelector(".slide-dots");
         const prevBtn = heroSlider.querySelector(".prev");
         const nextBtn = heroSlider.querySelector(".next");
@@ -121,9 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function go(i) {
             current = (i + total) % total;
-            slides.forEach(function (s, idx) {
-                s.classList.toggle("active", idx === current);
-            });
+            slidesWrap.style.transform = "translateX(" + (-current * 100) + "%)";
             dots.forEach(function (d, idx) {
                 d.classList.toggle("active", idx === current);
             });
