@@ -226,6 +226,30 @@ input, select, textarea { font-family: inherit; }
     transform: translateY(-1px);
 }
 .hero-cta-actions .btn-white { box-shadow: 0 8px 24px rgba(15, 40, 60, .18); }
+.hero-cta-actions .btn-white {
+    position: relative;
+    overflow: hidden;
+    animation: ctaGlow 2.4s ease-in-out infinite;
+}
+.hero-cta-actions .btn-white::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(31, 101, 114, .22), transparent);
+    transform: skewX(-20deg);
+    animation: ctaShine 3.2s ease-in-out infinite;
+}
+@keyframes ctaGlow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(15, 40, 60, .18), 0 0 0 0 rgba(255, 255, 255, .55); }
+    50% { box-shadow: 0 10px 32px rgba(15, 40, 60, .24), 0 0 0 12px rgba(255, 255, 255, 0); }
+}
+@keyframes ctaShine {
+    0% { left: -80%; }
+    55%, 100% { left: 130%; }
+}
 @media (max-width: 640px) {
     .hero-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
     .hero-cta-text { font-size: 16px; }
