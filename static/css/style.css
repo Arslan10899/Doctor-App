@@ -1455,7 +1455,7 @@ input, select, textarea { font-family: inherit; }
 .hero-slider {
     position: relative;
     width: 100%;
-    height: clamp(150px, 22vw, 300px);
+    height: clamp(240px, 38vw, 480px);
     background: #12303b;
 }
 .hero-slider .slides-wrap { position: absolute; inset: 0; }
