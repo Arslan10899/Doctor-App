@@ -2,105 +2,141 @@
 {% block title %}{{ doc['name'] }} - {{ doc['specialty_name'] }} in {{ doc['city_name'] }} | Doctor App{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="breadcrumbs">
+<div class="container dp-page">
+    <nav class="breadcrumbs">
         <a href="{{ url_for('index') }}">Home</a> &rsaquo;
         <a href="{{ url_for('doctors') }}">Doctors</a> &rsaquo;
         <a href="{{ url_for('doctors', specialty=doc['specialty_name']) }}">{{ doc['specialty_name'] }}</a> &rsaquo;
         <span style="color:#2b2f38;">{{ doc['name'] }}</span>
+    </nav>
+
+    <div class="dp-hero">
+        <div class="dp-hero-glow"></div>
+        <div class="dp-hero-main">
+            <div class="dp-photo-frame">
+                <div class="dp-photo{% if not doc['image_url'] %} no-img{% endif %}">
+                    {% if doc['image_url'] %}<img src="{{ doc['image_url'] }}" alt="{{ doc['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ doc['name'] }}">{% endif %}
+                </div>
+                {% if doc['sehat_card'] and doc['sehat_card']|lower == 'yes' %}
+                <span class="dp-sehat"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Sehat Card</span>
+                {% endif %}
+            </div>
+
+            <div class="dp-hero-info">
+                <div class="dp-verified">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2 4 5v6c0 5.05 3.41 9.76 8 11 4.59-1.24 8-5.95 8-11V5l-8-3zm-1.41 13.41L6.59 11.59l1.41-1.41L9.59 13l6-6 1.41 1.41-8.41 8z"/></svg>
+                    PMDC Verified Doctor
+                </div>
+                <h1>{{ doc['name'] }}</h1>
+                {% if doc['urdu_name'] %}<p class="dp-urdu">{{ doc['urdu_name'] }}</p>{% endif %}
+                <p class="dp-specialty">{{ doc['specialty_name'] }}</p>
+                <p class="dp-loc">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    {{ doc['city_name'] }}{% if doc['hospital_name'] %} &middot; {{ doc['hospital_name'] }}{% endif %}
+                </p>
+                <div class="dp-actions">
+                    {% if doc['phone'] %}
+                    <a class="dp-btn dp-btn-ghost" href="tel:{{ doc['phone'] }}">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        Call Now
+                    </a>
+                    {% endif %}
+                    {% if doc['whatsapp_number'] %}
+                    <a class="dp-btn dp-btn-whatsapp" href="https://wa.me/{{ doc['whatsapp_number']|replace('+', '') }}" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        WhatsApp
+                    </a>
+                    {% endif %}
+                    <a class="dp-btn dp-btn-solid js-book-now">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                        Book Appointment
+                    </a>
+                </div>
+            </div>
+
+            <div class="dp-stats">
+                <div class="dp-stat">
+                    <span class="dp-stat-icon" style="background:#fff7e6;color:#f5a623;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </span>
+                    <div><strong>{{ doc['rating']|round(1) }}</strong><span>Rating</span></div>
+                </div>
+                <div class="dp-stat">
+                    <span class="dp-stat-icon" style="background:#e6f4ff;color:#3b82f6;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </span>
+                    <div><strong>{{ doc['experience_text'] or (doc['experience']|string + ' yrs') }}</strong><span>Experience</span></div>
+                </div>
+                <div class="dp-stat">
+                    <span class="dp-stat-icon" style="background:#e6f8f1;color:#10b981;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </span>
+                    <div><strong>{{ '{:,}'.format(doc['fee']) if doc['fee'] else 'Call' }}</strong><span>Consultation Fee</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="doctor-profile">
-        <div>
-            <!-- Profile card -->
-            <div class="profile-card">
-                <div class="profile-head">
-                    <div class="avatar-lg{% if not doc['image_url'] %} no-img{% endif %}">
-                        {% if doc['image_url'] %}<img src="{{ doc['image_url'] }}" alt="{{ doc['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ doc['name'] }}">{% endif %}
+    <div class="dp-layout">
+        <div class="dp-main">
+            {% if doc['doctor_message'] %}
+            <div class="dp-card dp-message">
+                <span class="dp-card-icon" style="background:#fff1f0;color:#e5484d;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                </span>
+                <p style="font-weight:600;color:#7c2d2d;direction:rtl;text-align:right;">{{ doc['doctor_message'] }}</p>
+            </div>
+            {% endif %}
+
+            <div class="dp-card">
+                <div class="dp-card-head">
+                    <span class="dp-card-icon" style="background:var(--primary-light);color:var(--primary);">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </span>
+                    <div>
+                        <h3>About the Doctor</h3>
+                        <p class="dp-card-sub">Professional overview of {{ doc['name'] }}</p>
                     </div>
-                    <div style="text-align:left;">
-                        <h1>{{ doc['name'] }}</h1>
-                        {% if doc['urdu_name'] %}<p class="profile-spec" style="font-size:16px;direction:rtl;text-align:right;">{{ doc['urdu_name'] }}</p>{% endif %}
-                        <p class="profile-spec">{{ doc['specialty_name'] }}</p>
-                        <p class="profile-info-line">
-                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            {{ doc['city_name'] }}{% if doc['hospital_name'] %} &middot; {{ doc['hospital_name'] }}, {{ doc['hospital_address'] or '' }}{% endif %}
-                        </p>
-                        {% if doc['phone'] %}
-                        <p class="profile-info-line">
-                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                            {{ doc['phone'] }}
-                        </p>
+                </div>
+                <div class="dp-card-body">
+                    <p class="dp-about-text">{{ doc['about'] }}</p>
+                    <div class="dp-tags">
+                        {% if doc['qualification'] %}
+                        <span class="dp-tag"><strong>Qualifications:</strong> {{ doc['qualification'] }}</span>
                         {% endif %}
-                        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                            {% if doc['phone'] %}
-                            <a class="btn btn-outline btn-sm" href="tel:{{ doc['phone'] }}">
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                                Call
-                            </a>
-                            {% endif %}
-                            {% if doc['whatsapp_number'] %}
-                            <a class="btn btn-primary btn-sm" style="background:#25D366;border-color:#25D366;" href="https://wa.me/{{ doc['whatsapp_number']|replace('+', '') }}" target="_blank" rel="noopener">
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                WhatsApp Consult
-                            </a>
-                            {% endif %}
-                        </div>
+                        {% if doc['diseases'] %}
+                        <span class="dp-tag"><strong>Treats:</strong> {{ doc['diseases'] }}</span>
+                        {% endif %}
+                        {% if doc['online'] %}
+                        <span class="dp-tag dp-tag-green">&#9889; Available for WhatsApp / online consultation</span>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
 
-                <div class="info-grid">
-                    <div class="info-box">
-                        <strong>{{ doc['rating']|round(1) }}</strong>
-                        <span>Rating</span>
-                    </div>
-                    <div class="info-box">
-                        <strong>{{ doc['experience_text'] or (doc['experience']|string + ' yrs') }}</strong>
-                        <span>Experience</span>
-                    </div>
-                    <div class="info-box">
-                        <strong>{{ '{:,}'.format(doc['fee']) if doc['fee'] else 'Call' }}</strong>
-                        <span>Consultation Fee</span>
+            <div class="dp-card">
+                <div class="dp-card-head">
+                    <span class="dp-card-icon" style="background:#e6f4ff;color:#3b82f6;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 10l-6 6H2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4zm0 2v4a2 2 0 0 1-2 2H8v3h12v-7l2-2z"/></svg>
+                    </span>
+                    <div>
+                        <h3>Qualifications</h3>
+                        <p class="dp-card-sub">Education &amp; professional credentials</p>
                     </div>
                 </div>
-
-                {% if doc['doctor_message'] %}
-                <div class="about-section" style="background:#f0fdf4;border:1px solid #d1fae5;">
-                    <p style="font-weight:600;color:#065f46;direction:rtl;text-align:right;">{{ doc['doctor_message'] }}</p>
-                </div>
-                {% endif %}
-
-                <div class="about-section">
-                    <h3>About the Doctor</h3>
-                    <p>{{ doc['about'] }}</p>
-                    {% if doc['qualification'] %}
-                        <p style="margin-top:8px;"><strong>Qualifications:</strong> {{ doc['qualification'] }}</p>
-                    {% endif %}
-                    {% if doc['diseases'] %}
-                        <p style="margin-top:8px;"><strong>Treats:</strong> {{ doc['diseases'] }}</p>
-                    {% endif %}
-                    {% if doc['sehat_card'] and doc['sehat_card']|lower == 'yes' %}
-                        <p style="margin-top:8px;color:#059669;font-weight:600;">&#10003; Sehat Card Empaneled</p>
-                    {% endif %}
-                    {% if doc['online'] %}
-                        <p style="margin-top:10px;color:#059669;font-weight:600;">&#9889; Available for WhatsApp / online consultation</p>
-                    {% endif %}
-                </div>
-
-                <div class="about-section">
-                    <h3>Qualifications</h3>
-                    <div class="qual-list">
+                <div class="dp-card-body">
+                    <div class="dp-qual-list">
                         {% for q in [doc['mbbs'], doc['fellowship']] %}
                             {% if q %}
-                            <div class="qual-item">
-                                <span class="q-icon">&#10003;</span>
+                            <div class="dp-qual-item">
+                                <span class="dp-q-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></span>
                                 <span>{{ q }}</span>
                             </div>
                             {% endif %}
                         {% endfor %}
                         {% if doc['pmdc'] %}
-                        <div class="qual-item">
-                            <span class="q-icon">&#10003;</span>
+                        <div class="dp-qual-item">
+                            <span class="dp-q-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></span>
                             <span>PMDC Verified: {{ doc['pmdc'] }}</span>
                         </div>
                         {% endif %}
@@ -108,26 +144,33 @@
                 </div>
             </div>
 
-            <!-- Clinics & OPD schedule -->
             {% if clinics %}
-            <div class="profile-card" style="margin-top:24px;">
-                <h3>Clinic Visits &amp; Timings</h3>
-                <div class="qual-list">
+            <div class="dp-card">
+                <div class="dp-card-head">
+                    <span class="dp-card-icon" style="background:#f3e8ff;color:#8b5cf6;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </span>
+                    <div>
+                        <h3>Clinic Visits &amp; Timings</h3>
+                        <p class="dp-card-sub">Locations and availability</p>
+                    </div>
+                </div>
+                <div class="dp-card-body">
                     {% for cl in clinics %}
-                    <div class="qual-item" style="align-items:flex-start;flex-direction:column;gap:4px;border-bottom:1px solid #eef1f4;padding:12px 0;">
-                        <div style="display:flex;align-items:flex-start;gap:10px;width:100%;">
-                            <span class="q-icon">&#128205;</span>
-                            <div style="flex:1;">
-                                {% if cl['clinic_name'] %}<strong>{{ cl['clinic_name'] }}</strong><br>{% endif %}
-                                {{ cl['address'] or '' }}
+                    <div class="dp-clinic">
+                        <div class="dp-clinic-top">
+                            <span class="dp-clinic-pin"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></span>
+                            <div>
+                                {% if cl['clinic_name'] %}<strong>{{ cl['clinic_name'] }}</strong>{% endif %}
+                                <span class="dp-clinic-addr">{{ cl['address'] or '' }}</span>
                             </div>
                         </div>
-                        {% if cl.timings_dict %}
-                        <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:13px;">
-                            {% for day, info in cl.timings_dict.items() %}
+                        {% if cl['timings_dict'] %}
+                        <table class="dp-timings">
+                            {% for day, info in cl['timings_dict'].items() %}
                             <tr>
-                                <td style="padding:3px 6px;color:#4b5563;white-space:nowrap;">{{ day }}</td>
-                                <td style="padding:3px 6px;text-align:right;font-weight:600;">
+                                <td>{{ day }}</td>
+                                <td>
                                     {% if info.get('isClosed') %}Closed{% else %}{{ info.get('open') or '' }}{% if info.get('open') and info.get('close') %} - {{ info.get('close') }}{% elif info.get('open') %} onwards{% endif %}{% endif %}
                                 </td>
                             </tr>
@@ -141,106 +184,137 @@
             {% endif %}
 
             {% if opd_schedule %}
-            <div class="profile-card" style="margin-top:24px;">
-                <h3>Today's OPD / Hospital Schedule</h3>
-                <div class="qual-list">
-                    {% for entry in opd_schedule %}
-                    <div class="qual-item">
-                        <span class="q-icon">&#128205;</span>
-                        <div>
-                            <strong>{{ entry.get('hospitalName') or entry.get('hospitalCity') or '' }}</strong>
-                            <br>
-                            <span style="color:#4b5563;">{{ entry.get('specialty') or '' }}{% if entry.get('time') %} &middot; {{ entry.get('time') }}{% endif %}</span>
-                            {% if entry.get('days') %}<br><span style="font-size:12.5px;color:#6b7280;">{{ entry.get('days')|join(', ') }}</span>{% endif %}
-                        </div>
+            <div class="dp-card">
+                <div class="dp-card-head">
+                    <span class="dp-card-icon" style="background:#ecfdf5;color:#059669;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </span>
+                    <div>
+                        <h3>Today's OPD / Hospital Schedule</h3>
+                        <p class="dp-card-sub">Current hospital attendance</p>
                     </div>
-                    {% endfor %}
+                </div>
+                <div class="dp-card-body">
+                    <div class="dp-qual-list">
+                        {% for entry in opd_schedule %}
+                        <div class="dp-qual-item" style="align-items:flex-start;">
+                            <span class="dp-q-icon" style="background:#ecfdf5;color:#059669;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></span>
+                            <div>
+                                <strong>{{ entry.get('hospitalName') or entry.get('hospitalCity') or '' }}</strong>
+                                <br>
+                                <span style="color:#4b5563;">{{ entry.get('specialty') or '' }}{% if entry.get('time') %} &middot; {{ entry.get('time') }}{% endif %}</span>
+                                {% if entry.get('days') %}<br><span style="font-size:12.5px;color:#6b7280;">{{ entry.get('days')|join(', ') }}</span>{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-            {% endif %}
-
-            <!-- Similar doctors -->
-            {% if similar %}
-                <div style="margin-top:32px;">
-                    <h2 style="font-size:22px;margin-bottom:16px;">Similar Doctors You May Like</h2>
-                    {% for d in similar %}
-                        <a class="mini-doctor" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
-                            <div class="doctor-avatar{% if not d['image_url'] %} no-img{% endif %}">
-                                {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ d['name'] }}">{% endif %}
-                            </div>
-                            <div>
-                                <h4>{{ d['name'] }}</h4>
-                                <p class="mini-meta">{{ d['specialty_name'] }} &middot; {{ d['city_name'] }} &middot; {{ d['experience_text'] or (d['experience']|string + ' yrs') }} &middot; Rs. {{ '{:,}'.format(d['fee']) }}</p>
-                                <span class="rating">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                    {{ d['rating']|round(1) }}
-                                </span>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
             {% endif %}
         </div>
 
         <!-- Booking widget -->
-        <div class="profile-card booking-card">
-            <h3>Book Appointment</h3>
-            <p class="sub">Consultation fee: Rs. {{ '{:,}'.format(doc['fee']) }}</p>
-
-            {% if doc['whatsapp_number'] %}
-            <div style="margin-bottom:16px;padding:12px;background:#f0fdf4;border:1px solid #d1fae5;border-radius:10px;">
-                <p style="font-size:13px;color:#065f46;margin-bottom:8px;">Prefer instant booking? Contact directly.</p>
-                <a class="btn btn-primary btn-sm" style="background:#25D366;border-color:#25D366;width:100%;justify-content:center;" href="https://wa.me/{{ doc['whatsapp_number']|replace('+', '') }}" target="_blank" rel="noopener">
-                    Chat on WhatsApp
-                </a>
-            </div>
-            {% endif %}
-
-            {% if session.get('patient_id') %}
-                <form id="bookingForm" method="post" action="{{ url_for('book', doctor_id=doc['id']) }}">
-                    <div class="type-toggle" style="margin-bottom:16px;">
-                        <button type="button" class="type-btn selected" data-type="In-Clinic">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H7v-2h4v2zm4-4h-8v-2h8v2zm0-4H7V7h8v2z"/></svg>
-                            In-Clinic
-                        </button>
-                        <button type="button" class="type-btn" data-type="Video Consultation">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4V6.5l-4 4z"/></svg>
-                            Video Consult
-                        </button>
+        <div class="dp-side">
+            <div class="dp-booking" id="dpBooking">
+                <div class="dp-booking-head">
+                    <span class="dp-booking-cal"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg></span>
+                    <div>
+                        <h3>Book Appointment</h3>
+                        <p class="dp-booking-sub">Consultation fee: Rs. {{ '{:,}'.format(doc['fee']) }}</p>
                     </div>
-                    <input type="hidden" name="appointment_type" id="appointmentType" value="In-Clinic">
-
-                    <div class="form-group">
-                        <label for="appointmentDate">Select Date</label>
-                        <input type="date" id="appointmentDate" name="appointment_date" data-doctor-id="{{ doc['id'] }}" min="{{ min_date }}" value="{{ min_date }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Available Time Slots</label>
-                        <div class="slot-grid" id="slotGrid">
-                            <p class="slot-loading">Loading...</p>
-                        </div>
-                        <input type="hidden" name="slot" id="slot" value="">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="notes">Reason for Visit (optional)</label>
-                        <textarea name="notes" id="notes" placeholder="Briefly describe your symptoms or reason for consultation..."></textarea>
-                    </div>
-
-                    <div class="fee-note">
-                        <strong>Rs. {{ '{:,}'.format(doc['fee']) }}</strong> consultation fee payable at clinic. Free to book.
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Confirm Appointment</button>
-                </form>
-            {% else %}
-                <div class="login-prompt">
-                    <p>Please login to book an appointment with {{ doc['name'] }}.</p>
-                    <a href="{{ url_for('auth', next=request.path) }}" class="btn btn-primary">Login / Sign Up</a>
                 </div>
-            {% endif %}
+
+                {% if doc['whatsapp_number'] %}
+                <div class="dp-booking-wa">
+                    <p style="font-size:13px;color:#065f46;">Prefer instant booking? Contact directly.</p>
+                    <a class="dp-btn dp-btn-whatsapp" style="width:100%;justify-content:center;" href="https://wa.me/{{ doc['whatsapp_number']|replace('+', '') }}" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Chat on WhatsApp
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if session.get('patient_id') %}
+                    <form id="bookingForm" method="post" action="{{ url_for('book', doctor_id=doc['id']) }}">
+                        <div class="dp-type-toggle">
+                            <button type="button" class="dp-type-btn selected" data-type="In-Clinic">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2 1 9l11 7 9-5.72V17h2V9L12 2zm0 12.13L4.98 9.5 12 5.64l7.02 3.86L12 14.13z"/></svg>
+                                In-Clinic
+                            </button>
+                            <button type="button" class="dp-type-btn" data-type="Video Consultation">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4V6.5l-4 4z"/></svg>
+                                Video Consult
+                            </button>
+                        </div>
+                        <input type="hidden" name="appointment_type" id="appointmentType" value="In-Clinic">
+
+                        <div class="dp-form-group">
+                            <label for="appointmentDate">Select Date</label>
+                            <div class="dp-input-wrap">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+                                <input type="date" id="appointmentDate" name="appointment_date" data-doctor-id="{{ doc['id'] }}" min="{{ min_date }}" value="{{ min_date }}" required>
+                            </div>
+                        </div>
+
+                        <div class="dp-form-group">
+                            <label>Available Time Slots</label>
+                            <div class="slot-grid" id="slotGrid">
+                                <p class="slot-loading">Loading...</p>
+                            </div>
+                            <input type="hidden" name="slot" id="slot" value="">
+                        </div>
+
+                        <div class="dp-form-group">
+                            <label for="notes">Reason for Visit (optional)</label>
+                            <div class="dp-input-wrap">
+                                <textarea name="notes" id="notes" placeholder="Briefly describe your symptoms..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="dp-fee-note">
+                            <strong>Rs. {{ '{:,}'.format(doc['fee']) }}</strong> consultation fee payable at clinic. Free to book.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">Confirm Appointment</button>
+                    </form>
+                {% else %}
+                    <div class="dp-login">
+                        <p>Please login to book an appointment with {{ doc['name'] }}.</p>
+                        <a href="{{ url_for('auth', next=request.path) }}" class="btn btn-primary">Login / Sign Up</a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
+
+    {% if similar %}
+    <div class="dp-similar">
+        <div class="dp-similar-head">
+            <h2>Similar Doctors You May Like</h2>
+            <p>More trusted specialists in the same field</p>
+        </div>
+        <div class="dp-similar-grid">
+            {% for d in similar %}
+                <a class="dp-sim-card" href="{{ url_for('doctor_profile', doctor_id=d['id']) }}">
+                    <div class="dp-sim-photo{% if not d['image_url'] %} no-img{% endif %}">
+                        {% if d['image_url'] %}<img src="{{ d['image_url'] }}" alt="{{ d['name'] }}">{% else %}<img src="{{ url_for('static', filename='img/no-image.jpeg') }}" alt="{{ d['name'] }}">{% endif %}
+                    </div>
+                    <div class="dp-sim-body">
+                        <h4>{{ d['name'] }}</h4>
+                        <p class="dp-sim-meta">{{ d['specialty_name'] }}</p>
+                        <p class="dp-sim-info">{{ d['city_name'] }} &middot; {{ d['experience_text'] or (d['experience']|string + ' yrs') }}</p>
+                        <span class="dp-sim-foot">
+                            <span class="rating">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                {{ d['rating']|round(1) }}
+                            </span>
+                            <span class="dp-sim-fee">Rs. {{ '{:,}'.format(d['fee']) }}</span>
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

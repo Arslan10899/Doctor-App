@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Appointment type toggle
-    const typeBtns = document.querySelectorAll(".type-btn");
+    const typeBtns = document.querySelectorAll(".type-btn, .dp-type-btn");
     const typeHidden = document.getElementById("appointmentType");
     typeBtns.forEach(function (btn) {
         btn.addEventListener("click", function () {
