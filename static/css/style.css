@@ -191,28 +191,44 @@ input, select, textarea { font-family: inherit; }
 .hero-cta {
     margin-top: 26px;
     padding-top: 22px;
-    border-top: 1px dashed rgba(20, 80, 100, .18);
+    border-top: 1px solid rgba(255, 255, 255, .28);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
 }
 .hero-cta-text {
     margin: 0;
-    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
     font-weight: 800;
-    color: #0f172a;
+    color: #fff;
     letter-spacing: -.2px;
 }
+.hero-cta-text svg { flex-shrink: 0; opacity: .95; }
 .hero-cta-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
 .hero-cta-actions .btn { border-radius: 12px; font-weight: 700; }
+.btn-ghost-light {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .6);
+}
+.btn-ghost-light:hover {
+    background: rgba(255, 255, 255, .18);
+    border-color: #fff;
+    transform: translateY(-1px);
+}
+.hero-cta-actions .btn-white { box-shadow: 0 8px 24px rgba(15, 40, 60, .18); }
 @media (max-width: 640px) {
     .hero-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
-    .hero-cta-text { font-size: 15.5px; }
+    .hero-cta-text { font-size: 16px; }
     .hero-cta-actions { flex-direction: column; width: 100%; }
     .hero-cta-actions .btn { width: 100%; text-align: center; }
 }
