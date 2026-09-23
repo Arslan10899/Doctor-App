@@ -61,7 +61,7 @@
             <div class="slides-wrap">
                 {% for s in carousel %}
                 <div class="slide {% if loop.first %}active{% endif %}" style="position:absolute;inset:0;opacity:0;transition:opacity .7s;">
-                    <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}" style="width:100%;height:100%;object-fit:cover;">
+                    <img src="{{ s['image_url'] }}" alt="{{ s['title'] or 'Slide' }}" style="width:100%;height:100%;object-fit:contain;background:#111;">
                     {% if s['title'] %}<div class="slide-caption">{{ s['title'] }}</div>{% endif %}
                 </div>
                 {% endfor %}

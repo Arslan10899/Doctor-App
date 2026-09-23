@@ -338,7 +338,7 @@ input, select, textarea { font-family: inherit; }
     z-index: 1;
 }
 .hero-slider .slide.active { opacity: 1; pointer-events: auto; }
-.hero-slider .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-slider .slide img { width: 100%; height: 100%; object-fit: contain; background: #111; display: block; }
 .hero-slider .slide.active img { animation: kenburns 7s ease-out forwards; }
 @keyframes kenburns {
     from { transform: scale(1.06) translateY(1%); }
