@@ -498,6 +498,8 @@
     font-family: inherit;
 }
 .lv-edit-bar .btn { font-family: inherit; }
+.lv-studio .hero { overflow-x: auto; }
+.lv-studio .hero .container { min-width: 1200px; }
 .lv-on .hero-banner-box.pinned {
     cursor: move !important;
     box-shadow: 0 0 0 2px #22c55e inset;
@@ -533,6 +535,7 @@
     var bar = document.getElementById('lvBar');
     var area = document.getElementById('heroPinnedArea');
     if (!bar || !area) { if (bar) bar.hidden = true; return; }
+    document.body.classList.add('lv-studio');
     bar.hidden = false;
     var modeBtn = document.getElementById('lvMode');
     var saveBtn = document.getElementById('lvSave');
