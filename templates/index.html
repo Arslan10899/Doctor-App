@@ -478,4 +478,171 @@
     </div>
 </section>
 
+{% if is_admin %}
+<style>
+.lv-edit-bar {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: #0f2c38;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+}
+.lv-edit-bar .btn { font-family: inherit; }
+.lv-on .hero-banner-box.pinned {
+    cursor: move !important;
+    box-shadow: 0 0 0 2px #22c55e inset;
+    border-radius: 8px;
+}
+.lv-corner {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 5;
+    background: radial-gradient(circle at 100% 100%, #22c55e 0 6px, transparent 7px);
+}
+.lv-status { font-size: 12px; color: #86efac; min-width: 60px; }
+.lv-hint { font-size: 11px; font-weight: 600; color: #9fb6c1; }
+</style>
+
+<div class="lv-edit-bar" id="lvBar" hidden>
+    <button type="button" class="btn btn-sm" id="lvMode">Edit ON</button>
+    <button type="button" class="btn btn-sm btn-primary" id="lvSave"><b>Save Layout</b></button>
+    <span class="lv-status" id="lvStatus"></span>
+    <span class="lv-hint">Drag = move · Corner = size</span>
+</div>
+{% endif %}
+
+<script>
+{% if is_admin %}
+(function () {
+    var qs = new URLSearchParams(window.location.search);
+    if (qs.get('liveedit') !== '1') return;
+    var bar = document.getElementById('lvBar');
+    var area = document.getElementById('heroPinnedArea');
+    if (!bar || !area) { if (bar) bar.hidden = true; return; }
+    bar.hidden = false;
+    var modeBtn = document.getElementById('lvMode');
+    var saveBtn = document.getElementById('lvSave');
+    var statusEl = document.getElementById('lvStatus');
+    var on = false;
+    var items = null;
+    var selected = null;
+
+    function collect() {
+        return items.map(function (it) {
+            var r = it.getBoundingClientRect(), cr = area.getBoundingClientRect();
+            var px = Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10;
+            var py = Math.round(r.top - cr.top);
+            return {
+                id: parseInt(it.getAttribute('data-id'), 10),
+                pos_x: Math.max(0, Math.min(100, px)),
+                pos_y: Math.max(0, py),
+                bw: Math.round(r.width),
+                bh: Math.round(r.height)
+            };
+        });
+    }
+
+    function attach(it) {
+        var startX = 0, startY = 0, oLeft = 0, oTop = 0, dragging = false;
+        it.addEventListener('pointerdown', function (e) {
+            if (e.target.closest('.lv-corner')) return;
+            e.preventDefault(); e.stopPropagation();
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            oLeft = it.offsetLeft; oTop = it.offsetTop;
+            it.setPointerCapture(e.pointerId);
+        });
+        it.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
+            it.style.top = (oTop + (e.clientY - startY)) + 'px';
+        });
+        function stopDrag(e) {
+            if (!dragging) return;
+            dragging = false;
+            try { it.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+        it.addEventListener('pointerup', stopDrag);
+        it.addEventListener('pointercancel', stopDrag);
+        it.addEventListener('click', function (e) {
+            if (on) e.preventDefault();
+        });
+    }
+
+    function attachCorner(it) {
+        var corner = document.createElement('span');
+        corner.className = 'lv-corner';
+        it.appendChild(corner);
+        var rsX = 0, rsY = 0, rW = 0, rH = 0, resizing = false, ratio = 1;
+        corner.addEventListener('pointerdown', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            resizing = true;
+            rsX = e.clientX; rsY = e.clientY;
+            rW = it.offsetWidth; rH = it.offsetHeight;
+            ratio = rW / rH;
+            corner.setPointerCapture(e.pointerId);
+        });
+        corner.addEventListener('pointermove', function (e) {
+            if (!resizing) return;
+            var dx = e.clientX - rsX, dy = e.clientY - rsY;
+            var w = Math.max(80, rW + dx), h = Math.max(50, rH + dy);
+            if (Math.abs(dx) >= Math.abs(dy)) h = Math.round(w / ratio);
+            else w = Math.round(h * ratio);
+            it.style.width = w + 'px';
+            it.style.height = h + 'px';
+        });
+        function stopResize(e) {
+            if (!resizing) return;
+            resizing = false;
+            try { corner.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+        corner.addEventListener('pointerup', stopResize);
+        corner.addEventListener('pointercancel', stopResize);
+    }
+
+    function setMode(v) {
+        on = v;
+        document.querySelector('.hero') && document.querySelector('.hero').classList.toggle('lv-on', on);
+        modeBtn.textContent = on ? 'Edit OFF' : 'Edit ON';
+        modeBtn.classList.toggle('btn-primary', on);
+        if (on) {
+            items = Array.prototype.slice.call(area.querySelectorAll('.hero-banner-box.pinned'));
+            items.forEach(attach);
+            items.forEach(attachCorner);
+        }
+    }
+
+    modeBtn.addEventListener('click', function () { setMode(!on); });
+
+    saveBtn.addEventListener('click', function () {
+        statusEl.textContent = 'Saving...';
+        fetch('/admin/hero-banners/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(collect())
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            statusEl.textContent = d.ok ? 'Saved ✓' : 'Failed';
+            setTimeout(function () { statusEl.textContent = ''; }, 2500);
+        }).catch(function () { statusEl.textContent = 'Error'; });
+    });
+
+    setMode(true);
+})();
+{% endif %}
+</script>
+
 {% endblock %}

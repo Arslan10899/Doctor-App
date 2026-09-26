@@ -726,6 +726,7 @@ def index():
         banner_pinned=banner_pinned,
         pinned_height=pinned_height,
         notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
+        is_admin=bool(session.get("admin_logged_in")),
     )
 
 
