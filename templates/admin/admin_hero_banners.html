@@ -28,14 +28,14 @@
     grid-template-columns: .68fr 1.32fr;
     gap: 10px;
     align-items: stretch;
-    max-width: 980px;
+    max-width: 1160px;
     margin: 0 auto;
 }
 .studio-hero-visual { position: relative; display: flex; justify-content: flex-end; }
 .studio-hero-doctor { position: relative; }
 .studio-hero-doctor img {
     display: block;
-    height: 320px;
+    height: 500px;
     width: auto;
     max-width: 100%;
     filter: drop-shadow(0 28px 45px rgba(0,0,0,.28));
@@ -107,10 +107,9 @@
     position: relative;
     flex: 1;
     min-height: 190px;
-    margin-top: 16px;
-    border: 2px dashed rgba(255, 255, 255, .4);
-    border-radius: 12px;
-    padding: 12px;
+    margin-top: 22px;
+    outline: 2px dashed rgba(255, 255, 255, .4);
+    outline-offset: 0;
 }
 .mng-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
 .hb-top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; margin-bottom: 16px; }
@@ -612,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
             applySize(it, 260, 150);
             x += 260 + gap;
         });
-        canvas.style.minHeight = '200px';
+        canvas.style.minHeight = '190px';
     }
 
     function applySaved() {
@@ -628,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         var maxBottom = 190;
         items.forEach(function (it) {
+            if (it.getAttribute('data-x') === '') return;
             var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
             var bottom = (r.top - cr.top) + r.height;
             if (bottom > maxBottom) maxBottom = bottom;

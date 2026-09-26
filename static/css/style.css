@@ -249,8 +249,8 @@ input, select, textarea { font-family: inherit; }
     -webkit-user-drag: none;
     border: 0;
 }
-.hero-banners.pinned { display: block; min-height: var(--hb-minh, 190px); position: relative; }
-.hero-banners.pinned .hero-banner-box {
+.hero-banners.pinned { min-height: var(--hb-minh, 190px); }
+.hero-banner-box.pinned {
     position: absolute;
     margin: 0;
 }
