@@ -255,15 +255,15 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* Admin Hero Banner Studio */
-.studio-page-bg {
+.studio-hero {
     position: relative;
     background: linear-gradient(120deg, #1f6572 0%, var(--primary) 55%, #4db6ac 100%);
     color: #fff;
     overflow: hidden;
     border-radius: 14px;
-    padding: 22px;
+    padding: 14px 22px 18px;
 }
-.studio-page-bg::before {
+.studio-hero::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -274,35 +274,42 @@ input, select, textarea { font-family: inherit; }
         radial-gradient(circle at 90% 20%, #fff 1px, transparent 1px);
     background-size: 220px 220px;
 }
-.studio-page-inner {
+.studio-hero-grid {
     position: relative;
-    max-width: 760px;
+    display: grid;
+    grid-template-columns: .68fr 1.32fr;
+    gap: 10px;
+    align-items: stretch;
+    max-width: 980px;
     margin: 0 auto;
-    text-align: center;
 }
-.studio-hero-head {
-    padding-top: 6px;
+.studio-hero-visual { position: relative; display: flex; justify-content: flex-end; }
+.studio-hero-doctor img {
+    display: block;
+    height: 340px;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 28px 45px rgba(0,0,0,.28));
 }
-.studio-hero-title {
+.studio-hero-content { display: flex; flex-direction: column; }
+.studio-hero-cta-text {
     margin: 0;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 800;
     color: #fff;
     letter-spacing: -.2px;
 }
-.studio-hero-title svg { flex-shrink: 0; opacity: .95; }
-.studio-hero-btns {
+.studio-hero-cta-text svg { flex-shrink: 0; opacity: .95; }
+.studio-hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    justify-content: center;
-    margin-top: 14px;
+    margin-top: 12px;
 }
-.studio-btn {
+.studio-hero-btn-white {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -311,16 +318,14 @@ input, select, textarea { font-family: inherit; }
     font-size: 14px;
     font-weight: 700;
     font-family: inherit;
-    cursor: default;
-    pointer-events: none;
-}
-.studio-btn-white {
     background: #fff;
     color: #0f3a44;
     box-shadow: 0 8px 24px rgba(15, 40, 60, .18);
+    cursor: default;
+    pointer-events: none;
     position: relative;
 }
-.studio-btn-white::after {
+.studio-hero-btn-white::after {
     content: "";
     position: absolute;
     inset: -3px;
@@ -329,18 +334,28 @@ input, select, textarea { font-family: inherit; }
     animation: ctaGlow 2s infinite;
     z-index: -1;
 }
-.studio-btn-ghost {
+.studio-hero-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
     border: 1.5px solid rgba(255, 255, 255, .7);
     color: #fff;
     background: rgba(255, 255, 255, .12);
+    cursor: default;
+    pointer-events: none;
 }
 .studio-strip {
     position: relative;
+    flex: 1;
     min-height: 190px;
-    margin-top: 22px;
-    border: 2px dashed rgba(255, 255, 255, .35);
+    margin-top: 16px;
+    border: 2px dashed rgba(255, 255, 255, .4);
     border-radius: 12px;
-    padding: 16px;
+    padding: 12px;
 }
 .studio-item {
     position: absolute;
@@ -351,12 +366,12 @@ input, select, textarea { font-family: inherit; }
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    border: 2px solid rgba(20, 130, 150, .55);
-    background: #eaf8f6;
+    border: 1px solid rgba(255, 255, 255, .6);
+    background: rgba(255, 255, 255, .12);
     cursor: grab;
-    box-shadow: 0 8px 22px rgba(15, 60, 70, .2);
+    box-shadow: 0 16px 44px rgba(5, 25, 40, .35);
     max-width: 100%;
 }
 .studio-item.dragging { cursor: grabbing; z-index: 5; opacity: .9; }
