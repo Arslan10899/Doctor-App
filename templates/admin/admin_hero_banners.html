@@ -476,27 +476,27 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="studio-strip" id="studioCanvas">
-            {% for b in hero_banners %}
-            <div class="studio-item" data-id="{{ b['id'] }}"
-                 data-x="{{ b['pos_x'] if b['pos_x'] is not none else '' }}" data-y="{{ b['pos_y'] if b['pos_y'] is not none else '' }}"
-                 data-w="{{ b['bw'] if b['bw'] is not none else '' }}" data-h="{{ b['bh'] if b['bh'] is not none else '' }}"
-                 data-active="{{ b['active'] }}"
-                 {% if not b['active'] %}style="opacity:.4;"{% endif %}>
-                {% if b['media_type'] == 'video' %}
-                    {% if yt_embed(b['video_url']) %}
-                    <img src="{{ yt_thumb(b['video_url']) }}" alt="Hero video" draggable="false" style="background:#0a2230;" onerror="this.style.opacity='.25';">
+            <div class="studio-strip" id="studioCanvas">
+                {% for b in hero_banners %}
+                <div class="studio-item" data-id="{{ b['id'] }}"
+                     data-x="{{ b['pos_x'] if b['pos_x'] is not none else '' }}" data-y="{{ b['pos_y'] if b['pos_y'] is not none else '' }}"
+                     data-w="{{ b['bw'] if b['bw'] is not none else '' }}" data-h="{{ b['bh'] if b['bh'] is not none else '' }}"
+                     data-active="{{ b['active'] }}"
+                     {% if not b['active'] %}style="opacity:.4;"{% endif %}>
+                    {% if b['media_type'] == 'video' %}
+                        {% if yt_embed(b['video_url']) %}
+                        <img src="{{ yt_thumb(b['video_url']) }}" alt="Hero video" draggable="false" style="background:#0a2230;" onerror="this.style.opacity='.25';">
+                        {% else %}
+                        <video src="{{ b['video_url'] }}" muted loop playsinline draggable="false" preload="auto"></video>
+                        {% endif %}
+                        <span class="hb-vid-badge">VIDEO</span>
                     {% else %}
-                    <video src="{{ b['video_url'] }}" muted loop playsinline draggable="false" preload="auto"></video>
+                    <img src="{{ b['image_url'] }}" alt="Hero banner" draggable="false">
                     {% endif %}
-                    <span class="hb-vid-badge">VIDEO</span>
-                {% else %}
-                <img src="{{ b['image_url'] }}" alt="Hero banner" draggable="false">
-                {% endif %}
-                <span class="studio-corner" title="Drag to resize"></span>
+                    <span class="studio-corner" title="Drag to resize"></span>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </div>
     {% if not hero_banners %}
