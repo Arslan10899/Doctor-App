@@ -38,28 +38,28 @@
                         <a href="#how-it-works" class="btn btn-ghost-light btn-lg">How it works</a>
                     </div>
                 </div>
-                {% if hero_banners %}
-                <div class="hero-banners{% if banner_pinned %} pinned{% endif %}" id="heroBanners"{% if banner_pinned %} style="--hb-minh:{{ pinned_height }}px;"{% endif %}>
+                {% if hero_banners and not banner_pinned %}
+                <div class="hero-banners" id="heroBanners">
                     {% for hb in hero_banners %}
                     {% if hb['media_type'] == 'video' and (hb['video_url']) %}
                     {% set emb = yt_embed(hb['video_url'], hb['autoplay']) %}
                     {% if emb %}
-                    <a href="{{ url_for('doctors') }}" class="hero-banner-box{% if hb['pos_x'] is not none %} pinned{% endif %}" data-id="{{ hb['id'] }}"
+                    <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
-                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"{% if hb['pos_x'] is not none %} style="position:absolute;left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}"{% endif %}>
+                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}">
                         <iframe class="hb-media" src="{{ emb }}" title="Hero video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
                     </a>
                     {% else %}
-                    <a href="{{ url_for('doctors') }}" class="hero-banner-box{% if hb['pos_x'] is not none %} pinned{% endif %}" data-id="{{ hb['id'] }}"
+                    <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
-                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"{% if hb['pos_x'] is not none %} style="position:absolute;left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}"{% endif %}>
+                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}">
                         <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"{% if not hb['autoplay'] %} controls{% endif %}></video>
                     </a>
                     {% endif %}
                     {% elif hb['image_url'] %}
-                    <a href="{{ url_for('doctors') }}" class="hero-banner-box{% if hb['pos_x'] is not none %} pinned{% endif %}" data-id="{{ hb['id'] }}"
+                    <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
-                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"{% if hb['pos_x'] is not none %} style="position:absolute;left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}"{% endif %}>
+                       data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}">
                         <img src="{{ hb['image_url'] }}" alt="Book Appointment Banner" draggable="false">
                     </a>
                     {% endif %}
@@ -69,6 +69,39 @@
             </div>
         </div>
     </div>
+    {% if hero_banners and banner_pinned %}
+    <div class="hero-pinned-area" id="heroPinnedArea">
+        {% for hb in hero_banners %}
+        {% if hb['pos_x'] is not none %}
+        {% if hb['media_type'] == 'video' and (hb['video_url']) %}
+        {% set emb = yt_embed(hb['video_url'], hb['autoplay']) %}
+        {% if emb %}
+        <a href="{{ url_for('doctors') }}" class="hero-banner-box pinned" data-id="{{ hb['id'] }}"
+           data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
+           data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"
+           style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}">
+            <iframe class="hb-media" src="{{ emb }}" title="Hero video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        </a>
+        {% else %}
+        <a href="{{ url_for('doctors') }}" class="hero-banner-box pinned" data-id="{{ hb['id'] }}"
+           data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
+           data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"
+           style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}">
+            <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"{% if not hb['autoplay'] %} controls{% endif %}></video>
+        </a>
+        {% endif %}
+        {% elif hb['image_url'] %}
+        <a href="{{ url_for('doctors') }}" class="hero-banner-box pinned" data-id="{{ hb['id'] }}"
+           data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
+           data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"
+           style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}">
+            <img src="{{ hb['image_url'] }}" alt="Book Appointment Banner" draggable="false">
+        </a>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
 </section>
 
 <!-- ================= CAROUSEL ================= -->
