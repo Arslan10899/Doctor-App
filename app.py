@@ -1631,6 +1631,15 @@ def admin_content():
     )
 
 
+@app.route("/admin/hero-banners")
+@admin_required
+def admin_hero_banners():
+    return render_template(
+        "admin/admin_hero_banners.html",
+        hero_banners=query("SELECT * FROM hero_banners ORDER BY id DESC"),
+    )
+
+
 @app.route("/admin/hero-banners/save", methods=["POST"])
 @admin_required
 def admin_hero_banners_save():

@@ -1,0 +1,244 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Hero Banners{% endblock %}
+{% block title %}Hero Banner Studio{% endblock %}
+{% block content %}
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:16px;">
+    <div class="card" style="flex:1;min-width:260px;">
+        <h2>Add Hero Banner</h2>
+        <form method="post" action="{{ url_for('admin_content') }}">
+            <input type="hidden" name="section" value="hero_banner">
+            <label class="flabel">Image URL *</label>
+            <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
+            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                <button class="btn btn-sm" type="button" id="hero-banner-browse-btn">Browse &amp; Upload</button>
+                <input type="file" id="hero-banner-browse-file" accept="image/*" style="display:none;">
+                <span id="hero-banner-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+            </div>
+            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Homepage par <b>Book an Appointment</b> button ke neeche canvas par dikhegi. Add karne ke baad neeche canvas par drag + size set karo aur <b>Save Layout</b> dabao.</p>
+            <button class="btn btn-primary" type="submit">Add Banner</button>
+        </form>
+    </div>
+    <div class="card" style="flex:1.4;min-width:280px;">
+        <h2>How to use</h2>
+        <ol style="font-size:13px;color:#374151;line-height:1.8;padding-left:20px;margin:6px 0;">
+            <li><b>Add Banner</b> se image kholo (ya thumbnail par <b>swap</b> from Nikon).</li>
+            <li>Canvas par banner ko <b>mouse se pakd kar</b> jahan dil kare move karo.</li>
+            <li>Neechay right ke <b>corner</b> se kheench kar size barhao / ghatao.</li>
+            <li><b>Save Layout</b> dabao — position &amp; size permanently pin ho jate hain.</li>
+            <li>Kanvas preview bilkul homepage jaisa hi dikhta hai.</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn btn-sm" type="button" id="studio-save">
+                <b style="margin-right:4px;">Save Layout</b>
+            </button>
+            <span id="studio-save-status" style="font-size:12px;color:#1f8b8b;align-self:center;"></span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Canvas ({{ hero_banners|length }})</h2>
+    <div class="studio-strip" id="studioCanvas">
+        {% for b in hero_banners %}
+        <div class="studio-item" data-id="{{ b['id'] }}"
+             data-x="{{ b['pos_x'] or '' }}" data-y="{{ b['pos_y'] or '' }}"
+             data-w="{{ b['bw'] or '' }}" data-h="{{ b['bh'] or '' }}"
+             data-active="{{ b['active'] }}">
+            <img src="{{ b['image_url'] }}" alt="Hero banner" draggable="false">
+            <span class="studio-corner" title="Drag to resize"></span>
+            <div class="studio-actions">
+                <button type="button" class="btn btn-sm btn-toggle" title="Toggle show / hide"
+                        data-act="{{ b['active'] }}">
+                    {% if b['active'] %}ON{% else %}HIDDEN{% endif %}
+                </button>
+                <button type="button" class="btn btn-sm btn-edit" title="Change image">
+                    Image
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" title="Delete banner">
+                    Delete
+                </button>
+            </div>
+            <form class="studio-edit-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+                <input type="hidden" name="section" value="hero_banner_edit">
+                <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
+                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="https://...jpg">
+                <button type="submit" class="btn btn-sm">Update</button>
+            </form>
+            <form class="studio-toggle-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+                <input type="hidden" name="section" value="hero_banner_toggle">
+                <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
+                <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
+            </form>
+            <form class="studio-delete-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+                <input type="hidden" name="section" value="delete">
+                <input type="hidden" name="table" value="hero_banners">
+                <input type="hidden" name="record_id" value="{{ b['id'] }}">
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% if not hero_banners %}
+        <p style="font-size:13px;color:#6b7280;">Abhi koi hero banner nahi. Upar se pehla banner add karo.</p>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var canvas = document.getElementById('studioCanvas');
+    if (!canvas) return;
+    var saveBtn = document.getElementById('studio-save');
+    var saveStatus = document.getElementById('studio-save-status');
+    var items = Array.prototype.slice.call(canvas.querySelectorAll('.studio-item'));
+    var layoutInit = false;
+
+    function arrangeFlow() {
+        var gap = 16, x = 0;
+        items.forEach(function (it) {
+            it.style.left = x + 'px';
+            it.style.top = '0px';
+            it.style.width = '';
+            it.style.height = '';
+            x += (it.offsetWidth > 0 ? it.offsetWidth : 240) + gap;
+        });
+        canvas.style.minHeight = '190px';
+    }
+
+    function applySaved() {
+        items.forEach(function (it) {
+            var x = it.getAttribute('data-x'), y = it.getAttribute('data-y');
+            var w = it.getAttribute('data-w'), h = it.getAttribute('data-h');
+            if (x !== '' && y !== '') { it.style.left = x + '%'; it.style.top = y + 'px'; }
+            if (w) it.style.width = w + 'px';
+            if (h) it.style.height = h + 'px';
+        });
+        var maxBottom = 190;
+        items.forEach(function (it) {
+            var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+            var bottom = (r.top - cr.top) + r.height;
+            if (bottom > maxBottom) maxBottom = bottom;
+        });
+        canvas.style.minHeight = (maxBottom + 40) + 'px';
+    }
+
+    function enterEdit() {
+        items.forEach(function (it) { it.classList.add('studio-editing'); });
+        if (canvas.dataset.posInit !== '1' && !items.some(function (i) { return i.getAttribute('data-x') !== ''; })) {
+            arrangeFlow(); canvas.dataset.posInit = '1';
+        } else {
+            applySaved();
+        }
+    }
+
+    function collect() {
+        return items.map(function (it) {
+            var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+            var px = Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10;
+            var py = Math.round(r.top - cr.top);
+            return {
+                id: parseInt(it.getAttribute('data-id'), 10),
+                pos_x: Math.max(0, Math.min(100, px)),
+                pos_y: Math.max(0, py),
+                bw: Math.round(r.width),
+                bh: Math.round(r.height)
+            };
+        });
+    }
+
+    function saveLayout() {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        fetch('/admin/hero-banners/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(collect())
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Layout';
+            if (d.ok) { saveStatus.textContent = '\u2713 Layout saved & pinned'; setTimeout(function () { saveStatus.textContent = ''; }, 3000); }
+            else { saveStatus.textContent = 'Save failed'; }
+        }).catch(function () {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Layout';
+            saveStatus.textContent = 'Save failed \u2014 try again';
+        });
+    }
+
+    saveBtn.addEventListener('click', saveLayout);
+
+    // Drag
+    items.forEach(function (it) {
+        var startX = 0, startY = 0, oLeft = 0, oTop = 0, dragging = false;
+        it.addEventListener('pointerdown', function (e) {
+            if (e.target.closest('.studio-actions') || e.target.closest('.studio-corner')) return;
+            e.preventDefault();
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            oLeft = it.offsetLeft; oTop = it.offsetTop;
+            it.classList.add('dragging');
+            it.setPointerCapture(e.pointerId);
+        });
+        it.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
+            it.style.top = (oTop + (e.clientY - startY)) + 'px';
+        });
+        function stop(e) {
+            if (!dragging) return;
+            dragging = false;
+            it.classList.remove('dragging');
+            try { it.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+        it.addEventListener('pointerup', stop);
+        it.addEventListener('pointercancel', stop);
+
+        // Resize corner
+        var corner = it.querySelector('.studio-corner');
+        var rsX = 0, rsY = 0, rW = 0, rH = 0, resizing = false, ratio = 1;
+        corner.addEventListener('pointerdown', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            resizing = true;
+            rsX = e.clientX; rsY = e.clientY;
+            rW = it.offsetWidth; rH = it.offsetHeight;
+            ratio = rW / rH;
+            it.classList.add('dragging');
+            corner.setPointerCapture(e.pointerId);
+        });
+        corner.addEventListener('pointermove', function (e) {
+            if (!resizing) return;
+            var dx = e.clientX - rsX, dy = e.clientY - rsY;
+            var w = Math.max(80, rW + dx), h = Math.max(50, rH + dy);
+            if (Math.abs(dx) >= Math.abs(dy)) h = Math.round(w / ratio);
+            else w = Math.round(h * ratio);
+            it.style.width = w + 'px';
+            it.style.height = h + 'px';
+        });
+        function stopResize(e) {
+            if (!resizing) return;
+            resizing = false;
+            it.classList.remove('dragging');
+            try { corner.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+        corner.addEventListener('pointerup', stopResize);
+        corner.addEventListener('pointercancel', stopResize);
+    });
+
+    // Toggle
+    canvas.addEventListener('click', function (e) {
+        var t = e.target.closest('.btn-toggle');
+        if (t) { t.closest('.studio-toggle-form').submit(); return; }
+        var d = e.target.closest('.btn-delete');
+        if (d) {
+            if (confirm('Is banner ko permanently delete kar dein?')) d.closest('.studio-delete-form').submit();
+            return;
+        }
+        var ed = e.target.closest('.btn-edit');
+        if (ed) {
+            var form = ed.closest('.studio-item').querySelector('.studio-edit-form');
+            form.hidden = !form.hidden;
+        }
+    });
+
+    enterEdit();
+});
+</script>
+{% endblock %}
