@@ -174,10 +174,16 @@
 }
 .mng-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .mng-info { display: flex; align-items: center; justify-content: space-between; flex: 1; gap: 8px; }
+.mng-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.mng-actions .btn { padding: 5px 10px; font-size: 12px; }
+.mng-row-wrap { display: flex; flex-direction: column; gap: 6px; border: 1px solid #e3ecee; border-radius: 10px; padding: 6px 8px; background: #fff; }
+.mng-row-wrap .mng-row { border: none; padding: 0; }
+.mng-row-wrap .mng-row.is-off { opacity: .55; }
+.mng-edit-panel { border-top: 1px dashed #d7e3e6; padding-top: 8px; margin-top: 2px; }
+.mng-edit-panel input[type="text"], .mng-edit-panel input[type="number"] { width: 100%; }
+.mng-edit-panel form { display: flex; flex-direction: column; gap: 0; }
+.mng-edit-panel[hidden] { display: none; }
 .mng-id { font-size: 13px; font-weight: 700; color: #12303b; }
-.mng-state { font-size: 11.5px; font-weight: 700; }
-.mng-row.is-off .mng-state { color: #b23b3b; }
-.mng-row:not(.is-off) .mng-state { color: #0f8d80; }
 .toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; flex: none; cursor: pointer; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-slider {
@@ -286,32 +292,6 @@
     border-right: 2px solid #0f7d8f;
     border-bottom: 2px solid #0f7d8f;
 }
-.studio-actions {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    z-index: 4;
-    pointer-events: none;
-}
-.studio-actions .btn { pointer-events: auto; box-shadow: 0 3px 10px rgba(0, 0, 0, .18); }
-.studio-edit-form {
-    position: absolute;
-    bottom: 40px;
-    left: 6px;
-    right: 6px;
-    display: flex;
-    gap: 6px;
-    z-index: 6;
-    background: #12303b;
-    padding: 8px;
-    border-radius: 10px;
-}
-.studio-edit-form[hidden] { display: none; }
-.studio-edit-form input { flex: 1; }
-.studio-edit-form .btn { flex: none; }
 @keyframes floaty {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-12px); }
@@ -387,15 +367,16 @@
                 </div>
                 <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Ya phir yahan <b>YouTube link</b> paste karo (watch / shorts / youtu.be). Autoplay OFF par video tab dikhegi jab visitor kheinche. Zyada bari video upload na karo (website slow ho jayegi).</p>
             </div>
-            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Add karnay ke baad neeche canvas par drag + size set karo aur <b>Save Layout</b> dabao. Toggle <b>Manage Banners</b> se onclick karo.</p>
+            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Add karnay ke baad neeche <b>Canvas</b> par banner ko drag karke position set karo (size corner se adjust hota hai). Positions khud ba-khud save hoti hain. <b>Manage Banners</b> se show/hide, edit aur delete karo.</p>
             <button class="btn btn-primary" type="submit">Add Banner</button>
         </form>
     </div>
     <div class="card hb-top-col">
         <h2>Manage Banners ({{ hero_banners|length }})</h2>
-        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Check on karo jo homepage par show karni ho — bina check banner site par nahi dikhega. Size corner se adjust hota hai (default theek hai).</p>
+        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Toggle se homepage par banner show/hide karo. <b>Edit</b> se URL/name/order/autoplay badlo, <b>Delete</b> se hatao. Positions Canvas par drag se set hoti hain.</p>
         <div class="mng-list">
             {% for b in hero_banners %}
+            <div class="mng-row-wrap">
             <div class="mng-row{% if not b['active'] %} is-off{% endif %}">
                 <div class="mng-thumb">
                     {% if b['media_type'] == 'video' %}
@@ -415,17 +396,51 @@
                         <span class="mng-sub">Image</span>
                         {% endif %}
                     </div>
-                    <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-toggle-form">
-                        <input type="hidden" name="section" value="hero_banner_toggle">
-                        <input type="hidden" name="id" value="{{ b['id'] }}">
-                        <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
-                        <label class="toggle-switch" title="{{ 'Click to hide' if b['active'] else 'Click to show' }}">
-                            <input type="checkbox" class="mng-chk" {% if b['active'] %}checked{% endif %}>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span class="mng-state">{{ 'SHOW' if b['active'] else 'HIDDEN' }}</span>
-                    </form>
+                    <div class="mng-actions">
+                        <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-toggle-form">
+                            <input type="hidden" name="section" value="hero_banner_toggle">
+                            <input type="hidden" name="id" value="{{ b['id'] }}">
+                            <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
+                            <label class="toggle-switch" title="{{ 'Click to hide' if b['active'] else 'Click to show' }}">
+                                <input type="checkbox" class="mng-chk" {% if b['active'] %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </form>
+                        <button type="button" class="btn btn-sm mng-edit-btn" data-id="{{ b['id'] }}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger mng-del-btn" data-id="{{ b['id'] }}">Delete</button>
+                    </div>
                 </div>
+            </div>
+            <div class="mng-edit-panel" data-id="{{ b['id'] }}" hidden>
+                <form method="post" action="{{ url_for('admin_hero_banners') }}">
+                    <input type="hidden" name="section" value="hero_banner_edit">
+                    <input type="hidden" name="id" value="{{ b['id'] }}">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <input type="text" name="name" value="{{ b['name'] or '' }}" placeholder="Banner name">
+                        <input type="text" name="image_url" value="{{ b['image_url'] or '' }}" placeholder="Image URL">
+                        <input type="text" name="video_url" value="{{ b['video_url'] or '' }}" placeholder="Video / YouTube URL">
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="number" name="sort_order" value="{{ b['sort_order'] or 0 }}" placeholder="Order #" style="width:90px;">
+                            <select name="media_type" style="flex:1;">
+                                <option value="image" {% if b['media_type'] != 'video' %}selected{% endif %}>Image</option>
+                                <option value="video" {% if b['media_type'] == 'video' %}selected{% endif %}>Video</option>
+                            </select>
+                        </div>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;">
+                            <input type="checkbox" name="autoplay" value="1" {% if b['autoplay'] %}checked{% endif %}> Autoplay (video khud chalay)
+                        </label>
+                        <div style="display:flex;gap:6px;">
+                            <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-sm mng-edit-cancel" data-id="{{ b['id'] }}">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <form method="post" action="{{ url_for('admin_hero_banners') }}" class="mng-delete-form" hidden>
+                <input type="hidden" name="section" value="delete">
+                <input type="hidden" name="table" value="hero_banners">
+                <input type="hidden" name="record_id" value="{{ b['id'] }}">
+            </form>
             </div>
             {% else %}
             <p style="font-size:13px;color:#6b7280;">Abhi koi banner add nahi hua.</p>
@@ -442,7 +457,7 @@
 </div>
 
 <div class="card">
-    <h2>Canvas — homepage hero ka 100% exact copy ({{ hero_banners|length }})</h2>
+    <h2>Canvas</h2>
     <div class="studio-hero">
         <div class="studio-hero-grid">
             <div class="studio-hero-visual">
@@ -468,7 +483,8 @@
         <div class="studio-item" data-id="{{ b['id'] }}"
              data-x="{{ b['pos_x'] if b['pos_x'] is not none else '' }}" data-y="{{ b['pos_y'] if b['pos_y'] is not none else '' }}"
              data-w="{{ b['bw'] if b['bw'] is not none else '' }}" data-h="{{ b['bh'] if b['bh'] is not none else '' }}"
-             data-active="{{ b['active'] }}">
+             data-active="{{ b['active'] }}"
+             {% if not b['active'] %}style="opacity:.4;"{% endif %}>
             {% if b['media_type'] == 'video' %}
                 {% if yt_embed(b['video_url']) %}
                 <img src="{{ yt_thumb(b['video_url']) }}" alt="Hero video" draggable="false" style="background:#0a2230;" onerror="this.style.opacity='.25';">
@@ -480,42 +496,6 @@
             <img src="{{ b['image_url'] }}" alt="Hero banner" draggable="false">
             {% endif %}
             <span class="studio-corner" title="Drag to resize"></span>
-            <div class="studio-actions">
-                <button type="button" class="btn btn-sm btn-toggle" title="Toggle show / hide"
-                        data-act="{{ b['active'] }}">
-                    {% if b['active'] %}ON{% else %}HIDDEN{% endif %}
-                </button>
-                <button type="button" class="btn btn-sm btn-edit" title="Change image / video">
-                    Edit
-                </button>
-                <button type="button" class="btn btn-sm btn-danger btn-delete" title="Delete banner">
-                    Delete
-                </button>
-            </div>
-            <form class="studio-edit-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
-                <input type="hidden" name="section" value="hero_banner_edit">
-                <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
-                <input type="hidden" name="media_type" value="{{ b['media_type'] }}">
-                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="Image URL" style="min-width:80px;">
-                <input type="text" name="video_url" value="{{ b['video_url'] }}" placeholder="Video / YouTube URL" style="min-width:80px;">
-                <input type="text" name="name" value="{{ b['name'] or '' }}" placeholder="Name" style="min-width:70px;">
-                <input type="number" name="sort_order" value="{{ b['sort_order'] or 0 }}" placeholder="#" style="width:52px;">
-                <select name="autoplay" title="Autoplay">
-                    <option value="1" {% if b['autoplay'] %}selected{% endif %}>Auto ON</option>
-                    <option value="0" {% if not b['autoplay'] %}selected{% endif %}>Auto OFF</option>
-                </select>
-                <button type="submit" class="btn btn-sm">Update</button>
-            </form>
-            <form class="studio-toggle-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
-                <input type="hidden" name="section" value="hero_banner_toggle">
-                <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
-                <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
-            </form>
-            <form class="studio-delete-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
-                <input type="hidden" name="section" value="delete">
-                <input type="hidden" name="table" value="hero_banners">
-                <input type="hidden" name="record_id" value="{{ b['id'] }}">
-            </form>
         </div>
         {% endfor %}
                 </div>
@@ -629,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
         items.forEach(function (it) {
             it.style.left = x + 'px';
             it.style.top = '0px';
-            applySize(it, 260, 146);
+            applySize(it, 260, 150);
             x += 260 + gap;
         });
         canvas.style.minHeight = '200px';
@@ -638,7 +618,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function applySaved() {
         items.forEach(function (it) {
             var x = it.getAttribute('data-x'), y = it.getAttribute('data-y');
-            var w = it.getAttribute('data-w') || '260', h = it.getAttribute('data-h') || '146';
+            var w = it.getAttribute('data-w') || '260', h = it.getAttribute('data-h') || '150';
             it.style.width = w + 'px';
             it.style.height = h + 'px';
             it.style.top = '0px';
@@ -672,19 +652,28 @@ document.addEventListener('DOMContentLoaded', function () {
             chk.closest('.mng-toggle-form').submit();
         });
     });
-    canvas.addEventListener('click', function (e) {
-        var t = e.target.closest('.btn-toggle');
-        if (t) { t.closest('.studio-toggle-form').submit(); return; }
-        var d = e.target.closest('.btn-delete');
-        if (d) {
-            if (confirm('Is banner ko permanently delete kar dein?')) d.closest('.studio-delete-form').submit();
-            return;
-        }
-        var ed = e.target.closest('.btn-edit');
-        if (ed) {
-            var f = ed.closest('.studio-item').querySelector('.studio-edit-form');
-            f.hidden = !f.hidden;
-        }
+    // Manage Banners: Edit (expand inline form) and Delete
+    Array.prototype.slice.call(document.querySelectorAll('.mng-edit-btn')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-id');
+            Array.prototype.slice.call(document.querySelectorAll('.mng-edit-panel')).forEach(function (p) {
+                if (p.getAttribute('data-id') !== id) p.hidden = true;
+            });
+            var panel = document.querySelector('.mng-edit-panel[data-id="' + id + '"]');
+            if (panel) panel.hidden = !panel.hidden;
+        });
+    });
+    Array.prototype.slice.call(document.querySelectorAll('.mng-edit-cancel')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var panel = btn.closest('.mng-edit-panel');
+            if (panel) panel.hidden = true;
+        });
+    });
+    Array.prototype.slice.call(document.querySelectorAll('.mng-del-btn')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = btn.closest('.mng-row-wrap').querySelector('.mng-delete-form');
+            if (form && confirm('Is banner ko permanently delete kar dein?')) form.submit();
+        });
     });
 
     function collect() {
@@ -750,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function () {
     items.forEach(function (it) {
         var startX = 0, startY = 0, oLeft = 0, oTop = 0, dragging = false;
         it.addEventListener('pointerdown', function (e) {
-            if (e.target.closest('.studio-actions') || e.target.closest('.studio-corner')) return;
+            if (e.target.closest('.studio-corner')) return;
             e.preventDefault();
             select(it);
             dragging = true;
