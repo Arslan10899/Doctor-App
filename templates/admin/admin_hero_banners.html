@@ -125,9 +125,9 @@ document.addEventListener('DOMContentLoaded', function () {
         items.forEach(function (it) {
             it.style.left = x + 'px';
             it.style.top = '0px';
-            it.style.width = '';
-            it.style.height = '';
-            x += (it.offsetWidth > 0 ? it.offsetWidth : 240) + gap;
+            it.style.width = '260px';
+            it.style.height = '150px';
+            x += 260 + gap;
         });
         canvas.style.minHeight = '190px';
     }
@@ -135,10 +135,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function applySaved() {
         items.forEach(function (it) {
             var x = it.getAttribute('data-x'), y = it.getAttribute('data-y');
-            var w = it.getAttribute('data-w'), h = it.getAttribute('data-h');
+            var w = it.getAttribute('data-w') || '260', h = it.getAttribute('data-h') || '150';
+            it.style.width = w + 'px';
+            it.style.height = h + 'px';
             if (x !== '' && y !== '') { it.style.left = x + '%'; it.style.top = y + 'px'; }
-            if (w) it.style.width = w + 'px';
-            if (h) it.style.height = h + 'px';
         });
         var maxBottom = 190;
         items.forEach(function (it) {

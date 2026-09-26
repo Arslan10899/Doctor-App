@@ -39,28 +39,16 @@
                     </div>
                 </div>
                 {% if hero_banners %}
-                <div class="hero-banners{% if banner_pinned %} pinned{% endif %}" id="heroBanners" data-admin="{{ '1' if session.get('admin_logged_in') else '0' }}"{% if banner_pinned %} style="--hb-minh:{{ pinned_height }}px;"{% endif %}>
+                <div class="hero-banners{% if banner_pinned %} pinned{% endif %}" id="heroBanners"{% if banner_pinned %} style="--hb-minh:{{ pinned_height }}px;"{% endif %}>
                     {% for hb in hero_banners %}
                     {% if hb['image_url'] %}
                     <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
                        data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"{% if banner_pinned and hb['pos_x'] is not none %} style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}"{% endif %}>
                         <img src="{{ hb['image_url'] }}" alt="Book Appointment Banner" draggable="false">
-                        <span class="hb-resize" aria-hidden="true"></span>
                     </a>
                     {% endif %}
                     {% endfor %}
-                    <div class="hb-edit-tools">
-                        <button type="button" class="hb-btn" id="hbEditToggle">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                            <span id="hbEditLabel">Edit</span>
-                        </button>
-                        <button type="button" class="hb-btn hb-save" id="hbSave">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/></svg>
-                            Save
-                        </button>
-                    </div>
-                    <span class="hb-status"></span>
                 </div>
                 {% endif %}
             </div>
