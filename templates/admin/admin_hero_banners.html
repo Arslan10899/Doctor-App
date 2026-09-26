@@ -113,6 +113,11 @@
     padding: 12px;
 }
 .mng-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.hb-top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; margin-bottom: 16px; }
+.hb-top-col { margin: 0 !important; }
+@media (max-width: 900px) {
+    .hb-top-grid { grid-template-columns: 1fr; }
+}
 .hb-type-btn {
     flex: 1;
     border: 1.5px solid #d7e3e6;
@@ -311,8 +316,8 @@
     .studio-hero-doctor img { height: 220px; }
 }
 </style>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:16px;">
-    <div class="card" style="flex:1;min-width:260px;">
+<div class="hb-top-grid">
+    <div class="card hb-top-col">
         <h2>Add Hero Banner</h2>
         <form method="post" action="{{ url_for('admin_hero_banners') }}">
             <input type="hidden" name="section" value="hero_banner">
@@ -350,7 +355,7 @@
             <button class="btn btn-primary" type="submit">Add Banner</button>
         </form>
     </div>
-    <div class="card" style="flex:1.4;min-width:280px;">
+    <div class="card hb-top-col">
         <h2>Manage Banners ({{ hero_banners|length }})</h2>
         <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Check on karo jo homepage par show karni ho — bina check banner site par nahi dikhega. Size corner se adjust hota hai (default theek hai).</p>
         <div class="mng-list">
