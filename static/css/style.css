@@ -287,7 +287,7 @@ input, select, textarea { font-family: inherit; }
 .studio-hero-doctor { position: relative; }
 .studio-hero-doctor img {
     display: block;
-    height: 480px;
+    height: 320px;
     width: auto;
     max-width: 100%;
     filter: drop-shadow(0 28px 45px rgba(0,0,0,.28));
