@@ -112,34 +112,59 @@
     border-radius: 12px;
     padding: 12px;
 }
-.studio-presets {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-.size-btn {
-    border: 1.5px solid #d7e3e6;
-    background: #f5fbfb;
-    color: #12303b;
+.mng-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.mng-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e3ecee;
     border-radius: 10px;
-    padding: 9px 6px;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: inherit;
+    padding: 6px 8px;
+    background: #fff;
+}
+.mng-row.is-off { opacity: .55; }
+.mng-thumb {
+    width: 52px;
+    height: 34px;
+    flex: none;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #eef5f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d7e3e6;
+}
+.mng-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.mng-info { display: flex; align-items: center; justify-content: space-between; flex: 1; gap: 8px; }
+.mng-id { font-size: 13px; font-weight: 700; color: #12303b; }
+.mng-state { font-size: 11.5px; font-weight: 700; }
+.mng-row.is-off .mng-state { color: #b23b3b; }
+.mng-row:not(.is-off) .mng-state { color: #0f8d80; }
+.toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; flex: none; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+    position: absolute;
     cursor: pointer;
-    text-align: center;
-    line-height: 1.35;
-    transition: border-color .15s, background .15s, transform .1s;
+    inset: 0;
+    background: #d3dcdf;
+    border-radius: 999px;
+    transition: background .2s;
 }
-.size-btn small { display: block; font-size: 11px; font-weight: 600; color: #6b828b; margin-top: 2px; }
-.size-btn:hover { border-color: #0f8d80; background: #eafaf6; }
-.size-btn.is-active {
-    border-color: #0f8d80;
-    background: #0f8d80;
-    color: #fff;
-    box-shadow: 0 6px 16px rgba(15, 141, 128, .3);
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.25);
 }
-.size-btn.is-active small { color: #d7f5ef; }
+.toggle-switch input:checked + .toggle-slider { background: #0f8d80; }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
 .studio-item.selected { outline: 3px solid #fbbf24; outline-offset: 2px; }
 .studio-size {
     position: absolute;
@@ -264,16 +289,33 @@
         </form>
     </div>
     <div class="card" style="flex:1.4;min-width:280px;">
-        <h2>Banner Size Presets</h2>
-        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Pehle canvas par banner ko <b>click</b> karke select karo, phir size choose karo.</p>
-        <div class="studio-presets">
-            <button type="button" class="size-btn" data-w="180" data-h="101">Small<br><small>180 × 101</small></button>
-            <button type="button" class="size-btn is-active" data-w="260" data-h="146">Medium<br><small>260 × 146</small></button>
-            <button type="button" class="size-btn" data-w="340" data-h="191">Large<br><small>340 × 191</small></button>
-            <button type="button" class="size-btn" data-w="420" data-h="236">XL<br><small>420 × 236</small></button>
+        <h2>Manage Banners ({{ hero_banners|length }})</h2>
+        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Check on karo jo homepage par show karni ho — bina check banner site par nahi dikhega. Size corner se adjust hota hai (default theek hai).</p>
+        <div class="mng-list">
+            {% for b in hero_banners %}
+            <div class="mng-row{% if not b['active'] %} is-off{% endif %}">
+                <div class="mng-thumb">
+                    {% if b['image_url'] %}<img src="{{ b['image_url'] }}" alt="banner {{ b['id'] }}" onerror="this.style.visibility='hidden';">{% endif %}
+                </div>
+                <div class="mng-info">
+                    <span class="mng-id">Banner #{{ b['id'] }}</span>
+                    <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-toggle-form">
+                        <input type="hidden" name="section" value="hero_banner_toggle">
+                        <input type="hidden" name="id" value="{{ b['id'] }}">
+                        <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
+                        <label class="toggle-switch" title="{{ 'Click to hide' if b['active'] else 'Click to show' }}">
+                            <input type="checkbox" class="mng-chk" {% if b['active'] %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="mng-state">{{ 'SHOW' if b['active'] else 'HIDDEN' }}</span>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p style="font-size:13px;color:#6b7280;">Abhi koi banner add nahi hua.</p>
+            {% endfor %}
         </div>
-        <p style="font-size:12px;color:#6b7280;margin:10px 0 8px;">Ya banner ke <b>corner handle</b> se freely kheench kar size / position set karo.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
             <button class="btn btn-sm" type="button" id="studio-arrange">Auto Arrange</button>
             <button class="btn btn-sm btn-primary" type="button" id="studio-save">
                 <b>Save Layout</b>
@@ -388,7 +430,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var saveBtn = document.getElementById('studio-save');
     var saveStatus = document.getElementById('studio-save-status');
     var arrangeBtn = document.getElementById('studio-arrange');
-    var sizeBtns = Array.prototype.slice.call(document.querySelectorAll('.size-btn'));
     var items = Array.prototype.slice.call(canvas.querySelectorAll('.studio-item'));
     var selected = null;
 
@@ -414,11 +455,6 @@ document.addEventListener('DOMContentLoaded', function () {
         it.style.width = w + 'px';
         it.style.height = h + 'px';
         updateLabel(it);
-        var btn = sizeBtns.filter(function (b) {
-            return b.getAttribute('data-w') === String(w) && b.getAttribute('data-h') === String(h);
-        })[0];
-        sizeBtns.forEach(function (b) { b.classList.remove('is-active'); });
-        if (btn) btn.classList.add('is-active');
     }
 
     function arrangeFlow() {
@@ -463,18 +499,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    sizeBtns.forEach(function (b) {
-        b.addEventListener('click', function () {
-            if (!selected) { saveStatus.textContent = '\u21d2 Pehle banner select karo'; setTimeout(function () { saveStatus.textContent = ''; }, 2200); return; }
-            applySize(selected, parseInt(b.getAttribute('data-w'), 10), parseInt(b.getAttribute('data-h'), 10));
+    // Show / hide toggles
+    Array.prototype.slice.call(document.querySelectorAll('.mng-chk')).forEach(function (chk) {
+        chk.addEventListener('change', function () {
+            chk.closest('.mng-toggle-form').submit();
         });
     });
-    if (arrangeBtn) {
-        arrangeBtn.addEventListener('click', function () {
-            arrangeFlow();
-            items.forEach(updateLabel);
-        });
-    }
+    canvas.addEventListener('click', function (e) {
+        var t = e.target.closest('.btn-toggle');
+        if (t) { t.closest('.studio-toggle-form').submit(); return; }
+        var d = e.target.closest('.btn-delete');
+        if (d) {
+            if (confirm('Is banner ko permanently delete kar dein?')) d.closest('.studio-delete-form').submit();
+            return;
+        }
+        var ed = e.target.closest('.btn-edit');
+        if (ed) {
+            var f = ed.closest('.studio-item').querySelector('.studio-edit-form');
+            f.hidden = !f.hidden;
+        }
+    });
 
     function collect() {
         return items.map(function (it) {
@@ -511,6 +555,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     saveBtn.addEventListener('click', saveLayout);
+    if (arrangeBtn) {
+        arrangeBtn.addEventListener('click', function () {
+            arrangeFlow();
+            items.forEach(updateLabel);
+        });
+    }
 
     // Drag
     items.forEach(function (it) {
@@ -570,22 +620,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         corner.addEventListener('pointerup', stopResize);
         corner.addEventListener('pointercancel', stopResize);
-    });
-
-    // Toggle
-    canvas.addEventListener('click', function (e) {
-        var t = e.target.closest('.btn-toggle');
-        if (t) { t.closest('.studio-toggle-form').submit(); return; }
-        var d = e.target.closest('.btn-delete');
-        if (d) {
-            if (confirm('Is banner ko permanently delete kar dein?')) d.closest('.studio-delete-form').submit();
-            return;
-        }
-        var ed = e.target.closest('.btn-edit');
-        if (ed) {
-            var form = ed.closest('.studio-item').querySelector('.studio-edit-form');
-            form.hidden = !form.hidden;
-        }
     });
 
     enterEdit();
