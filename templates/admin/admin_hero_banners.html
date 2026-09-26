@@ -83,7 +83,36 @@
 </div>
 
 <script>
+function uploadToInput(fileInput, urlInput, statusEl) {
+    if (!fileInput.files.length) { return; }
+    var fd = new FormData();
+    fd.append('file', fileInput.files[0]);
+    if (statusEl) statusEl.textContent = 'Uploading...';
+    fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.ok) {
+                urlInput.value = res.url;
+                urlInput.removeAttribute('required');
+                if (statusEl) statusEl.textContent = 'Uploaded.';
+            } else {
+                if (statusEl) statusEl.textContent = 'Error: ' + (res.error || 'upload failed');
+            }
+        })
+        .catch(function() {
+            if (statusEl) statusEl.textContent = 'Upload failed. Check server.';
+        });
+}
 document.addEventListener('DOMContentLoaded', function () {
+    var browseBtn = document.getElementById('hero-banner-browse-btn');
+    var browseFile = document.getElementById('hero-banner-browse-file');
+    var urlInput = document.getElementById('new-hero-banner-image');
+    var uploadStatus = document.getElementById('hero-banner-upload-status');
+    if (browseBtn && browseFile && urlInput) {
+        browseBtn.addEventListener('click', function () { browseFile.click(); });
+        browseFile.addEventListener('change', function () { uploadToInput(browseFile, urlInput, uploadStatus); });
+    }
+
     var canvas = document.getElementById('studioCanvas');
     if (!canvas) return;
     var saveBtn = document.getElementById('studio-save');
