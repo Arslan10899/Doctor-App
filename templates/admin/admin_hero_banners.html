@@ -19,17 +19,19 @@
         </form>
     </div>
     <div class="card" style="flex:1.4;min-width:280px;">
-        <h2>How to use</h2>
-        <ol style="font-size:13px;color:#374151;line-height:1.8;padding-left:20px;margin:6px 0;">
-            <li><b>Add Banner</b> se image kholo (ya thumbnail par <b>swap</b> from Nikon).</li>
-            <li>Canvas par banner ko <b>mouse se pakd kar</b> jahan dil kare move karo.</li>
-            <li>Neechay right ke <b>corner</b> se kheench kar size barhao / ghatao.</li>
-            <li><b>Save Layout</b> dabao — position &amp; size permanently pin ho jate hain.</li>
-            <li>Kanvas preview bilkul homepage jaisa hi dikhta hai.</li>
-        </ol>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-            <button class="btn btn-sm" type="button" id="studio-save">
-                <b style="margin-right:4px;">Save Layout</b>
+        <h2>Banner Size Presets</h2>
+        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Pehle canvas par banner ko <b>click</b> karke select karo, phir size choose karo.</p>
+        <div class="studio-presets">
+            <button type="button" class="size-btn" data-w="180" data-h="101">Small<br><small>180 × 101</small></button>
+            <button type="button" class="size-btn is-active" data-w="260" data-h="146">Medium<br><small>260 × 146</small></button>
+            <button type="button" class="size-btn" data-w="340" data-h="191">Large<br><small>340 × 191</small></button>
+            <button type="button" class="size-btn" data-w="420" data-h="236">XL<br><small>420 × 236</small></button>
+        </div>
+        <p style="font-size:12px;color:#6b7280;margin:10px 0 8px;">Ya banner ke <b>corner handle</b> se freely kheench kar size / position set karo.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm" type="button" id="studio-arrange">Auto Arrange</button>
+            <button class="btn btn-sm btn-primary" type="button" id="studio-save">
+                <b>Save Layout</b>
             </button>
             <span id="studio-save-status" style="font-size:12px;color:#1f8b8b;align-self:center;"></span>
         </div>
@@ -138,28 +140,61 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!canvas) return;
     var saveBtn = document.getElementById('studio-save');
     var saveStatus = document.getElementById('studio-save-status');
+    var arrangeBtn = document.getElementById('studio-arrange');
+    var sizeBtns = Array.prototype.slice.call(document.querySelectorAll('.size-btn'));
     var items = Array.prototype.slice.call(canvas.querySelectorAll('.studio-item'));
-    var layoutInit = false;
+    var selected = null;
+
+    function makeLabel(it) {
+        var lab = it.querySelector('.studio-size');
+        if (!lab) {
+            lab = document.createElement('span');
+            lab.className = 'studio-size';
+            it.appendChild(lab);
+        }
+        return lab;
+    }
+    function updateLabel(it) {
+        makeLabel(it).textContent = Math.round(it.offsetWidth) + ' \u00d7 ' + Math.round(it.offsetHeight);
+    }
+    function select(it) {
+        if (selected === it) return;
+        if (selected) selected.classList.remove('selected');
+        selected = it;
+        if (selected) selected.classList.add('selected');
+    }
+    function applySize(it, w, h) {
+        it.style.width = w + 'px';
+        it.style.height = h + 'px';
+        updateLabel(it);
+        var btn = sizeBtns.filter(function (b) {
+            return b.getAttribute('data-w') === String(w) && b.getAttribute('data-h') === String(h);
+        })[0];
+        sizeBtns.forEach(function (b) { b.classList.remove('is-active'); });
+        if (btn) btn.classList.add('is-active');
+    }
 
     function arrangeFlow() {
         var gap = 16, x = 0;
         items.forEach(function (it) {
             it.style.left = x + 'px';
             it.style.top = '0px';
-            it.style.width = '260px';
-            it.style.height = '150px';
+            applySize(it, 260, 146);
             x += 260 + gap;
         });
-        canvas.style.minHeight = '190px';
+        canvas.style.minHeight = '200px';
     }
 
     function applySaved() {
         items.forEach(function (it) {
             var x = it.getAttribute('data-x'), y = it.getAttribute('data-y');
-            var w = it.getAttribute('data-w') || '260', h = it.getAttribute('data-h') || '150';
+            var w = it.getAttribute('data-w') || '260', h = it.getAttribute('data-h') || '146';
             it.style.width = w + 'px';
             it.style.height = h + 'px';
+            it.style.top = '0px';
+            it.style.left = '0px';
             if (x !== '' && y !== '') { it.style.left = x + '%'; it.style.top = y + 'px'; }
+            updateLabel(it);
         });
         var maxBottom = 190;
         items.forEach(function (it) {
@@ -171,12 +206,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function enterEdit() {
-        items.forEach(function (it) { it.classList.add('studio-editing'); });
-        if (canvas.dataset.posInit !== '1' && !items.some(function (i) { return i.getAttribute('data-x') !== ''; })) {
+        items.forEach(function (it) { it.classList.add('studio-editing'); updateLabel(it); });
+        if (items.length && canvas.dataset.posInit !== '1' && !items.some(function (i) { return i.getAttribute('data-x') !== ''; })) {
             arrangeFlow(); canvas.dataset.posInit = '1';
+        } else if (items.length && !items[0].offsetWidth) {
+            arrangeFlow();
         } else {
             applySaved();
         }
+    }
+
+    sizeBtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+            if (!selected) { saveStatus.textContent = '\u21d2 Pehle banner select karo'; setTimeout(function () { saveStatus.textContent = ''; }, 2200); return; }
+            applySize(selected, parseInt(b.getAttribute('data-w'), 10), parseInt(b.getAttribute('data-h'), 10));
+        });
+    });
+    if (arrangeBtn) {
+        arrangeBtn.addEventListener('click', function () {
+            arrangeFlow();
+            items.forEach(updateLabel);
+        });
     }
 
     function collect() {
@@ -221,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         it.addEventListener('pointerdown', function (e) {
             if (e.target.closest('.studio-actions') || e.target.closest('.studio-corner')) return;
             e.preventDefault();
+            select(it);
             dragging = true;
             startX = e.clientX; startY = e.clientY;
             oLeft = it.offsetLeft; oTop = it.offsetTop;
@@ -246,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var rsX = 0, rsY = 0, rW = 0, rH = 0, resizing = false, ratio = 1;
         corner.addEventListener('pointerdown', function (e) {
             e.preventDefault(); e.stopPropagation();
+            select(it);
             resizing = true;
             rsX = e.clientX; rsY = e.clientY;
             rW = it.offsetWidth; rH = it.offsetHeight;
@@ -261,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
             else w = Math.round(h * ratio);
             it.style.width = w + 'px';
             it.style.height = h + 'px';
+            updateLabel(it);
         });
         function stopResize(e) {
             if (!resizing) return;
