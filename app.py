@@ -1631,6 +1631,40 @@ def admin_content():
     )
 
 
+@app.route("/admin/hero-banners", methods=["POST"])
+@admin_required
+def admin_hero_banners_action():
+    section = request.form.get("section")
+    if section == "hero_banner":
+        image_url = request.form.get("image_url", "").strip()
+        if image_url:
+            execute("INSERT INTO hero_banners (image_url, active) VALUES (?, 1)", (image_url,))
+            flash("Hero banner added.", "success")
+        else:
+            flash("Image URL is required to add a hero banner.", "warning")
+    elif section == "hero_banner_toggle":
+        bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
+        val = 1 if request.form.get("active") == "1" else 0
+        if bid:
+            execute("UPDATE hero_banners SET active=? WHERE id=?", (val, bid))
+            flash("Hero banner " + ("enabled." if val else "hidden."), "success")
+    elif section == "hero_banner_edit":
+        bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
+        image_url = request.form.get("image_url", "").strip()
+        if bid and image_url:
+            execute("UPDATE hero_banners SET image_url=? WHERE id=?", (image_url, bid))
+            flash("Hero banner updated.", "success")
+        else:
+            flash("Image URL is required to save a hero banner.", "warning")
+    elif section == "delete":
+        table = request.form.get("table", "")
+        cid = request.form.get("record_id", request.form.get("id", type=int))
+        if table == "hero_banners" and cid:
+            execute("DELETE FROM hero_banners WHERE id=?", (cid,))
+            flash("Hero banner removed.", "info")
+    return redirect(url_for("admin_hero_banners"))
+
+
 @app.route("/admin/hero-banners")
 @admin_required
 def admin_hero_banners():

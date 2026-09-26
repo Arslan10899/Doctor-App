@@ -5,7 +5,7 @@
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:16px;">
     <div class="card" style="flex:1;min-width:260px;">
         <h2>Add Hero Banner</h2>
-        <form method="post" action="{{ url_for('admin_content') }}">
+        <form method="post" action="{{ url_for('admin_hero_banners') }}">
             <input type="hidden" name="section" value="hero_banner">
             <label class="flabel">Image URL *</label>
             <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
@@ -76,18 +76,18 @@
                     Delete
                 </button>
             </div>
-            <form class="studio-edit-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+            <form class="studio-edit-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
                 <input type="hidden" name="section" value="hero_banner_edit">
                 <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
                 <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="https://...jpg">
                 <button type="submit" class="btn btn-sm">Update</button>
             </form>
-            <form class="studio-toggle-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+            <form class="studio-toggle-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
                 <input type="hidden" name="section" value="hero_banner_toggle">
                 <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
                 <input type="hidden" name="active" value="{% if b['active'] %}0{% else %}1{% endif %}">
             </form>
-            <form class="studio-delete-form" method="post" action="{{ url_for('admin_content') }}" hidden>
+            <form class="studio-delete-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
                 <input type="hidden" name="section" value="delete">
                 <input type="hidden" name="table" value="hero_banners">
                 <input type="hidden" name="record_id" value="{{ b['id'] }}">
