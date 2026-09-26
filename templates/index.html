@@ -38,11 +38,15 @@
                         <a href="#how-it-works" class="btn btn-ghost-light btn-lg">How it works</a>
                     </div>
                 </div>
-                {% if hero_banner and hero_banner['image_url'] %}
-                <div class="hero-banner-box">
-                    <a href="{{ url_for('doctors') }}">
-                        <img src="{{ hero_banner['image_url'] }}" alt="Book Appointment Banner">
+                {% if hero_banners %}
+                <div class="hero-banners">
+                    {% for hb in hero_banners %}
+                    {% if hb['image_url'] %}
+                    <a href="{{ url_for('doctors') }}" class="hero-banner-box">
+                        <img src="{{ hb['image_url'] }}" alt="Book Appointment Banner">
                     </a>
+                    {% endif %}
+                    {% endfor %}
                 </div>
                 {% endif %}
             </div>

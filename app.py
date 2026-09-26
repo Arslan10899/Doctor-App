@@ -631,7 +631,7 @@ def index():
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
-    hero_banner = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY id DESC LIMIT 1", one=True)
+    hero_banners = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY id DESC")
     return render_template(
         "index.html",
         specialties=specialties,
@@ -648,7 +648,7 @@ def index():
         cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")],
         announcements=announcements,
         carousel=carousel,
-        hero_banner=hero_banner,
+        hero_banners=hero_banners,
         notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
     )
 
