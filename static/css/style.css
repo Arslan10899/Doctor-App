@@ -1433,7 +1433,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     gap: 0;
     width: max-content;
     white-space: nowrap;
-    animation: announce-scroll 45s linear infinite reverse;
+    animation: announce-scroll 80s linear infinite;
     padding-left: 100%;
     -webkit-mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
     mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
