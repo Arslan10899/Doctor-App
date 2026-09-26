@@ -189,21 +189,20 @@ input, select, textarea { font-family: inherit; }
 
 /* Hero CTA (below search) */
 .hero-cta {
-    margin-top: 26px;
+    margin-top: 22px;
     padding-top: 22px;
     border-top: 1px solid rgba(255, 255, 255, .28);
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
 }
 .hero-cta-text {
     margin: 0;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 800;
     color: #fff;
     letter-spacing: -.2px;
