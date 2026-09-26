@@ -255,13 +255,92 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* Admin Hero Banner Studio */
+.studio-page-bg {
+    position: relative;
+    background: linear-gradient(120deg, #1f6572 0%, var(--primary) 55%, #4db6ac 100%);
+    color: #fff;
+    overflow: hidden;
+    border-radius: 14px;
+    padding: 22px;
+}
+.studio-page-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .12;
+    background-image:
+        radial-gradient(circle at 20% 30%, #fff 1px, transparent 1px),
+        radial-gradient(circle at 70% 60%, #fff 1px, transparent 1px),
+        radial-gradient(circle at 90% 20%, #fff 1px, transparent 1px);
+    background-size: 220px 220px;
+}
+.studio-page-inner {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+}
+.studio-hero-head {
+    padding-top: 6px;
+}
+.studio-hero-title {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.2px;
+}
+.studio-hero-title svg { flex-shrink: 0; opacity: .95; }
+.studio-hero-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 14px;
+}
+.studio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: default;
+    pointer-events: none;
+}
+.studio-btn-white {
+    background: #fff;
+    color: #0f3a44;
+    box-shadow: 0 8px 24px rgba(15, 40, 60, .18);
+    position: relative;
+}
+.studio-btn-white::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0);
+    animation: ctaGlow 2s infinite;
+    z-index: -1;
+}
+.studio-btn-ghost {
+    border: 1.5px solid rgba(255, 255, 255, .7);
+    color: #fff;
+    background: rgba(255, 255, 255, .12);
+}
 .studio-strip {
     position: relative;
     min-height: 190px;
-    border: 2px dashed #cbd5e1;
-    border-radius: 14px;
+    margin-top: 22px;
+    border: 2px dashed rgba(255, 255, 255, .35);
+    border-radius: 12px;
     padding: 16px;
-    background: repeating-linear-gradient(0deg, rgba(30, 144, 160, .04) 0 24px, transparent 24px 48px);
 }
 .studio-item {
     position: absolute;
