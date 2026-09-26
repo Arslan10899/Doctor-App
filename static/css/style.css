@@ -229,11 +229,9 @@ input, select, textarea { font-family: inherit; }
     width: 260px;
     height: 150px;
     max-width: 100%;
-    border-radius: 16px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .35);
-    box-shadow: 0 16px 44px rgba(5, 25, 40, .35);
-    background: rgba(255, 255, 255, .1);
+    border: none;
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
