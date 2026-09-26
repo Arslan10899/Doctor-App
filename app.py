@@ -416,6 +416,10 @@ def init_db():
     assign_doctor_images(cur)
     db.commit()
     db.close()
+    # Fresh DBs (no patients table) skip migrate() above; run it here so hero_banners
+    # (and any other new tables/columns) exist/update even on very old databases that
+    # lack the patients table. migrate() is idempotent and closes its own connection.
+    migrate(sqlite3.connect(DB_PATH))
 
 
 FEMALE_FIRST_NAMES = {
@@ -476,6 +480,22 @@ def migrate(db):
     for col, ddl in {"name": "TEXT", "email": "TEXT"}.items():
         if col not in acols:
             cur.execute(f"ALTER TABLE admins ADD COLUMN {col} {ddl}")
+
+    # Ensure hero_banners table exists (with all columns) BEFORE we ALTER it below.
+    cur.execute("CREATE TABLE IF NOT EXISTS hero_banners ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "name TEXT,"
+                "image_url TEXT,"
+                "video_url TEXT,"
+                "media_type TEXT DEFAULT 'image',"
+                "autoplay INTEGER DEFAULT 1,"
+                "sort_order INTEGER DEFAULT 0,"
+                "active INTEGER DEFAULT 1,"
+                "pos_x REAL,"
+                "pos_y REAL,"
+                "bw INTEGER DEFAULT 260,"
+                "bh INTEGER,"
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
 
     bcols = [r[1] for r in cur.execute("PRAGMA table_info(hero_banners)").fetchall()]
     for col, ddl in {"pos_x": "REAL", "pos_y": "REAL", "bw": "INTEGER DEFAULT 260", "bh": "INTEGER",
