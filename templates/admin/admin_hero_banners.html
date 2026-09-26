@@ -404,6 +404,11 @@
                                 <span class="toggle-slider"></span>
                             </label>
                         </form>
+                        <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-dup-form">
+                            <input type="hidden" name="section" value="hero_banner_duplicate">
+                            <input type="hidden" name="id" value="{{ b['id'] }}">
+                            <button type="submit" class="btn btn-sm" title="Duplicate this banner">Copy</button>
+                        </form>
                         <button type="button" class="btn btn-sm mng-edit-btn" data-id="{{ b['id'] }}">Edit</button>
                         <button type="button" class="btn btn-sm btn-danger mng-del-btn" data-id="{{ b['id'] }}">Delete</button>
                     </div>
@@ -449,13 +454,22 @@
             <button class="btn btn-sm btn-primary" type="button" id="studio-save">
                 <b>Save Layout</b>
             </button>
+            <a class="btn btn-sm" href="{{ url_for('index') }}" target="_blank" rel="noopener">Live Preview</a>
             <span id="studio-save-status" style="font-size:12px;color:#1f8b8b;align-self:center;"></span>
         </div>
+        <p style="font-size:12px;color:#6b7280;margin-top:6px;">Drag = move &middot; Corner = resize &middot; Press <b>Del</b> = delete selected banner &middot; <b>Enter</b> = save layout</p>
     </div>
 </div>
 
 <div class="card">
-    <h2>Canvas</h2>
+    <h2>Canvas
+        {% if banner_pinned %}
+        <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline" style="display:inline-block;float:right;margin-top:2px;">
+            <input type="hidden" name="section" value="hero_banner_reset">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Reset layout? Sab banners wapas auto-flow par aa jayenge (positions clear).')">Reset Layout</button>
+        </form>
+        {% endif %}
+    </h2>
     <div class="studio-hero">
         <div class="studio-hero-grid">
             <div class="studio-hero-visual">
@@ -667,6 +681,31 @@ document.addEventListener('DOMContentLoaded', function () {
             var form = btn.closest('.mng-row-wrap').querySelector('.mng-delete-form');
             if (form && confirm('Is banner ko permanently delete kar dein?')) form.submit();
         });
+    });
+
+    function deleteItemForm(it) {
+        var id = it.getAttribute('data-id');
+        var btn = document.querySelector('.mng-del-btn[data-id="' + id + '"]');
+        if (btn) return btn.closest('.mng-row-wrap').querySelector('.mng-delete-form');
+        return null;
+    }
+
+    function deleteSelected() {
+        if (!selected) return;
+        var form = deleteItemForm(selected);
+        if (form && confirm('Is banner ko permanently delete kar dein?')) form.submit();
+    }
+
+    document.addEventListener('keydown', function (e) {
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            deleteSelected();
+        }
+        if (e.key === 'Enter' && !e.shiftKey) {
+            saveLayout();
+        }
     });
 
     function collect() {

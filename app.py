@@ -1738,15 +1738,37 @@ def admin_hero_banners_action():
         if table == "hero_banners" and cid:
             execute("DELETE FROM hero_banners WHERE id=?", (cid,))
             flash("Hero banner removed.", "info")
+    elif section == "hero_banner_duplicate":
+        bid = request.form.get("id", request.form.get("hero_banner_id", type=int))
+        row = query("SELECT * FROM hero_banners WHERE id=?", (bid,))
+        if row:
+            b = row[0]
+            sort_order = b["sort_order"] or 0
+            exists_so = query("SELECT COUNT(*) c FROM hero_banners WHERE sort_order=?", (sort_order,))[0]["c"]
+            if exists_so:
+                same = query("SELECT id FROM hero_banners WHERE sort_order=? ORDER BY id DESC", (sort_order,))
+                sort_order = (same[0]["id"] if same else sort_order) + 1
+            newname = (b["name"] or "Banner") + " (copy)"
+            execute(
+                "INSERT INTO hero_banners (name, image_url, video_url, media_type, autoplay, sort_order, active, pos_x, pos_y, bw, bh) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                (newname, b["image_url"], b["video_url"], b["media_type"], b["autoplay"], sort_order, b["active"], b["pos_x"], b["pos_y"], b["bw"], b["bh"])
+            )
+            flash("Hero banner duplicated.", "success")
+    elif section == "hero_banner_reset":
+        execute("UPDATE hero_banners SET pos_x=NULL, pos_y=NULL, bw=260, bh=150")
+        flash("Layout reset — banners wapas auto-flow mode par.", "success")
     return redirect(url_for("admin_hero_banners"))
 
 
 @app.route("/admin/hero-banners")
 @admin_required
 def admin_hero_banners():
+    hero_banners = query("SELECT * FROM hero_banners ORDER BY id DESC")
+    pinned = any(b["pos_x"] is not None for b in hero_banners)
     return render_template(
         "admin/admin_hero_banners.html",
-        hero_banners=query("SELECT * FROM hero_banners ORDER BY id DESC"),
+        hero_banners=hero_banners,
+        banner_pinned=pinned,
     )
 
 
