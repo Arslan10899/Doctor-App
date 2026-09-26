@@ -229,12 +229,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .6);
-    background: rgba(255, 255, 255, .12);
+    border: none;
+    background: transparent;
     cursor: grab;
-    box-shadow: 0 16px 44px rgba(5, 25, 40, .35);
+    box-shadow: none;
     max-width: 100%;
 }
 .studio-item.dragging { cursor: grabbing; z-index: 5; opacity: .9; }
@@ -489,7 +488,7 @@
                 <button type="button" class="btn btn-sm btn-edit" title="Change image / video">
                     Edit
                 </button>
-                <button type="button" class="btn btn-sm btn-danger" title="Delete banner">
+                <button type="button" class="btn btn-sm btn-danger btn-delete" title="Delete banner">
                     Delete
                 </button>
             </div>
