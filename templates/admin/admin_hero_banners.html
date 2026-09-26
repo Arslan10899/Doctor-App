@@ -466,8 +466,8 @@
                 <div class="studio-strip" id="studioCanvas">
         {% for b in hero_banners %}
         <div class="studio-item" data-id="{{ b['id'] }}"
-             data-x="{{ b['pos_x'] or '' }}" data-y="{{ b['pos_y'] or '' }}"
-             data-w="{{ b['bw'] or '' }}" data-h="{{ b['bh'] or '' }}"
+             data-x="{{ b['pos_x'] if b['pos_x'] is not none else '' }}" data-y="{{ b['pos_y'] if b['pos_y'] is not none else '' }}"
+             data-w="{{ b['bw'] if b['bw'] is not none else '' }}" data-h="{{ b['bh'] if b['bh'] is not none else '' }}"
              data-active="{{ b['active'] }}">
             {% if b['media_type'] == 'video' %}
                 {% if yt_embed(b['video_url']) %}
@@ -702,6 +702,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function autosave() {
+        var itemsArr = collect();
+        fetch('/admin/hero-banners/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemsArr)
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            if (d.ok && saveStatus) {
+                saveStatus.textContent = '\u2713 Auto-saved';
+                setTimeout(function () { if (saveStatus) saveStatus.textContent = ''; }, 2500);
+            } else if (saveStatus) { saveStatus.textContent = 'Auto-save failed'; }
+        }).catch(function () {
+            if (saveStatus) saveStatus.textContent = 'Auto-save failed \u2014 try again';
+        });
+    }
+
     function saveLayout() {
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
@@ -726,6 +742,7 @@ document.addEventListener('DOMContentLoaded', function () {
         arrangeBtn.addEventListener('click', function () {
             arrangeFlow();
             items.forEach(updateLabel);
+            autosave();
         });
     }
 
@@ -752,6 +769,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dragging = false;
             it.classList.remove('dragging');
             try { it.releasePointerCapture(e.pointerId); } catch (err) {}
+            autosave();
         }
         it.addEventListener('pointerup', stop);
         it.addEventListener('pointercancel', stop);
@@ -784,6 +802,7 @@ document.addEventListener('DOMContentLoaded', function () {
             resizing = false;
             it.classList.remove('dragging');
             try { corner.releasePointerCapture(e.pointerId); } catch (err) {}
+            autosave();
         }
         corner.addEventListener('pointerup', stopResize);
         corner.addEventListener('pointercancel', stopResize);
