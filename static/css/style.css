@@ -219,10 +219,16 @@ input, select, textarea { font-family: inherit; }
     margin-top: 22px;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 14px;
     position: relative;
+}
+.hero-banners.pinned {
+    min-height: var(--hb-minh, 190px);
+    outline: 1px dashed rgba(255, 255, 255, .22);
+    outline-offset: 12px;
+    border-radius: 16px;
 }
 .hero-banner-box {
     flex: 0 0 auto;
@@ -249,10 +255,10 @@ input, select, textarea { font-family: inherit; }
     -webkit-user-drag: none;
     border: 0;
 }
-.hero-banners.pinned { min-height: var(--hb-minh, 190px); }
 .hero-banner-box.pinned {
     position: absolute;
     margin: 0;
+    z-index: 2;
 }
 
 /* Admin Hero Banner Studio */

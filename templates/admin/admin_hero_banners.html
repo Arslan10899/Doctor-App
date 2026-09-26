@@ -589,7 +589,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return lab;
     }
     function updateLabel(it) {
-        makeLabel(it).textContent = Math.round(it.offsetWidth) + ' \u00d7 ' + Math.round(it.offsetHeight);
+        var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+        var px = Math.max(0, Math.min(100, Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10));
+        var py = Math.max(0, Math.round(r.top - cr.top));
+        makeLabel(it).textContent = px + '% \u00b7 ' + py + 'px \u00b7 ' + Math.round(it.offsetWidth) + '\u00d7' + Math.round(it.offsetHeight);
     }
     function select(it) {
         if (selected === it) return;
