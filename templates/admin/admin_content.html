@@ -42,21 +42,6 @@
         </form>
     </div>
     <div class="card">
-        <h2>Add Hero Banner</h2>
-        <form method="post">
-            <input type="hidden" name="section" value="hero_banner">
-            <label class="flabel">Image URL *</label>
-            <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
-            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
-                <button class="btn btn-sm" type="button" id="hero-banner-browse-btn">Browse &amp; Upload</button>
-                <input type="file" id="hero-banner-browse-file" accept="image/*" style="display:none;">
-                <span id="hero-banner-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
-            </div>
-            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Homepage "Book an Appointment" button ke neeche dikhegi.</p>
-            <button class="btn btn-primary" type="submit">Add Banner</button>
-        </form>
-    </div>
-    <div class="card">
         <h2>Add Notification</h2>
         <form method="post">
             <input type="hidden" name="section" value="notification">
@@ -142,58 +127,6 @@
     </table>
 </div>
 
-<div class="card">
-    <h2>Hero Banner ({{ hero_banners|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Image</th><th>Status</th><th></th></tr></thead>
-        {% for b in hero_banners %}
-        <tr{% if not b['active'] %} style="opacity:.55;"{% endif %}>
-            <td>{% if b['image_url'] %}<img src="{{ b['image_url'] }}" style="width:80px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
-            <td>
-                <label class="toggle-switch" title="{{ 'Click to hide' if b['active'] else 'Click to show' }}">
-                    <input type="checkbox" class="hb-toggle" data-id="{{ b['id'] }}" {% if b['active'] %}checked{% endif %}>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-state">{{ 'SHOW' if b['active'] else 'HIDDEN' }}</span>
-            </td>
-            <td>
-                <button class="btn btn-sm hb-edit" type="button"
-                        data-id="{{ b['id'] }}"
-                        data-image="{{ b['image_url'] }}">Edit</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
-                    <input type="hidden" name="section" value="delete">
-                    <input type="hidden" name="table" value="hero_banners">
-                    <input type="hidden" name="id" value="{{ b['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-<!-- Hero banner edit modal -->
-<div id="heroBannerModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
-        <h2 style="font-size:17px;margin-bottom:16px;">Edit Hero Banner</h2>
-        <form method="post">
-            <input type="hidden" name="section" value="hero_banner_edit">
-            <input type="hidden" name="id" id="hb-id">
-            <label class="flabel">Image URL *</label>
-            <input type="text" name="image_url" id="hb-image" placeholder="https://...jpg" required>
-            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
-                <button class="btn btn-sm" type="button" id="hb-edit-browse-btn">Browse &amp; Upload</button>
-                <input type="file" id="hb-edit-browse-file" accept="image/*" style="display:none;">
-                <span id="hb-edit-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:6px;">
-                <button class="btn btn-primary" type="submit">Save Changes</button>
-                <button class="btn" type="button" onclick="document.getElementById('heroBannerModal').style.display='none';">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <!-- Carousel edit modal -->
 <div id="carouselModal" style="display:none;position:fixed;inset:0;background:rgba(15,40,60,.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
     <div style="background:#fff;border-radius:14px;padding:24px;width:min(520px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);">
@@ -252,34 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('announcement-content').value = h2t(b.getAttribute('data-content') || '');
             document.getElementById('announcement-date-from').value = b.getAttribute('data-date-from') || '';
             document.getElementById('announcement-date-to').value = b.getAttribute('data-date-to') || '';
-            m.style.display = 'flex';
-        });
-    });
-    document.querySelectorAll('.hb-toggle').forEach(function(chk) {
-        chk.addEventListener('change', function() {
-            var id = chk.getAttribute('data-id');
-            var val = chk.checked ? '1' : '0';
-            chk.disabled = true;
-            var fd = new FormData();
-            fd.append('section', 'hero_banner_toggle');
-            fd.append('id', id);
-            fd.append('active', val);
-            fetch('{{ url_for("admin_content") }}', { method: 'POST', body: fd })
-                .then(function(r) { return r.text(); })
-                .then(function() {
-                    chk.disabled = false;
-                    var state = chk.closest('td').querySelector('.toggle-state');
-                    if (state) state.textContent = chk.checked ? 'SHOW' : 'HIDDEN';
-                    chk.closest('tr').style.opacity = chk.checked ? '1' : '.55';
-                })
-                .catch(function() { chk.checked = !chk.checked; chk.disabled = false; alert('Toggle failed. Try again.'); });
-        });
-    });
-    document.querySelectorAll('.hb-edit').forEach(function(b) {
-        b.addEventListener('click', function() {
-            var m = document.getElementById('heroBannerModal');
-            document.getElementById('hb-id').value = b.getAttribute('data-id');
-            document.getElementById('hb-image').value = h2t(b.getAttribute('data-image') || '');
             m.style.display = 'flex';
         });
     });
@@ -385,8 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var pairs = [
         ['carousel-browse-btn', 'carousel-browse-file', 'new-carousel-image', 'carousel-upload-status'],
         ['carousel-edit-browse-btn', 'carousel-edit-browse-file', 'carousel-image', 'carousel-edit-upload-status'],
-        ['hb-edit-browse-btn', 'hb-edit-browse-file', 'hb-image', 'hb-edit-upload-status'],
-        ['hero-banner-browse-btn', 'hero-banner-browse-file', 'new-hero-banner-image', 'hero-banner-upload-status'],
         ['notif-edit-browse-btn', 'notif-edit-browse-file', 'notification-image', 'notif-edit-upload-status'],
         ['add-notif-browse-btn', 'add-notif-browse-file', 'add-notif-image', 'add-notif-upload-status']
     ];
