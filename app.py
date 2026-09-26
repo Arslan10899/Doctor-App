@@ -489,6 +489,12 @@ def migrate(db):
             status TEXT DEFAULT 'new',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS hero_banners (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image_url TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     """)
 
     if not cur.execute("SELECT id FROM cities WHERE name='Dera Ismail Khan'").fetchone():
@@ -625,6 +631,7 @@ def index():
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
+    hero_banner = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY id DESC LIMIT 1", one=True)
     return render_template(
         "index.html",
         specialties=specialties,
@@ -641,6 +648,7 @@ def index():
         cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")],
         announcements=announcements,
         carousel=carousel,
+        hero_banner=hero_banner,
         notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
     )
 
@@ -1533,6 +1541,27 @@ def admin_content():
                 execute("UPDATE carousel_images SET title=?, image_url=? WHERE id=?",
                         (title or None, image_url, cid))
                 flash("Carousel slide updated.", "success")
+        elif section == "hero_banner":
+            image_url = request.form.get("image_url", "").strip()
+            if image_url:
+                execute("INSERT INTO hero_banners (image_url, active) VALUES (?, 1)", (image_url,))
+                flash("Hero banner added.", "success")
+            else:
+                flash("Image URL is required to add a hero banner.", "warning")
+        elif section == "hero_banner_toggle":
+            bid = request.form.get("id", type=int)
+            val = 1 if request.form.get("active") == "1" else 0
+            if bid:
+                execute("UPDATE hero_banners SET active=? WHERE id=?", (val, bid))
+                flash("Hero banner " + ("enabled." if val else "hidden."), "success")
+        elif section == "hero_banner_edit":
+            bid = request.form.get("id", type=int)
+            image_url = request.form.get("image_url", "").strip()
+            if bid and image_url:
+                execute("UPDATE hero_banners SET image_url=? WHERE id=?", (image_url, bid))
+                flash("Hero banner updated.", "success")
+            else:
+                flash("Image URL is required to save a hero banner.", "warning")
         elif section == "notification":
             title = request.form.get("title", "").strip()
             description = request.form.get("description", "").strip()
@@ -1573,7 +1602,7 @@ def admin_content():
         elif section == "delete":
             table = request.form.get("table", "")
             cid = request.form.get("id", type=int)
-            if table in ("announcements", "carousel_images", "notifications") and cid:
+            if table in ("announcements", "carousel_images", "notifications", "hero_banners") and cid:
                 execute(f"DELETE FROM {table} WHERE id=?", (cid,))
                 flash("Item removed.", "info")
         return redirect(url_for("admin_content"))
@@ -1582,6 +1611,7 @@ def admin_content():
         announcements=query("SELECT * FROM announcements ORDER BY id DESC"),
         carousel=query("SELECT * FROM carousel_images ORDER BY id DESC"),
         notifications=query("SELECT * FROM notifications ORDER BY id DESC"),
+        hero_banners=query("SELECT * FROM hero_banners ORDER BY id DESC"),
     )
 
 
