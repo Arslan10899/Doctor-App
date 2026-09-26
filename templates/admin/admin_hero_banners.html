@@ -565,6 +565,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgField) imgField.required = type === 'image';
         if (vidField) vidField.required = type === 'video';
     };
+    // Set initial required-state correctly (image default): hidden video field must NOT be required,
+    // otherwise browser blocks the submit with an invisible validation error.
+    window.switchHbType('image');
     Array.prototype.forEach.call(document.querySelectorAll('input[name="autoplay"]'), function (r) {
         r.addEventListener('change', function () {
             Array.prototype.forEach.call(document.querySelectorAll('[data-flag^="auto"]'), function (b) {
