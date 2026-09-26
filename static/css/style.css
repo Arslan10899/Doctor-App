@@ -217,21 +217,18 @@ input, select, textarea { font-family: inherit; }
 .hero-cta-actions .btn { border-radius: 12px; font-weight: 700; }
 .hero-banner-box {
     margin-top: 22px;
+    width: fit-content;
+    max-width: 100%;
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, .35);
     box-shadow: 0 16px 44px rgba(5, 25, 40, .35);
     background: rgba(255, 255, 255, .1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 .hero-banner-box a {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    width: 100%;
 }
 .hero-banner-box img {
     width: auto;
