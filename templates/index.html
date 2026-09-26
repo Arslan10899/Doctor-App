@@ -525,6 +525,12 @@
     box-shadow: 0 0 0 2px #22c55e inset;
     border-radius: 8px;
 }
+.lv-on .hero-banner-box.pinned .hb-media,
+.lv-on .hero-banner-box.pinned img,
+.lv-on .hero-banner-box.pinned video,
+.lv-on .hero-banner-box.pinned iframe {
+    pointer-events: none;
+}
 .lv-corner {
     position: absolute;
     right: 2px;
@@ -563,6 +569,7 @@
     var on = false;
     var items = null;
     var selected = null;
+    var attached = false;
 
     function collect() {
         return items.map(function (it) {
@@ -579,39 +586,10 @@
         });
     }
 
-    function attach(it) {
-        var startX = 0, startY = 0, oLeft = 0, oTop = 0, dragging = false;
-        it.addEventListener('pointerdown', function (e) {
-            if (e.target.closest('.lv-corner')) return;
-            e.preventDefault(); e.stopPropagation();
-            dragging = true;
-            startX = e.clientX; startY = e.clientY;
-            oLeft = it.offsetLeft; oTop = it.offsetTop;
-            it.setPointerCapture(e.pointerId);
-        });
-        it.addEventListener('pointermove', function (e) {
-            if (!dragging) return;
-            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
-            it.style.top = (oTop + (e.clientY - startY)) + 'px';
-        });
-        function stopDrag(e) {
-            if (!dragging) return;
-            dragging = false;
-            try { it.releasePointerCapture(e.pointerId); } catch (err) {}
-        }
-        it.addEventListener('pointerup', stopDrag);
-        it.addEventListener('pointercancel', stopDrag);
-        it.addEventListener('click', function (e) {
-            if (on) e.preventDefault();
-        });
-    }
-
-    function attachCorner(it) {
-        var corner = document.createElement('span');
-        corner.className = 'lv-corner';
-        it.appendChild(corner);
+    function makeCorner(it, corner) {
         var rsX = 0, rsY = 0, rW = 0, rH = 0, resizing = false, ratio = 1;
         corner.addEventListener('pointerdown', function (e) {
+            if (!on) return;
             e.preventDefault(); e.stopPropagation();
             resizing = true;
             rsX = e.clientX; rsY = e.clientY;
@@ -632,9 +610,61 @@
             if (!resizing) return;
             resizing = false;
             try { corner.releasePointerCapture(e.pointerId); } catch (err) {}
+            autosave();
         }
         corner.addEventListener('pointerup', stopResize);
         corner.addEventListener('pointercancel', stopResize);
+    }
+
+    function attach(it) {
+        var startX = 0, startY = 0, oLeft = 0, oTop = 0, dragging = false;
+        it.addEventListener('pointerdown', function (e) {
+            if (!on) return;
+            if (e.target.closest('.lv-corner')) return;
+            e.preventDefault(); e.stopPropagation();
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            oLeft = it.offsetLeft; oTop = it.offsetTop;
+            it.setPointerCapture(e.pointerId);
+        });
+        it.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
+            it.style.top = (oTop + (e.clientY - startY)) + 'px';
+        });
+        function stopDrag(e) {
+            if (!dragging) return;
+            dragging = false;
+            try { it.releasePointerCapture(e.pointerId); } catch (err) {}
+            autosave();
+        }
+        it.addEventListener('pointerup', stopDrag);
+        it.addEventListener('pointercancel', stopDrag);
+        it.addEventListener('click', function (e) {
+            if (on) e.preventDefault();
+        });
+    }
+
+    function attachCorner(it) {
+        if (it.querySelector('.lv-corner')) return;
+        var corner = document.createElement('span');
+        corner.className = 'lv-corner';
+        it.appendChild(corner);
+        makeCorner(it, corner);
+    }
+
+    function autosave() {
+        if (!on) return;
+        fetch('/admin/hero-banners/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(collect())
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            if (d.ok && statusEl) {
+                statusEl.textContent = '✓ ' + (items.length || 0) + ' saved';
+                setTimeout(function () { if (statusEl) statusEl.textContent = ''; }, 2000);
+            }
+        }).catch(function () {});
     }
 
     function setMode(v) {
@@ -642,10 +672,11 @@
         document.querySelector('.hero') && document.querySelector('.hero').classList.toggle('lv-on', on);
         modeBtn.textContent = on ? 'Edit OFF' : 'Edit ON';
         modeBtn.classList.toggle('btn-primary', on);
-        if (on) {
+        if (on && !attached) {
             items = Array.prototype.slice.call(area.querySelectorAll('.hero-banner-box.pinned'));
             items.forEach(attach);
             items.forEach(attachCorner);
+            attached = true;
         }
     }
 

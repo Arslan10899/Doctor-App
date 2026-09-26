@@ -308,6 +308,7 @@
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+    pointer-events: none;
 }
 .studio-item video {
     width: 100%;
@@ -316,7 +317,9 @@
     display: block;
     user-select: none;
     -webkit-user-select: none;
+    pointer-events: none;
 }
+.studio-item iframe { pointer-events: none; }
 .hb-vid-badge {
     position: absolute;
     top: 6px;
@@ -772,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('keydown', function (e) {
         var tag = (e.target.tagName || '').toLowerCase();
-        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return;
         if (e.key === 'Delete' || e.key === 'Backspace') {
             e.preventDefault();
             deleteSelected();

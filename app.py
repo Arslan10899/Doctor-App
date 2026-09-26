@@ -1744,15 +1744,11 @@ def admin_hero_banners_action():
         row = query("SELECT * FROM hero_banners WHERE id=?", (bid,))
         if row:
             b = row[0]
-            sort_order = b["sort_order"] or 0
-            exists_so = query("SELECT COUNT(*) c FROM hero_banners WHERE sort_order=?", (sort_order,))[0]["c"]
-            if exists_so:
-                same = query("SELECT id FROM hero_banners WHERE sort_order=? ORDER BY id DESC", (sort_order,))
-                sort_order = (same[0]["id"] if same else sort_order) + 1
+            max_so = query("SELECT COALESCE(MAX(sort_order), 0) m FROM hero_banners")[0]["m"]
             newname = (b["name"] or "Banner") + " (copy)"
             execute(
                 "INSERT INTO hero_banners (name, image_url, video_url, media_type, autoplay, sort_order, active, pos_x, pos_y, bw, bh) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                (newname, b["image_url"], b["video_url"], b["media_type"], b["autoplay"], sort_order, b["active"], b["pos_x"], b["pos_y"], b["bw"], b["bh"])
+                (newname, b["image_url"], b["video_url"], b["media_type"], b["autoplay"], max_so + 1, b["active"], b["pos_x"], b["pos_y"], b["bw"], b["bh"])
             )
             flash("Hero banner duplicated.", "success")
     elif section == "hero_banner_reset":
@@ -1784,13 +1780,16 @@ def admin_hero_banners_save():
         bid = item.get("id")
         if not bid:
             continue
-        pos_x = item.get("pos_x")
-        pos_y = item.get("pos_y")
-        bw = item.get("bw")
-        bh = item.get("bh")
+        try:
+            pos_x = max(0.0, min(100.0, float(item.get("pos_x"))))
+            pos_y = max(0, int(float(item.get("pos_y"))))
+            bw = max(40, int(float(item.get("bw"))))
+            bh = max(40, int(float(item.get("bh"))))
+        except (TypeError, ValueError):
+            continue
         execute(
             "UPDATE hero_banners SET pos_x=?, pos_y=?, bw=?, bh=? WHERE id=?",
-            (pos_x, pos_y, bw, bh, bid),
+            (round(pos_x, 3), pos_y, bw, bh, bid),
         )
     return jsonify({"ok": True})
 
