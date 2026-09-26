@@ -222,7 +222,24 @@ input, select, textarea { font-family: inherit; }
     align-items: center;
     justify-content: center;
     gap: 14px;
+    position: relative;
 }
+.hero-banners.editing {
+    display: block;
+    min-height: 160px;
+    border: 2px dashed rgba(255, 255, 255, .35);
+    border-radius: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, .06);
+}
+.hero-banners.editing .hero-banner-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: grab;
+    margin: 0;
+}
+.hero-banners.editing .hero-banner-box.dragging { cursor: grabbing; z-index: 5; opacity: .9; }
 .hero-banner-box {
     flex: 0 0 auto;
     max-width: 100%;
@@ -234,6 +251,7 @@ input, select, textarea { font-family: inherit; }
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 .hero-banner-box img {
     width: auto;
@@ -241,6 +259,70 @@ input, select, textarea { font-family: inherit; }
     max-width: 260px;
     max-height: 150px;
     display: block;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+.hb-resize {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    display: none;
+    place-items: center;
+}
+.hero-banners.editing .hb-resize { display: grid; }
+.hb-resize::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    opacity: .9;
+}
+.hb-edit-tools {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    gap: 8px;
+    z-index: 20;
+}
+.hero-banners.editing .hb-edit-tools { display: flex; }
+.hero-banners.editing .hero-banner-box:nth-child(n):not(.dragging) { position: absolute; }
+.hb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+}
+.hb-btn { background: #0d9488; color: #fff; }
+.hb-btn:hover { background: #159a8e; }
+.hb-save { background: #fff; color: #0d9488; box-shadow: 0 6px 18px rgba(5, 25, 40, .25); }
+.hb-save:hover { background: #eafcf7; }
+.hb-status {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #5eead4;
+    z-index: 20;
+    display: none;
+}
+.hero-banners.editing .hb-status { display: block; }
+.hero-banners.pinned { display: block; min-height: var(--hb-minh, 190px); position: relative; }
+.hero-banners.pinned .hero-banner-box {
+    position: absolute;
+    margin: 0;
 }
 .btn-ghost-light {
     background: transparent;

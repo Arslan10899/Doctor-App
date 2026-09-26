@@ -444,6 +444,11 @@ def migrate(db):
         if col not in acols:
             cur.execute(f"ALTER TABLE admins ADD COLUMN {col} {ddl}")
 
+    bcols = [r[1] for r in cur.execute("PRAGMA table_info(hero_banners)").fetchall()]
+    for col, ddl in {"pos_x": "REAL", "pos_y": "REAL", "bw": "INTEGER DEFAULT 260", "bh": "INTEGER"}.items():
+        if col not in bcols:
+            cur.execute(f"ALTER TABLE hero_banners ADD COLUMN {col} {ddl}")
+
     cur.executescript("""
         CREATE TABLE IF NOT EXISTS clinics (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -493,6 +498,10 @@ def migrate(db):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             image_url TEXT,
             active INTEGER DEFAULT 1,
+            pos_x REAL,
+            pos_y REAL,
+            bw INTEGER DEFAULT 260,
+            bh INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
@@ -632,6 +641,11 @@ def index():
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
     hero_banners = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY id DESC")
+    banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
+    pinned_height = 190
+    if banner_pinned:
+        raw = [(b["pos_y"] or 0) + (b["bh"] or 150) for b in hero_banners if b["pos_x"] is not None]
+        pinned_height = max([190] + raw) + 20
     return render_template(
         "index.html",
         specialties=specialties,
@@ -649,6 +663,8 @@ def index():
         announcements=announcements,
         carousel=carousel,
         hero_banners=hero_banners,
+        banner_pinned=banner_pinned,
+        pinned_height=pinned_height,
         notifications=query("SELECT * FROM notifications ORDER BY id DESC LIMIT 3"),
     )
 
@@ -1613,6 +1629,28 @@ def admin_content():
         notifications=query("SELECT * FROM notifications ORDER BY id DESC"),
         hero_banners=query("SELECT * FROM hero_banners ORDER BY id DESC"),
     )
+
+
+@app.route("/admin/hero-banners/save", methods=["POST"])
+@admin_required
+def admin_hero_banners_save():
+    """Save hero banner positions / sizes (admin drag & resize)."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, list):
+        return jsonify({"ok": False, "error": "Invalid payload."}), 400
+    for item in data:
+        bid = item.get("id")
+        if not bid:
+            continue
+        pos_x = item.get("pos_x")
+        pos_y = item.get("pos_y")
+        bw = item.get("bw")
+        bh = item.get("bh")
+        execute(
+            "UPDATE hero_banners SET pos_x=?, pos_y=?, bw=?, bh=? WHERE id=?",
+            (pos_x, pos_y, bw, bh, bid),
+        )
+    return jsonify({"ok": True})
 
 
 @app.route("/admin/upload", methods=["POST"])
