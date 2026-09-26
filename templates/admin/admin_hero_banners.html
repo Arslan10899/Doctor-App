@@ -534,7 +534,7 @@
         {% endif %}
     </h2>
     <div class="studio-hero">
-        <div class="studio-hero-grid">
+        <div class="studio-hero-grid"{% if banner_pinned %} style="min-height:{{ pinned_height }}px;"{% endif %}>
             <div class="studio-hero-visual">
                 <div class="studio-hero-doctor">
                     <img src="{{ url_for('static', filename='img/hero-doctor.png') }}" alt="Doctor">
@@ -680,8 +680,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     function updateLabel(it) {
         var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
-        var px = Math.max(0, Math.min(100, Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10));
-        var py = Math.max(0, Math.round(r.top - cr.top));
+        var maxX = Math.max(0, 100 - Math.round((it.offsetWidth / cr.width) * 100 * 10) / 10);
+        var maxY = Math.max(0, cr.height - it.offsetHeight);
+        var px = Math.max(0, Math.min(maxX, Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10));
+        var py = Math.max(0, Math.min(maxY, Math.round(r.top - cr.top)));
         makeLabel(it).textContent = px + '% \u00b7 ' + py + 'px \u00b7 ' + Math.round(it.offsetWidth) + '\u00d7' + Math.round(it.offsetHeight);
     }
     function select(it) {
@@ -790,10 +792,12 @@ document.addEventListener('DOMContentLoaded', function () {
             var r = it.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
             var px = Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10;
             var py = Math.round(r.top - cr.top);
+            var maxX = 100 - Math.round((it.offsetWidth / cr.width) * 100 * 10) / 10;
+            var maxY = cr.height - it.offsetHeight;
             return {
                 id: parseInt(it.getAttribute('data-id'), 10),
-                pos_x: Math.max(0, Math.min(100, px)),
-                pos_y: Math.max(0, py),
+                pos_x: Math.max(0, Math.min(maxX, px)),
+                pos_y: Math.max(0, Math.min(maxY, py)),
                 bw: Math.round(r.width),
                 bh: Math.round(r.height)
             };
@@ -859,8 +863,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         it.addEventListener('pointermove', function (e) {
             if (!dragging) return;
-            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
-            it.style.top = (oTop + (e.clientY - startY)) + 'px';
+            var cr = canvas.getBoundingClientRect();
+            var maxL = Math.max(0, cr.width - it.offsetWidth);
+            var maxT = Math.max(0, cr.height - it.offsetHeight);
+            it.style.left = Math.max(0, Math.min(maxL, oLeft + (e.clientX - startX))) + 'px';
+            it.style.top = Math.max(0, Math.min(maxT, oTop + (e.clientY - startY))) + 'px';
         });
         function stop(e) {
             if (!dragging) return;
@@ -891,6 +898,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var w = Math.max(80, rW + dx), h = Math.max(50, rH + dy);
             if (Math.abs(dx) >= Math.abs(dy)) h = Math.round(w / ratio);
             else w = Math.round(h * ratio);
+            var cr = canvas.getBoundingClientRect();
+            w = Math.min(w, Math.max(80, cr.width - it.offsetLeft));
+            h = Math.min(h, Math.max(50, cr.height - it.offsetTop));
             it.style.width = w + 'px';
             it.style.height = h + 'px';
             updateLabel(it);

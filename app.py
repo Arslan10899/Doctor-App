@@ -700,12 +700,24 @@ def index():
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
-    hero_banners = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")
+    hero_banners = [dict(r) for r in query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")]
     banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
     pinned_height = 190
+    GRID_W = 1160
     if banner_pinned:
-        raw = [(b["pos_y"] or 0) + (b["bh"] or 150) for b in hero_banners if b["pos_x"] is not None]
+        raw = []
+        for b in hero_banners:
+            if b["pos_x"] is None:
+                continue
+            bw = b["bw"] or 260
+            bh = b["bh"] or 150
+            b["pos_x"] = max(0.0, min(100.0 - (bw / GRID_W) * 100, float(b["pos_x"])))
+            b["pos_y"] = max(0.0, float(b["pos_y"] or 0))
+            raw.append(b["pos_y"] + bh)
         pinned_height = max([190] + raw) + 20
+        for b in hero_banners:
+            if b["pos_x"] is not None:
+                b["pos_y"] = max(0.0, min(float(pinned_height) - (b["bh"] or 150), float(b["pos_y"])))
     return render_template(
         "index.html",
         specialties=specialties,
@@ -1762,10 +1774,15 @@ def admin_hero_banners_action():
 def admin_hero_banners():
     hero_banners = query("SELECT * FROM hero_banners ORDER BY id DESC")
     pinned = any(b["pos_x"] is not None for b in hero_banners)
+    pinned_height = 190
+    if pinned:
+        raw = [(b["pos_y"] or 0) + (b["bh"] or 150) for b in hero_banners if b["pos_x"] is not None]
+        pinned_height = max([190] + raw) + 20
     return render_template(
         "admin/admin_hero_banners.html",
         hero_banners=hero_banners,
         banner_pinned=pinned,
+        pinned_height=pinned_height,
     )
 
 

@@ -21,7 +21,7 @@
 <!-- ================= HERO ================= -->
 <section class="hero">
     <div class="container">
-        <div class="hero-grid">
+        <div class="hero-grid"{% if hero_banners and banner_pinned %} style="min-height:{{ pinned_height }}px;"{% endif %}>
             <div class="hero-visual">
                 <div class="hero-doctor-card">
                     <img src="{{ url_for('static', filename='img/hero-doctor.png') }}" alt="Pakistani doctor">
@@ -576,10 +576,12 @@
             var r = it.getBoundingClientRect(), cr = area.getBoundingClientRect();
             var px = Math.round(((r.left - cr.left) / cr.width) * 100 * 10) / 10;
             var py = Math.round(r.top - cr.top);
+            var maxX = 100 - Math.round((it.offsetWidth / cr.width) * 100 * 10) / 10;
+            var maxY = cr.height - it.offsetHeight;
             return {
                 id: parseInt(it.getAttribute('data-id'), 10),
-                pos_x: Math.max(0, Math.min(100, px)),
-                pos_y: Math.max(0, py),
+                pos_x: Math.max(0, Math.min(maxX, px)),
+                pos_y: Math.max(0, Math.min(maxY, py)),
                 bw: Math.round(r.width),
                 bh: Math.round(r.height)
             };
@@ -603,6 +605,9 @@
             var w = Math.max(80, rW + dx), h = Math.max(50, rH + dy);
             if (Math.abs(dx) >= Math.abs(dy)) h = Math.round(w / ratio);
             else w = Math.round(h * ratio);
+            var cr = area.getBoundingClientRect();
+            w = Math.min(w, Math.max(80, cr.width - it.offsetLeft));
+            h = Math.min(h, Math.max(50, cr.height - it.offsetTop));
             it.style.width = w + 'px';
             it.style.height = h + 'px';
         });
@@ -629,8 +634,11 @@
         });
         it.addEventListener('pointermove', function (e) {
             if (!dragging) return;
-            it.style.left = (oLeft + (e.clientX - startX)) + 'px';
-            it.style.top = (oTop + (e.clientY - startY)) + 'px';
+            var cr = area.getBoundingClientRect();
+            var maxL = Math.max(0, cr.width - it.offsetWidth);
+            var maxT = Math.max(0, cr.height - it.offsetHeight);
+            it.style.left = Math.max(0, Math.min(maxL, oLeft + (e.clientX - startX))) + 'px';
+            it.style.top = Math.max(0, Math.min(maxT, oTop + (e.clientY - startY))) + 'px';
         });
         function stopDrag(e) {
             if (!dragging) return;
