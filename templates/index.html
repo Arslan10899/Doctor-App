@@ -28,24 +28,6 @@
                 </div>
             </div>
             <div class="hero-content">
-                <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
-                    <div class="search-row">
-                        <div class="search-field">
-                            <input type="text" name="q" placeholder="Search doctors, hospitals, specialties..." aria-label="Search">
-                        </div>
-                        <div class="search-field field-city">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            <select name="city" aria-label="City">
-                                <option value="">All Cities</option>
-                                {% for c in cities %}
-                                    <option value="{{ c }}">{{ c }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-search">Search</button>
-                    </div>
-                </form>
-
                 <div class="hero-cta">
                     <p class="hero-cta-text">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
