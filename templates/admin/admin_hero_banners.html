@@ -3,14 +3,6 @@
 {% block title %}Hero Banner Studio{% endblock %}
 {% block content %}
 <style>
-.studio-hero {
-    position: relative;
-    background: linear-gradient(120deg, #1f6572 0%, #2a7f8e 55%, #4db6ac 100%);
-    color: #fff;
-    overflow: hidden;
-    border-radius: 14px;
-    padding: 18px 20px 16px;
-}
 .studio-hero::before {
     content: "";
     position: absolute;
@@ -28,8 +20,17 @@
     grid-template-columns: .68fr 1.32fr;
     gap: 10px;
     align-items: stretch;
-    max-width: 1160px;
+    width: 1160px;
+    max-width: none;
     margin: 0 auto;
+}
+.studio-hero {
+    position: relative;
+    background: linear-gradient(120deg, #1f6572 0%, #2a7f8e 55%, #4db6ac 100%);
+    color: #fff;
+    overflow-x: auto;
+    border-radius: 14px;
+    padding: 18px 20px 16px;
 }
 .studio-hero-visual { position: relative; display: flex; justify-content: flex-end; }
 .studio-hero-doctor { position: relative; }
