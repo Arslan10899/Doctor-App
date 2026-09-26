@@ -237,7 +237,9 @@ input, select, textarea { font-family: inherit; }
     align-items: center;
     position: relative;
 }
-.hero-banner-box img {
+.hero-banner-box img,
+.hero-banner-box video,
+.hero-banner-box .hb-media {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -245,6 +247,7 @@ input, select, textarea { font-family: inherit; }
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+    border: 0;
 }
 .hero-banners.pinned { display: block; min-height: var(--hb-minh, 190px); position: relative; }
 .hero-banners.pinned .hero-banner-box {

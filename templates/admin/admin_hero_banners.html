@@ -113,6 +113,23 @@
     padding: 12px;
 }
 .mng-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.hb-type-btn {
+    flex: 1;
+    border: 1.5px solid #d7e3e6;
+    background: #f5fbfb;
+    color: #12303b;
+    border-radius: 10px;
+    padding: 9px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s, background .15s, transform .1s;
+}
+.hb-type-btn.is-active { border-color: #0f8d80; background: #0f8d80; color: #fff; }
+.hb-type-btn.is-active { box-shadow: 0 6px 16px rgba(15, 141, 128, .3); }
+.hb-type-btn:hover { border-color: #0f8d80; }
 .mng-row {
     display: flex;
     align-items: center;
@@ -210,6 +227,28 @@
     -webkit-user-select: none;
     -webkit-user-drag: none;
 }
+.studio-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.hb-vid-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 5;
+    background: rgba(240, 82, 60, .92);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 7px;
+    letter-spacing: .3px;
+    pointer-events: none;
+}
 .studio-corner {
     position: absolute;
     right: 3px;
@@ -277,14 +316,37 @@
         <h2>Add Hero Banner</h2>
         <form method="post" action="{{ url_for('admin_hero_banners') }}">
             <input type="hidden" name="section" value="hero_banner">
-            <label class="flabel">Image URL *</label>
-            <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
-            <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
-                <button class="btn btn-sm" type="button" id="hero-banner-browse-btn">Browse &amp; Upload</button>
-                <input type="file" id="hero-banner-browse-file" accept="image/*" style="display:none;">
-                <span id="hero-banner-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+            <input type="hidden" name="media_type" id="hb-media-type" value="image">
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+                <label class="hb-type-btn is-active" data-type="image">
+                    <input type="radio" name="media_type" value="image" class="hb-type-radio" checked style="display:none;" onchange="switchHbType('image')">
+                    Image
+                </label>
+                <label class="hb-type-btn" data-type="video">
+                    <input type="radio" name="media_type" value="video" class="hb-type-radio" style="display:none;" onchange="switchHbType('video')">
+                    Video (Browse / YouTube)
+                </label>
             </div>
-            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Homepage par <b>Book an Appointment</b> button ke neeche canvas par dikhegi. Add karne ke baad neeche canvas par drag + size set karo aur <b>Save Layout</b> dabao.</p>
+            <div id="hb-image-fields">
+                <label class="flabel">Image URL *</label>
+                <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
+                <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                    <button class="btn btn-sm" type="button" id="hero-banner-browse-btn">Browse &amp; Upload</button>
+                    <input type="file" id="hero-banner-browse-file" accept="image/*" style="display:none;">
+                    <span id="hero-banner-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+                </div>
+            </div>
+            <div id="hb-video-fields" style="display:none;">
+                <label class="flabel">Video File URL * <span style="font-weight:600;color:#6b7280;">(Browse se mp4 upload karo)</span></label>
+                <input type="text" name="video_url" id="new-hero-banner-video" placeholder="https://...mp4 ya YouTube link" required>
+                <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+                    <button class="btn btn-sm" type="button" id="hero-banner-video-browse-btn">Browse &amp; Upload Video</button>
+                    <input type="file" id="hero-banner-video-browse-file" accept="video/mp4,video/webm,video/ogg,video/quicktime" style="display:none;">
+                    <span id="hero-banner-video-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Ya phir yahan <b>YouTube link</b> paste karo (watch / shorts / youtu.be) — video autoplay hogi. Zyada bari video upload na karo (website slow ho jayegi).</p>
+            </div>
+            <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Add karnay ke baad neeche canvas par drag + size set karo aur <b>Save Layout</b> dabao. Toggle <b>Manage Banners</b> se onclick karo.</p>
             <button class="btn btn-primary" type="submit">Add Banner</button>
         </form>
     </div>
@@ -295,7 +357,11 @@
             {% for b in hero_banners %}
             <div class="mng-row{% if not b['active'] %} is-off{% endif %}">
                 <div class="mng-thumb">
+                    {% if b['media_type'] == 'video' %}
+                        {% if yt_embed(b['video_url']) %}{% set th = yt_thumb(b['video_url']) %}{% if th %}<img src="{{ th }}" alt="video" onerror="this.style.visibility='hidden';">{% else %}<span style="font-size:16px;">&#9654;</span>{% endif %}{% else %}<video src="{{ b['video_url'] }}" muted preload="metadata"></video>{% endif %}
+                    {% else %}
                     {% if b['image_url'] %}<img src="{{ b['image_url'] }}" alt="banner {{ b['id'] }}" onerror="this.style.visibility='hidden';">{% endif %}
+                    {% endif %}
                 </div>
                 <div class="mng-info">
                     <span class="mng-id">Banner #{{ b['id'] }}</span>
@@ -353,15 +419,24 @@
              data-x="{{ b['pos_x'] or '' }}" data-y="{{ b['pos_y'] or '' }}"
              data-w="{{ b['bw'] or '' }}" data-h="{{ b['bh'] or '' }}"
              data-active="{{ b['active'] }}">
+            {% if b['media_type'] == 'video' %}
+                {% if yt_embed(b['video_url']) %}
+                <img src="{{ yt_thumb(b['video_url']) }}" alt="Hero video" draggable="false" style="background:#0a2230;" onerror="this.style.opacity='.25';">
+                {% else %}
+                <video src="{{ b['video_url'] }}" muted loop playsinline draggable="false" preload="auto"></video>
+                {% endif %}
+                <span class="hb-vid-badge">VIDEO</span>
+            {% else %}
             <img src="{{ b['image_url'] }}" alt="Hero banner" draggable="false">
+            {% endif %}
             <span class="studio-corner" title="Drag to resize"></span>
             <div class="studio-actions">
                 <button type="button" class="btn btn-sm btn-toggle" title="Toggle show / hide"
                         data-act="{{ b['active'] }}">
                     {% if b['active'] %}ON{% else %}HIDDEN{% endif %}
                 </button>
-                <button type="button" class="btn btn-sm btn-edit" title="Change image">
-                    Image
+                <button type="button" class="btn btn-sm btn-edit" title="Change image / video">
+                    Edit
                 </button>
                 <button type="button" class="btn btn-sm btn-danger" title="Delete banner">
                     Delete
@@ -370,7 +445,9 @@
             <form class="studio-edit-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
                 <input type="hidden" name="section" value="hero_banner_edit">
                 <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
-                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="https://...jpg">
+                <input type="hidden" name="media_type" value="{{ b['media_type'] }}">
+                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="Image URL">
+                <input type="text" name="video_url" value="{{ b['video_url'] }}" placeholder="Video / YouTube URL">
                 <button type="submit" class="btn btn-sm">Update</button>
             </form>
             <form class="studio-toggle-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
@@ -416,6 +493,22 @@ function uploadToInput(fileInput, urlInput, statusEl) {
         });
 }
 document.addEventListener('DOMContentLoaded', function () {
+    window.switchHbType = function (type) {
+        var hidden = document.getElementById('hb-media-type');
+        if (hidden) hidden.value = type;
+        var btns = document.querySelectorAll('.hb-type-btn');
+        Array.prototype.forEach.call(btns, function (b) {
+            b.classList.toggle('is-active', b.getAttribute('data-type') === type);
+        });
+        var imgFields = document.getElementById('hb-image-fields');
+        var vidFields = document.getElementById('hb-video-fields');
+        if (imgFields) imgFields.style.display = type === 'image' ? '' : 'none';
+        if (vidFields) vidFields.style.display = type === 'video' ? '' : 'none';
+        var imgField = document.getElementById('new-hero-banner-image');
+        var vidField = document.getElementById('new-hero-banner-video');
+        if (imgField) imgField.required = type === 'image';
+        if (vidField) vidField.required = type === 'video';
+    };
     var browseBtn = document.getElementById('hero-banner-browse-btn');
     var browseFile = document.getElementById('hero-banner-browse-file');
     var urlInput = document.getElementById('new-hero-banner-image');
@@ -423,6 +516,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (browseBtn && browseFile && urlInput) {
         browseBtn.addEventListener('click', function () { browseFile.click(); });
         browseFile.addEventListener('change', function () { uploadToInput(browseFile, urlInput, uploadStatus); });
+    }
+    var vidBrowseBtn = document.getElementById('hero-banner-video-browse-btn');
+    var vidBrowseFile = document.getElementById('hero-banner-video-browse-file');
+    var vidInput = document.getElementById('new-hero-banner-video');
+    var vidUploadStatus = document.getElementById('hero-banner-video-upload-status');
+    if (vidBrowseBtn && vidBrowseFile && vidInput) {
+        vidBrowseBtn.addEventListener('click', function () { vidBrowseFile.click(); });
+        vidBrowseFile.addEventListener('change', function () { uploadToInput(vidBrowseFile, vidInput, vidUploadStatus); });
     }
 
     var canvas = document.getElementById('studioCanvas');

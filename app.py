@@ -26,7 +26,38 @@ def inject_globals():
         specs = [r["name"] for r in query("SELECT name FROM specialties ORDER BY name")]
     except Exception:
         cities, specs = CITIES, SPECIALTIES
-    return {"cities": cities, "all_specialties": specs, "current_year": 2026}
+    return {"cities": cities, "all_specialties": specs, "current_year": 2026, "yt_embed": yt_embed, "yt_thumb": yt_thumb}
+
+def yt_video_id(url):
+    """Extract YouTube video id from any common link form."""
+    if not url:
+        return None
+    u = url.strip()
+    if "youtu.be/" in u:
+        return u.split("youtu.be/")[1].split("?")[0].split("#")[0]
+    if "youtube.com/" in u:
+        if "/shorts/" in u:
+            return u.split("/shorts/")[1].split("?")[0].split("#")[0]
+        if "/embed/" in u:
+            return u.split("/embed/")[1].split("?")[0].split("#")[0]
+        q = u.split("?")[1] if "?" in u else ""
+        import urllib.parse
+        for k, v in urllib.parse.parse_qsl(q):
+            if k == "v":
+                return v
+    return None
+
+def yt_thumb(url):
+    """YouTube video thumbnail image URL (or None if not a YouTube link)."""
+    vid = yt_video_id(url)
+    return "https://img.youtube.com/vi/" + vid + "/hqdefault.jpg" if vid else None
+
+def yt_embed(url):
+    """Convert a YouTube watch/shorts/you.be link into an embeddable URL (or None)."""
+    vid = yt_video_id(url)
+    if vid:
+        return "https://www.youtube.com/embed/" + vid + "?autoplay=1&mute=1&loop=1&playlist=" + vid + "&rel=0"
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -445,7 +476,8 @@ def migrate(db):
             cur.execute(f"ALTER TABLE admins ADD COLUMN {col} {ddl}")
 
     bcols = [r[1] for r in cur.execute("PRAGMA table_info(hero_banners)").fetchall()]
-    for col, ddl in {"pos_x": "REAL", "pos_y": "REAL", "bw": "INTEGER DEFAULT 260", "bh": "INTEGER"}.items():
+    for col, ddl in {"pos_x": "REAL", "pos_y": "REAL", "bw": "INTEGER DEFAULT 260", "bh": "INTEGER",
+                     "media_type": "TEXT DEFAULT 'image'", "video_url": "TEXT"}.items():
         if col not in bcols:
             cur.execute(f"ALTER TABLE hero_banners ADD COLUMN {col} {ddl}")
 
@@ -497,6 +529,8 @@ def migrate(db):
         CREATE TABLE IF NOT EXISTS hero_banners (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             image_url TEXT,
+            video_url TEXT,
+            media_type TEXT DEFAULT 'image',
             active INTEGER DEFAULT 1,
             pos_x REAL,
             pos_y REAL,
@@ -1636,12 +1670,17 @@ def admin_content():
 def admin_hero_banners_action():
     section = request.form.get("section")
     if section == "hero_banner":
+        media_type = "video" if request.form.get("media_type") == "video" else "image"
         image_url = request.form.get("image_url", "").strip()
-        if image_url:
-            execute("INSERT INTO hero_banners (image_url, active) VALUES (?, 1)", (image_url,))
+        video_url = request.form.get("video_url", "").strip()
+        if media_type == "video" and video_url:
+            execute("INSERT INTO hero_banners (media_type, video_url, active) VALUES (?, ?, 1)", (media_type, video_url))
+            flash("Hero banner video added.", "success")
+        elif media_type == "image" and image_url:
+            execute("INSERT INTO hero_banners (media_type, image_url, active) VALUES (?, ?, 1)", (media_type, image_url))
             flash("Hero banner added.", "success")
         else:
-            flash("Image URL is required to add a hero banner.", "warning")
+            flash("Image URL ya Video URL required hai banner add karne ke liye.", "warning")
     elif section == "hero_banner_toggle":
         bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
         val = 1 if request.form.get("active") == "1" else 0
@@ -1650,12 +1689,14 @@ def admin_hero_banners_action():
             flash("Hero banner " + ("enabled." if val else "hidden."), "success")
     elif section == "hero_banner_edit":
         bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
+        media_type = "video" if request.form.get("media_type") == "video" else "image"
         image_url = request.form.get("image_url", "").strip()
-        if bid and image_url:
-            execute("UPDATE hero_banners SET image_url=? WHERE id=?", (image_url, bid))
+        video_url = request.form.get("video_url", "").strip()
+        if bid and ((media_type == "video" and video_url) or (media_type == "image" and image_url)):
+            execute("UPDATE hero_banners SET media_type=?, image_url=?, video_url=? WHERE id=?", (media_type, image_url, video_url, bid))
             flash("Hero banner updated.", "success")
         else:
-            flash("Image URL is required to save a hero banner.", "warning")
+            flash("Media URL required hai update karne ke liye.", "warning")
     elif section == "delete":
         table = request.form.get("table", "")
         cid = request.form.get("record_id", request.form.get("id", type=int))
@@ -1699,13 +1740,13 @@ def admin_hero_banners_save():
 @app.route("/admin/upload", methods=["POST"])
 @admin_required
 def admin_upload():
-    """Upload an image (used for carousel / notifications) and return its URL."""
+    """Upload an image or video (hero banners / carousel / notifications) and return its URL."""
     f = request.files.get("file")
     if not f or not f.filename:
         return jsonify({"ok": False, "error": "No file selected."}), 400
     ext = os.path.splitext(f.filename)[1].lower()
-    if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"):
-        return jsonify({"ok": False, "error": "Only image files are allowed (png/jpg/jpeg/gif/webp/svg)."}), 400
+    if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".mp4", ".webm", ".ogg", ".mov"):
+        return jsonify({"ok": False, "error": "Only images (png/jpg/jpeg/gif/webp/svg) or videos (mp4/webm/ogg/mov) are allowed."}), 400
     up_dir = os.path.join(BASE_DIR, "static", "uploads")
     os.makedirs(up_dir, exist_ok=True)
     fname = secure_filename(f.filename)
