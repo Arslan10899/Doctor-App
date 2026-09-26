@@ -33,17 +33,17 @@ def yt_video_id(url):
     if not url:
         return None
     u = url.strip()
-    if "youtu.be/" in u:
-        return u.split("youtu.be/")[1].split("?")[0].split("#")[0]
-    if "youtube.com/" in u:
-        if "/shorts/" in u:
-            return u.split("/shorts/")[1].split("?")[0].split("#")[0]
-        if "/embed/" in u:
-            return u.split("/embed/")[1].split("?")[0].split("#")[0]
+    import re
+    # watch?v=..., youtu.be/..., shorts/..., live/..., embed/..., v/... forms
+    m = re.search(r'(?:youtube\.com/(?:watch\?[^#]*v=|shorts/|live/|embed/|v/)|youtu\.be/|m\.youtube\.com/(?:watch\?[^#]*v=|shorts/|live/|embed/|v/))([\w-]{6,})', u)
+    if m:
+        return m.group(1)
+    # query param fallback (e.g. music.youtube.com)
+    if "youtube.com/" in u or "youtu.be/" in u:
         q = u.split("?")[1] if "?" in u else ""
         import urllib.parse
         for k, v in urllib.parse.parse_qsl(q):
-            if k == "v":
+            if k == "v" and v:
                 return v
     return None
 
