@@ -145,6 +145,21 @@
     background: #fff;
 }
 .mng-row.is-off { opacity: .55; }
+.mng-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #0f8d80;
+    color: #fff;
+    font-size: 11px;
+    margin-right: 4px;
+}
+.mng-row.is-off .mng-num { background: #9aa7ab; }
+.mng-sub { font-size: 11.5px; color: #6b828b; font-weight: 600; }
 .mng-thumb {
     width: 52px;
     height: 34px;
@@ -332,6 +347,17 @@
                     Video (Browse / YouTube)
                 </label>
             </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                <div>
+                    <label class="flabel">Banner Name (optional)</label>
+                    <input type="text" name="name" id="hb-name" placeholder="e.g. Winter Offer">
+                </div>
+                <div>
+                    <label class="flabel">Number / Order</label>
+                    <input type="number" name="sort_order" id="hb-sort" min="0" step="1" value="{{ (hero_banners|length) + 1 }}">
+                </div>
+            </div>
+            <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Number = banner ka order (1 pehla, 2 doosra). Homepage par isi tarah dikhega.</p>
             <div id="hb-image-fields">
                 <label class="flabel">Image URL *</label>
                 <input type="text" name="image_url" id="new-hero-banner-image" placeholder="https://...jpg" required>
@@ -342,6 +368,17 @@
                 </div>
             </div>
             <div id="hb-video-fields" style="display:none;">
+                <label class="flabel" style="margin-bottom:8px;">Autoplay (video khud chalay)</label>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                    <label class="hb-type-btn is-active" data-flag="auto1">
+                        <input type="radio" name="autoplay" value="1" checked style="display:none;">
+                        Autoplay ON
+                    </label>
+                    <label class="hb-type-btn" data-flag="auto0">
+                        <input type="radio" name="autoplay" value="0" style="display:none;">
+                        Autoplay OFF
+                    </label>
+                </div>
                 <label class="flabel">Video File URL * <span style="font-weight:600;color:#6b7280;">(Browse se mp4 upload karo)</span></label>
                 <input type="text" name="video_url" id="new-hero-banner-video" placeholder="https://...mp4 ya YouTube link" required>
                 <div style="display:flex;gap:8px;align-items:center;margin:8px 0;">
@@ -349,7 +386,7 @@
                     <input type="file" id="hero-banner-video-browse-file" accept="video/mp4,video/webm,video/ogg,video/quicktime" style="display:none;">
                     <span id="hero-banner-video-upload-status" style="font-size:12px;color:#1f8b8b;"></span>
                 </div>
-                <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Ya phir yahan <b>YouTube link</b> paste karo (watch / shorts / youtu.be) — video autoplay hogi. Zyada bari video upload na karo (website slow ho jayegi).</p>
+                <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Ya phir yahan <b>YouTube link</b> paste karo (watch / shorts / youtu.be). Autoplay OFF par video tab dikhegi jab visitor kheinche. Zyada bari video upload na karo (website slow ho jayegi).</p>
             </div>
             <p style="font-size:12px;color:#6b7280;margin:-6px 0 8px;">Add karnay ke baad neeche canvas par drag + size set karo aur <b>Save Layout</b> dabao. Toggle <b>Manage Banners</b> se onclick karo.</p>
             <button class="btn btn-primary" type="submit">Add Banner</button>
@@ -369,7 +406,16 @@
                     {% endif %}
                 </div>
                 <div class="mng-info">
-                    <span class="mng-id">Banner #{{ b['id'] }}</span>
+                    <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">
+                        <span class="mng-id">
+                            <b class="mng-num">{{ loop.index }}</b>{% if b['name'] %} {{ b['name'] }}{% else %} Banner #{{ b['id'] }}{% endif %}
+                        </span>
+                        {% if b['media_type'] == 'video' %}
+                        <span class="mng-sub">Video &middot; {{ 'Autoplay ON' if b['autoplay'] else 'Autoplay OFF' }}</span>
+                        {% else %}
+                        <span class="mng-sub">Image</span>
+                        {% endif %}
+                    </div>
                     <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-toggle-form">
                         <input type="hidden" name="section" value="hero_banner_toggle">
                         <input type="hidden" name="id" value="{{ b['id'] }}">
@@ -451,8 +497,14 @@
                 <input type="hidden" name="section" value="hero_banner_edit">
                 <input type="hidden" name="hero_banner_id" value="{{ b['id'] }}">
                 <input type="hidden" name="media_type" value="{{ b['media_type'] }}">
-                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="Image URL">
-                <input type="text" name="video_url" value="{{ b['video_url'] }}" placeholder="Video / YouTube URL">
+                <input type="text" name="image_url" value="{{ b['image_url'] }}" placeholder="Image URL" style="min-width:80px;">
+                <input type="text" name="video_url" value="{{ b['video_url'] }}" placeholder="Video / YouTube URL" style="min-width:80px;">
+                <input type="text" name="name" value="{{ b['name'] or '' }}" placeholder="Name" style="min-width:70px;">
+                <input type="number" name="sort_order" value="{{ b['sort_order'] or 0 }}" placeholder="#" style="width:52px;">
+                <select name="autoplay" title="Autoplay">
+                    <option value="1" {% if b['autoplay'] %}selected{% endif %}>Auto ON</option>
+                    <option value="0" {% if not b['autoplay'] %}selected{% endif %}>Auto OFF</option>
+                </select>
                 <button type="submit" class="btn btn-sm">Update</button>
             </form>
             <form class="studio-toggle-form" method="post" action="{{ url_for('admin_hero_banners') }}" hidden>
@@ -514,6 +566,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgField) imgField.required = type === 'image';
         if (vidField) vidField.required = type === 'video';
     };
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="autoplay"]'), function (r) {
+        r.addEventListener('change', function () {
+            Array.prototype.forEach.call(document.querySelectorAll('[data-flag^="auto"]'), function (b) {
+                b.classList.toggle('is-active', b.getAttribute('data-flag') === 'auto' + r.value);
+            });
+        });
+    });
     var browseBtn = document.getElementById('hero-banner-browse-btn');
     var browseFile = document.getElementById('hero-banner-browse-file');
     var urlInput = document.getElementById('new-hero-banner-image');

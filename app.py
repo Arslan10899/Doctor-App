@@ -52,11 +52,13 @@ def yt_thumb(url):
     vid = yt_video_id(url)
     return "https://img.youtube.com/vi/" + vid + "/hqdefault.jpg" if vid else None
 
-def yt_embed(url):
+def yt_embed(url, autoplay=True):
     """Convert a YouTube watch/shorts/you.be link into an embeddable URL (or None)."""
     vid = yt_video_id(url)
     if vid:
-        return "https://www.youtube.com/embed/" + vid + "?autoplay=1&mute=1&loop=1&playlist=" + vid + "&rel=0"
+        if autoplay:
+            return "https://www.youtube.com/embed/" + vid + "?autoplay=1&mute=1&loop=1&playlist=" + vid + "&rel=0"
+        return "https://www.youtube.com/embed/" + vid + "?rel=0"
     return None
 
 
@@ -477,7 +479,8 @@ def migrate(db):
 
     bcols = [r[1] for r in cur.execute("PRAGMA table_info(hero_banners)").fetchall()]
     for col, ddl in {"pos_x": "REAL", "pos_y": "REAL", "bw": "INTEGER DEFAULT 260", "bh": "INTEGER",
-                     "media_type": "TEXT DEFAULT 'image'", "video_url": "TEXT"}.items():
+                     "media_type": "TEXT DEFAULT 'image'", "video_url": "TEXT",
+                     "name": "TEXT", "autoplay": "INTEGER DEFAULT 1", "sort_order": "INTEGER DEFAULT 0"}.items():
         if col not in bcols:
             cur.execute(f"ALTER TABLE hero_banners ADD COLUMN {col} {ddl}")
 
@@ -528,9 +531,12 @@ def migrate(db):
         );
         CREATE TABLE IF NOT EXISTS hero_banners (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
             image_url TEXT,
             video_url TEXT,
             media_type TEXT DEFAULT 'image',
+            autoplay INTEGER DEFAULT 1,
+            sort_order INTEGER DEFAULT 0,
             active INTEGER DEFAULT 1,
             pos_x REAL,
             pos_y REAL,
@@ -674,7 +680,7 @@ def index():
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
-    hero_banners = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY id DESC")
+    hero_banners = query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")
     banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
     pinned_height = 190
     if banner_pinned:
@@ -1673,11 +1679,16 @@ def admin_hero_banners_action():
         media_type = "video" if request.form.get("media_type") == "video" else "image"
         image_url = request.form.get("image_url", "").strip()
         video_url = request.form.get("video_url", "").strip()
+        name = request.form.get("name", "").strip()
+        autoplay = 1 if request.form.get("autoplay") == "1" else 0
+        sort_order = request.form.get("sort_order", type=int) or 0
         if media_type == "video" and video_url:
-            execute("INSERT INTO hero_banners (media_type, video_url, active) VALUES (?, ?, 1)", (media_type, video_url))
+            execute("INSERT INTO hero_banners (media_type, video_url, name, autoplay, sort_order, active) VALUES (?, ?, ?, ?, ?, 1)",
+                    (media_type, video_url, name or None, autoplay, sort_order))
             flash("Hero banner video added.", "success")
         elif media_type == "image" and image_url:
-            execute("INSERT INTO hero_banners (media_type, image_url, active) VALUES (?, ?, 1)", (media_type, image_url))
+            execute("INSERT INTO hero_banners (media_type, image_url, name, autoplay, sort_order, active) VALUES (?, ?, ?, ?, ?, 1)",
+                    (media_type, image_url, name or None, autoplay, sort_order))
             flash("Hero banner added.", "success")
         else:
             flash("Image URL ya Video URL required hai banner add karne ke liye.", "warning")
@@ -1692,8 +1703,12 @@ def admin_hero_banners_action():
         media_type = "video" if request.form.get("media_type") == "video" else "image"
         image_url = request.form.get("image_url", "").strip()
         video_url = request.form.get("video_url", "").strip()
+        name = request.form.get("name", "").strip()
+        autoplay = 1 if request.form.get("autoplay") == "1" else 0
+        sort_order = request.form.get("sort_order", type=int) or 0
         if bid and ((media_type == "video" and video_url) or (media_type == "image" and image_url)):
-            execute("UPDATE hero_banners SET media_type=?, image_url=?, video_url=? WHERE id=?", (media_type, image_url, video_url, bid))
+            execute("UPDATE hero_banners SET media_type=?, image_url=?, video_url=?, name=?, autoplay=?, sort_order=? WHERE id=?",
+                    (media_type, image_url, video_url, name or None, autoplay, sort_order, bid))
             flash("Hero banner updated.", "success")
         else:
             flash("Media URL required hai update karne ke liye.", "warning")
