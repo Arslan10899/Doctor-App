@@ -81,33 +81,74 @@
     font-weight: 800;
 }
 .studio-hero-search {
-    background: #fff;
-    border: 1px solid rgba(255, 255, 255, .25);
-    border-radius: 50px;
-    padding: 5px;
-    box-shadow: 0 14px 40px rgba(15, 40, 60, .14);
-    color: #333;
+    background: transparent;
     margin-top: 0;
+    max-width: 660px;
 }
-.studio-search-row { display: flex; align-items: center; width: 100%; gap: 6px; }
-.studio-search-field {
-    flex: 1 1 auto;
-    min-width: 0;
-    height: 46px;
+.studio-search-wrap {
+    background: #fff;
+    padding: 8px 10px;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(0, 50, 120, 0.14);
+    border: 1px solid rgba(220, 230, 245, 0.9);
+    display: flex;
+    align-items: center;
+    color: #334155;
+}
+.studio-search-section {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 18px;
-    border-radius: 50px;
+    flex: 2;
+    min-width: 0;
+    padding: 8px 16px;
 }
-.studio-search-field input {
+.studio-search-section input,
+.studio-dropdown-section input {
     border: none;
-    background: transparent;
     outline: none;
-    font-size: 15px;
     width: 100%;
     min-width: 0;
-    color: #333;
+    background: transparent;
+    font-size: 15px;
+    color: #334155;
+}
+.studio-search-section > svg { color: #0284c7; width: 20px; height: 20px; flex-shrink: 0; }
+.studio-divider {
+    width: 1px;
+    height: 28px;
+    background-color: #e2e8f0;
+    flex-shrink: 0;
+}
+.studio-dropdown-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    padding: 8px 16px;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.studio-dropdown-section > svg:first-of-type { color: #0284c7; width: 20px; height: 20px; flex-shrink: 0; }
+.studio-dropdown-section > svg:last-of-type { margin-left: auto; color: #64748b; flex-shrink: 0; }
+.studio-search-btn {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 100%);
+    color: white;
+    border-radius: 9999px;
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(20, 184, 166, 0.35);
+    white-space: nowrap;
+    cursor: default;
+    pointer-events: none;
 }
 .studio-hero-cta {
     margin-top: 20px;
@@ -564,11 +605,18 @@
                         <p class="studio-hero-sub"><span class="studio-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
                     </div>
                     <div class="studio-hero-search">
-                        <div class="studio-search-row">
-                            <div class="studio-search-field">
+                        <div class="studio-search-wrap">
+                            <div class="studio-search-section">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                <input type="text" placeholder="Search doctors, hospitals, specialties..." readonly>
+                                <input type="text" placeholder="Search by doctor, specialty, hospital or condition..." readonly>
                             </div>
+                            <div class="studio-divider"></div>
+                            <div class="studio-dropdown-section">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <input type="text" placeholder="Your Location" readonly>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <span class="studio-search-btn"><span>Search</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
                         </div>
                     </div>
                 </div>

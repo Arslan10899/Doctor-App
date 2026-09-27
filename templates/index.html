@@ -34,11 +34,26 @@
                         <p class="hero-sub"><span class="hero-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
                     </div>
                     <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
-                        <div class="search-row">
-                            <div class="search-field">
+                        <div class="search-bar-wrap">
+                            <div class="search-section">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                <input type="text" name="q" placeholder="Search doctors, hospitals, specialties..." aria-label="Search">
+                                <input type="text" name="q" placeholder="Search by doctor, specialty, hospital or condition..." aria-label="Search">
                             </div>
+                            <div class="divider"></div>
+                            <div class="dropdown-section">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <select name="city" aria-label="Location">
+                                    <option value="">Your Location</option>
+                                    {% for c in cities %}
+                                    <option value="{{ c }}">{{ c }}</option>
+                                    {% endfor %}
+                                </select>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <button class="search-btn" type="submit" aria-label="Search">
+                                <span>Search</span>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                            </button>
                         </div>
                     </form>
                 </div>
