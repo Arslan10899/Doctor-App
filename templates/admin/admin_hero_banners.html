@@ -716,8 +716,43 @@ document.addEventListener('DOMContentLoaded', function () {
         var scale = Math.min(260 / nw, 150 / nh);
         applySize(it, Math.round(nw * scale), Math.round(nh * scale));
     }
+    function mediaRatio(it) {
+        var m = it.querySelector('img, video');
+        if (!m) return null;
+        var nw = m.videoWidth || m.naturalWidth || 0;
+        var nh = m.videoHeight || m.naturalHeight || 0;
+        return (nw && nh) ? (nw / nh) : null;
+    }
+    var tightenedAny = false;
+    function tightenToMedia(it) {
+        var media = it.querySelector('img, video');
+        if (!media) return;
+        var done = function () {
+            var ratio = mediaRatio(it);
+            var w = it.offsetWidth, h = it.offsetHeight;
+            if (!ratio || !w || !h) return;
+            if (Math.abs(w / h - ratio) < 0.02) return;
+            var nw = w, nh = Math.round(w / ratio);
+            if (nh < 50) { nh = 50; nw = Math.round(50 * ratio); }
+            applySize(it, nw, nh);
+            tightenedAny = true;
+            scheduleTightenSave();
+        };
+        if (media.tagName === 'VIDEO') {
+            if (media.videoWidth) done();
+            else media.addEventListener('loadedmetadata', done);
+        } else {
+            if (media.complete && media.naturalWidth) done();
+            else media.addEventListener('load', done);
+        }
+    }
+    var _tSave;
+    function scheduleTightenSave() {
+        clearTimeout(_tSave);
+        _tSave = setTimeout(function () { if (tightenedAny) autosave(); }, 400);
+    }
     function autofitItem(it) {
-        if (it.getAttribute('data-w')) return;
+        if (it.getAttribute('data-w')) { tightenToMedia(it); return; }
         var media = it.querySelector('img, video');
         if (!media) return;
         var done = function () { fitToMedia(it, media); };
@@ -958,7 +993,8 @@ document.addEventListener('DOMContentLoaded', function () {
             resizing = true;
             rsX = e.clientX; rsY = e.clientY;
             rW = it.offsetWidth; rH = it.offsetHeight;
-            ratio = rW / rH;
+            ratio = mediaRatio(it) || (rW / rH);
+            applySize(it, rW, rH);
             it.classList.add('dragging');
             corner.setPointerCapture(e.pointerId);
         });

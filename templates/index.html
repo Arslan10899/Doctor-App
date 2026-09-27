@@ -625,7 +625,10 @@
             resizing = true;
             rsX = e.clientX; rsY = e.clientY;
             rW = it.offsetWidth; rH = it.offsetHeight;
-            ratio = rW / rH;
+            var m = it.querySelector('img, video');
+            var nw = m ? (m.videoWidth || m.naturalWidth || 0) : 0;
+            var nh = m ? (m.videoHeight || m.naturalHeight || 0) : 0;
+            ratio = (nw && nh) ? (nw / nh) : (rW / rH);
             corner.setPointerCapture(e.pointerId);
         });
         corner.addEventListener('pointermove', function (e) {
