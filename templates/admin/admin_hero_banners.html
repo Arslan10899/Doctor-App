@@ -937,6 +937,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var maxT = Math.max(0, (cr.height / hzScale) - it.offsetHeight);
             it.style.left = Math.max(0, Math.min(maxL, oLeft + (e.clientX - startX) / hzScale)) + 'px';
             it.style.top = Math.max(0, Math.min(maxT, oTop + (e.clientY - startY) / hzScale)) + 'px';
+            updateLabel(it);
         });
         function stop(e) {
             if (!dragging) return;
