@@ -349,7 +349,7 @@ input, select, textarea { font-family: inherit; }
     letter-spacing: -.02em;
     white-space: nowrap;
 }
-.hero p.hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; }
+.hero p.hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; white-space: nowrap; }
 .hero-title-accent {
     display: block;
     margin-top: 4px;
@@ -1536,6 +1536,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 @media (max-width: 1000px) {
     .hero-head { grid-template-columns: 1fr; gap: 22px; }
+    .hero p.hero-sub { white-space: normal; }
 }
 @media (max-width: 640px) {
     .search-bar-wrap { border-radius: 18px; }
