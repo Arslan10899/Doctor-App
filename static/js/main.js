@@ -311,7 +311,25 @@ document.addEventListener("DOMContentLoaded", function () {
             matches.forEach(function (d) {
                 const item = document.createElement("div");
                 item.className = "book-suggest-item";
-                item.innerHTML = "<strong>" + d.doctor_name + "</strong><small>" + d.specialty_name + " \u00b7 " + d.city_name + "</small>";
+                const fee = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
+                const online = d.online ? '<span class="bs-badge bs-online">Online</span>' : '<span class="bs-badge bs-offline">In person</span>';
+                const left = document.createElement("div");
+                left.className = "bs-left";
+                const nm = document.createElement("strong");
+                nm.textContent = d.doctor_name;
+                const meta = document.createElement("small");
+                meta.textContent = d.specialty_name + " \u00b7 " + d.city_name;
+                left.appendChild(nm);
+                left.appendChild(meta);
+                const right = document.createElement("div");
+                right.className = "bs-right";
+                const feeEl = document.createElement("span");
+                feeEl.className = "bs-fee";
+                feeEl.textContent = fee;
+                right.appendChild(feeEl);
+                right.insertAdjacentHTML("beforeend", online);
+                item.appendChild(left);
+                item.appendChild(right);
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
                     selectDoctor(d);
