@@ -384,7 +384,7 @@ input, select, textarea { font-family: inherit; }
 }
 .hero p.hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; white-space: nowrap; }
 .hero-title-key {
-    color: #ffd25e;
+    color: #7ff0dc;
     position: relative;
 }
 .hero-title-key::after {
@@ -395,7 +395,7 @@ input, select, textarea { font-family: inherit; }
     bottom: .04em;
     height: .07em;
     border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255, 210, 94, .85), rgba(255, 210, 94, .15));
+    background: linear-gradient(90deg, rgba(127, 240, 220, .85), rgba(127, 240, 220, .15));
 }
 .hero-title-accent {
     display: block;
@@ -465,7 +465,7 @@ input, select, textarea { font-family: inherit; }
     border: 1px solid rgba(220, 230, 245, 0.9);
     display: flex;
     align-items: center;
-    max-width: 640px;
+    max-width: 520px;
     width: 100%;
     color: var(--text);
 }
@@ -473,9 +473,9 @@ input, select, textarea { font-family: inherit; }
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 2.2;
+    flex: 1 1 auto;
     min-width: 0;
-    padding: 6px 14px;
+    padding: 6px 10px;
 }
 .search-section input {
     border: none;
@@ -1587,7 +1587,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 640px) {
     .search-bar-wrap { border-radius: 18px; }
     .search-section, .dropdown-section { padding: 5px 10px; }
-    .search-section { flex: 1.4; }
     .divider { display: none; }
     .search-btn { width: 34px; height: 34px; }
     .hero-head { gap: 18px; }
