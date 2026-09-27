@@ -398,7 +398,7 @@ input, select, textarea { font-family: inherit; }
     display: grid;
     grid-template-columns: 0.9fr 1.5fr;
     gap: 38px;
-    align-items: end;
+    align-items: center;
     width: 100%;
 }
 .hero-head-text { min-width: 0; }
