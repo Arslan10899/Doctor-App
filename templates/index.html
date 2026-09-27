@@ -64,15 +64,19 @@
                     {% set emb = yt_embed(hb['video_url'], hb['autoplay']) %}
                     {% if emb %}
                     <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
+                       data-autoplay="{{ hb['autoplay'] }}" data-embed-auto="{{ yt_embed(hb['video_url'], True) }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
                        data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}">
                         <iframe class="hb-media" src="{{ emb }}" title="Hero video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                        {% if not hb['autoplay'] %}<span class="hb-play-badge">&#9654;</span>{% endif %}
                     </a>
                     {% else %}
                     <a href="{{ url_for('doctors') }}" class="hero-banner-box" data-id="{{ hb['id'] }}"
+                       data-autoplay="{{ hb['autoplay'] }}"
                        data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
                        data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}">
-                        <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"{% if not hb['autoplay'] %} controls{% endif %}></video>
+                        <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"></video>
+                        {% if not hb['autoplay'] %}<span class="hb-play-badge">&#9654;</span>{% endif %}
                     </a>
                     {% endif %}
                     {% elif hb['image_url'] %}
@@ -96,17 +100,21 @@
         {% set emb = yt_embed(hb['video_url'], hb['autoplay']) %}
         {% if emb %}
         <a href="{{ url_for('doctors') }}" class="hero-banner-box pinned" data-id="{{ hb['id'] }}"
+           data-autoplay="{{ hb['autoplay'] }}" data-embed-auto="{{ yt_embed(hb['video_url'], True) }}"
            data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
            data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"
            style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}">
             <iframe class="hb-media" src="{{ emb }}" title="Hero video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            {% if not hb['autoplay'] %}<span class="hb-play-badge">&#9654;</span>{% endif %}
         </a>
         {% else %}
         <a href="{{ url_for('doctors') }}" class="hero-banner-box pinned" data-id="{{ hb['id'] }}"
+           data-autoplay="{{ hb['autoplay'] }}"
            data-x="{{ hb['pos_x'] or '' }}" data-y="{{ hb['pos_y'] or '' }}"
            data-w="{{ hb['bw'] or '' }}" data-h="{{ hb['bh'] or '' }}"
            style="left:{{ hb['pos_x'] }}%;top:{{ hb['pos_y'] }}px;width:{{ hb['bw'] }}px;{% if hb['bh'] %}height:{{ hb['bh'] }}px;{% endif %}">
-            <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"{% if not hb['autoplay'] %} controls{% endif %}></video>
+            <video class="hb-media" src="{{ hb['video_url'] }}"{% if hb['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"></video>
+            {% if not hb['autoplay'] %}<span class="hb-play-badge">&#9654;</span>{% endif %}
         </a>
         {% endif %}
         {% elif hb['image_url'] %}
@@ -705,6 +713,31 @@
     setMode(true);
 })();
 {% endif %}
+</script>
+
+<script>
+(function () {
+    function isLiveEdit() { return document.body.classList.contains('lv-studio'); }
+    document.addEventListener('click', function (e) {
+        if (isLiveEdit()) return;
+        var box = e.target.closest ? e.target.closest('.hero-banner-box') : null;
+        if (!box) return;
+        var auto = box.getAttribute('data-autoplay');
+        if (auto !== '0') return;
+        e.preventDefault();
+        var vid = box.querySelector('video.hb-media');
+        if (vid) {
+            if (vid.paused) { vid.muted = false; vid.play().catch(function () {}); }
+            else vid.pause();
+            return;
+        }
+        var ifr = box.querySelector('iframe.hb-media');
+        if (ifr) {
+            var autoSrc = box.getAttribute('data-embed-auto');
+            if (autoSrc && ifr.src.indexOf('autoplay=1') === -1) ifr.src = autoSrc;
+        }
+    });
+})();
 </script>
 
 {% endblock %}

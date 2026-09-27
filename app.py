@@ -1730,6 +1730,14 @@ def admin_hero_banners_action():
         if bid:
             execute("UPDATE hero_banners SET active=? WHERE id=?", (val, bid))
             flash("Hero banner " + ("enabled." if val else "hidden."), "success")
+    elif section == "hero_banner_autoplay_toggle":
+        bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
+        if bid:
+            row = query("SELECT * FROM hero_banners WHERE id=?", (bid,))
+            if row:
+                val = 0 if row[0]["autoplay"] else 1
+                execute("UPDATE hero_banners SET autoplay=? WHERE id=?", (val, bid))
+                flash("Autoplay " + ("ON." if val else "OFF."), "success")
     elif section == "hero_banner_edit":
         bid = request.form.get("hero_banner_id", request.form.get("id", type=int))
         media_type = "video" if request.form.get("media_type") == "video" else "image"

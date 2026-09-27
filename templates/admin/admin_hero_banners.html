@@ -433,7 +433,7 @@
     </div>
     <div class="card hb-top-col">
         <h2>Manage Banners ({{ hero_banners|length }})</h2>
-        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Toggle se homepage par banner show/hide karo. <b>Edit</b> se URL/name/order/autoplay badlo, <b>Delete</b> se hatao. Positions Canvas par drag se set hoti hain.</p>
+        <p style="font-size:12px;color:#6b7280;margin:-4px 0 10px;">Pahla toggle = show/hide. Video banners par doosra toggle = <b>Autoplay ON/OFF</b>. Autoplay OFF par video click karne se same window mein khulegi (doctors page par route nahi hogi). <b>Edit</b> se URL/name/order badlo, <b>Delete</b> se hatao. Positions Canvas par drag se set hoti hain.</p>
         <div class="mng-list">
             {% for b in hero_banners %}
             <div class="mng-row-wrap">
@@ -466,6 +466,16 @@
                                 <span class="toggle-slider"></span>
                             </label>
                         </form>
+                        {% if b['media_type'] == 'video' %}
+                        <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-autoplay-form">
+                            <input type="hidden" name="section" value="hero_banner_autoplay_toggle">
+                            <input type="hidden" name="id" value="{{ b['id'] }}">
+                            <label class="toggle-switch" title="{{ 'Autoplay ON (video khud chalay). Click to OFF.' if b['autoplay'] else 'Autoplay OFF (click par video khulegi, same window). Click to ON.' }}">
+                                <input type="checkbox" class="mng-auto-chk" {% if b['autoplay'] %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </form>
+                        {% endif %}
                         <form method="post" action="{{ url_for('admin_hero_banners') }}" class="inline mng-dup-form">
                             <input type="hidden" name="section" value="hero_banner_duplicate">
                             <input type="hidden" name="id" value="{{ b['id'] }}">
@@ -736,6 +746,12 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.slice.call(document.querySelectorAll('.mng-chk')).forEach(function (chk) {
         chk.addEventListener('change', function () {
             chk.closest('.mng-toggle-form').submit();
+        });
+    });
+    // Autoplay toggles (video banners only)
+    Array.prototype.slice.call(document.querySelectorAll('.mng-auto-chk')).forEach(function (chk) {
+        chk.addEventListener('change', function () {
+            chk.closest('.mng-autoplay-form').submit();
         });
     });
     // Manage Banners: Edit (expand inline form) and Delete
