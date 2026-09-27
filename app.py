@@ -703,7 +703,6 @@ def index():
     hero_banners = [dict(r) for r in query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")]
     banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
     pinned_height = 190
-    GRID_W = 1160
     if banner_pinned:
         raw = []
         for b in hero_banners:
@@ -711,7 +710,7 @@ def index():
                 continue
             bw = b["bw"] or 260
             bh = b["bh"] or 150
-            b["pos_x"] = max(0.0, min(100.0 - (bw / GRID_W) * 100, float(b["pos_x"])))
+            b["pos_x"] = max(0.0, min(100.0, float(b["pos_x"])))
             b["pos_y"] = max(0.0, float(b["pos_y"] or 0))
             raw.append(b["pos_y"] + bh)
         pinned_height = max([190] + raw) + 20
