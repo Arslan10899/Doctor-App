@@ -1,0 +1,68 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Booking Requests{% endblock %}
+{% block title %}Booking Requests{% endblock %}
+{% block content %}
+<div class="actions-top">
+    <a class="btn btn-outline" href="{{ url_for('admin_booking_requests') }}">All ({{ total }})</a>
+    <a class="btn btn-outline" href="{{ url_for('admin_booking_requests', status='new') }}">New ({{ counts.get('new', 0) }})</a>
+    <a class="btn btn-outline" href="{{ url_for('admin_booking_requests', status='confirmed') }}">Confirmed ({{ counts.get('confirmed', 0) }})</a>
+    <a class="btn btn-outline" href="{{ url_for('admin_booking_requests', status='closed') }}">Closed ({{ counts.get('closed', 0) }})</a>
+</div>
+<div class="card">
+    <h2>Booking Requests ({{ requests|length }})</h2>
+    {% if requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th><th>Received</th><th>Patient</th><th>WhatsApp</th>
+                <th>Visit Type</th><th>Doctor</th><th>Notes</th><th>Status</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r['id'] }}</td>
+                <td style="font-size:12px;color:#6b7280;white-space:nowrap;">{{ r['created_at'] }}</td>
+                <td><strong>{{ r['patient_name'] }}</strong></td>
+                <td>
+                    <a href="https://wa.me/{{ r['wa'] }}" target="_blank" rel="noopener noreferrer" style="color:#059669;font-weight:600;">{{ r['whatsapp'] }}</a>
+                </td>
+                <td><span class="tag {{ 'tag-on' if r['visit_type'] == 'Online Check-up' else 'tag-off' }}">{{ r['visit_type'] }}</span></td>
+                <td>
+                    {% if r['doctor_name'] %}
+                        {% if r['doctor_id'] %}
+                            <a href="{{ url_for('doctor_profile', doctor_id=r['doctor_id']) }}">{{ r['doctor_name'] }}</a>
+                        {% else %}
+                            {{ r['doctor_name'] }}
+                        {% endif %}
+                    {% else %}
+                        <span style="color:#9ca3af;">Any doctor</span>
+                    {% endif %}
+                </td>
+                <td style="max-width:220px;font-size:12.5px;color:#4b5563;">{{ r['notes'] or '-' }}</td>
+                <td>
+                    <span class="tag {{ 'tag-on' if r['status'] == 'confirmed' else ('tag-off' if r['status'] == 'closed' else '') }}">{{ r['status']|capitalize }}</span>
+                </td>
+                <td>
+                    <form class="inline" method="post" action="{{ url_for('admin_booking_request_status', req_id=r['id']) }}">
+                        <input type="hidden" name="filter" value="{{ active_status }}">
+                        {% if r['status'] != 'confirmed' %}
+                        <button class="btn btn-primary btn-sm" type="submit" name="status" value="confirmed">Confirm</button>
+                        {% endif %}
+                        {% if r['status'] != 'closed' %}
+                        <button class="btn btn-outline btn-sm" type="submit" name="status" value="closed">Close</button>
+                        {% endif %}
+                        {% if r['status'] != 'new' %}
+                        <button class="btn btn-outline btn-sm" type="submit" name="status" value="new">Reopen</button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">No booking requests yet. New requests from the website will appear here.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -819,7 +819,7 @@ def booking_request():
     visit_type = request.form.get("visit_type", "").strip()
     notes = request.form.get("notes", "").strip()
     if not patient_name or not whatsapp:
-        return jsonify({"ok": False, "error": "Please enter your name and WhatsApp number."}), 400
+        return jsonify({"ok": False, "error": "Please enter the patient name and WhatsApp number."}), 400
     execute(
         "INSERT INTO booking_requests "
         "(doctor_id, doctor_name, patient_name, whatsapp, mobile, visit_type, notes) "
@@ -1197,6 +1197,44 @@ def admin_logout():
     session.pop("admin_name", None)
     flash("Logged out of admin panel.", "info")
     return redirect(url_for("index"))
+
+
+@app.route("/admin/booking-requests")
+@admin_required
+def admin_booking_requests():
+    f = request.args.get("status", "").strip()
+    if f in ("new", "confirmed", "closed"):
+        rows = query("SELECT * FROM booking_requests WHERE status=? ORDER BY id DESC", (f,))
+    else:
+        rows = query("SELECT * FROM booking_requests ORDER BY id DESC")
+    counts = {
+        r["status"]: r["n"]
+        for r in query("SELECT status, COUNT(*) AS n FROM booking_requests GROUP BY status")
+    }
+    items = []
+    for r in rows:
+        r = dict(r)
+        wa = re.sub(r"\D", "", r["whatsapp"] or "")
+        r["wa"] = wa[1:] if wa.startswith("0") else wa
+        items.append(r)
+    return render_template(
+        "admin/admin_booking_requests.html",
+        requests=items,
+        counts=counts,
+        active_status=f,
+        total=query("SELECT COUNT(*) AS n FROM booking_requests")[0]["n"],
+    )
+
+
+@app.route("/admin/booking-requests/<int:req_id>/status", methods=["POST"])
+@admin_required
+def admin_booking_request_status(req_id):
+    status = request.form.get("status", "new").strip()
+    if status not in ("new", "confirmed", "closed"):
+        status = "new"
+    execute("UPDATE booking_requests SET status=? WHERE id=?", (status, req_id))
+    flash("Request #%s marked as %s." % (req_id, status), "success")
+    return redirect(url_for("admin_booking_requests", status=request.form.get("filter", "").strip()))
 
 
 @app.route("/admin")
