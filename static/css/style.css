@@ -397,7 +397,7 @@ input, select, textarea { font-family: inherit; }
 .hero-head {
     display: grid;
     grid-template-columns: 0.9fr 1.5fr;
-    gap: 38px;
+    gap: 30px;
     align-items: center;
     width: 100%;
 }
@@ -424,7 +424,7 @@ input, select, textarea { font-family: inherit; }
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 2;
+    flex: 2.2;
     min-width: 0;
     padding: 6px 14px;
 }
@@ -457,8 +457,7 @@ input, select, textarea { font-family: inherit; }
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
-}
-.city-drop {
+}.city-drop {
     display: inline-flex;
     align-items: center;
     gap: 8px;
