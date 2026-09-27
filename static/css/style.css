@@ -420,7 +420,7 @@ input, select, textarea { font-family: inherit; }
     width: 100%;
     color: var(--text);
     position: relative;
-    top: 8px;
+    top: 16px;
 }
 .search-section {
     display: flex;
