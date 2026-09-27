@@ -718,6 +718,17 @@
 <script>
 (function () {
     function isLiveEdit() { return document.body.classList.contains('lv-studio'); }
+    function setPlaying(box, playing) {
+        if (box) box.classList.toggle('hb-playing', playing);
+    }
+    document.addEventListener('play', function (e) {
+        if (isLiveEdit()) return;
+        setPlaying(e.target.closest ? e.target.closest('.hero-banner-box') : null, true);
+    }, true);
+    document.addEventListener('pause', function (e) {
+        if (isLiveEdit()) return;
+        setPlaying(e.target.closest ? e.target.closest('.hero-banner-box') : null, false);
+    }, true);
     document.addEventListener('click', function (e) {
         if (isLiveEdit()) return;
         var box = e.target.closest ? e.target.closest('.hero-banner-box') : null;
@@ -734,7 +745,10 @@
         var ifr = box.querySelector('iframe.hb-media');
         if (ifr) {
             var autoSrc = box.getAttribute('data-embed-auto');
-            if (autoSrc && ifr.src.indexOf('autoplay=1') === -1) ifr.src = autoSrc;
+            if (autoSrc && ifr.src.indexOf('autoplay=1') === -1) {
+                ifr.src = autoSrc;
+                setPlaying(box, true);
+            }
         }
     });
 

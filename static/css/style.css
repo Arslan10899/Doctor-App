@@ -278,7 +278,9 @@ input, select, textarea { font-family: inherit; }
     box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
     z-index: 3;
     pointer-events: none;
+    transition: opacity .25s ease;
 }
+.hero-banner-box.hb-playing .hb-play-badge { opacity: 0; }
 
 .btn-ghost-light {
     background: transparent;
