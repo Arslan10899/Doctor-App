@@ -183,7 +183,6 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-grid > * { min-width: 0; }
 .hero-content { display: flex; flex-direction: column; }
-.hero-content .hero-search { margin-top: 0; }
 .hero-content h1 { margin-top: 6px; }
 .hero-content .hero-sub { margin-top: 8px; }
 .hero-content .hero-stats { margin-top: auto; padding-top: 30px; }
@@ -1569,7 +1568,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .field-city { border-left: none; }
 }
 @media (max-width: 1000px) {
-    .hero-head { grid-template-columns: 1fr; gap: 22px; }
     .hero p.hero-sub { white-space: normal; }
 }
 @media (max-width: 640px) {
