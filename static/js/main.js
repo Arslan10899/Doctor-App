@@ -319,7 +319,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const visitType = visitInput.value;
 
             errorBox.hidden = true;
-            if (!doctor) return showError("Please select a doctor.");
             if (!name) return showError("Please enter your name.");
             if (!whatsapp) return showError("Please enter your WhatsApp number.");
 
@@ -328,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
             payload.append("doctor_name", doctor);
             payload.append("patient_name", name);
             payload.append("whatsapp", whatsapp);
-            payload.append("mobile", document.getElementById("bkMobile").value.trim());
+            payload.append("mobile", "");
             payload.append("visit_type", visitType);
             payload.append("notes", document.getElementById("bkNotes").value.trim());
 
