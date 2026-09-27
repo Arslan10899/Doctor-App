@@ -687,6 +687,7 @@ document.addEventListener('DOMContentLoaded', function () {
         applySize(it, Math.round(nw * scale), Math.round(nh * scale));
     }
     function autofitItem(it) {
+        if (it.getAttribute('data-w')) return;
         var media = it.querySelector('img, video');
         if (!media) return;
         var done = function () { fitToMedia(it, media); };

@@ -805,6 +805,7 @@
         }
     }
     function autofitBox(box) {
+        if (box.getAttribute('data-w')) return;
         var media = box.querySelector('img, video');
         if (!media) return;
         var done = function () { fitBox(box, media); };
