@@ -303,7 +303,7 @@
 .studio-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     user-select: none;
     -webkit-user-select: none;
@@ -313,7 +313,7 @@
 .studio-item video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     user-select: none;
     -webkit-user-select: none;
@@ -679,6 +679,27 @@ document.addEventListener('DOMContentLoaded', function () {
     var items = Array.prototype.slice.call(canvas.querySelectorAll('.studio-item'));
     var selected = null;
 
+    function fitToMedia(it, media) {
+        var nw = media.videoWidth || media.naturalWidth || 0;
+        var nh = media.videoHeight || media.naturalHeight || 0;
+        if (!nw || !nh) return;
+        var scale = Math.min(260 / nw, 150 / nh);
+        applySize(it, Math.round(nw * scale), Math.round(nh * scale));
+    }
+    function autofitItem(it) {
+        var media = it.querySelector('img, video');
+        if (!media) return;
+        var done = function () { fitToMedia(it, media); };
+        if (media.tagName === 'VIDEO') {
+            if (media.videoWidth) done();
+            else media.addEventListener('loadedmetadata', done);
+        } else {
+            if (media.complete && media.naturalWidth) done();
+            else media.addEventListener('load', done);
+        }
+    }
+    function autofitAll() { items.forEach(autofitItem); }
+
     function makeLabel(it) {
         var lab = it.querySelector('.studio-size');
         if (!lab) {
@@ -740,6 +761,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             applySaved();
         }
+        autofitAll();
     }
 
     // Show / hide toggles

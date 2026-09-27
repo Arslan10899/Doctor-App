@@ -737,6 +737,39 @@
             if (autoSrc && ifr.src.indexOf('autoplay=1') === -1) ifr.src = autoSrc;
         }
     });
+
+    function fitBox(box, media) {
+        var nw = media.videoWidth || media.naturalWidth || 0;
+        var nh = media.videoHeight || media.naturalHeight || 0;
+        if (!nw || !nh) return;
+        var scale = Math.min(260 / nw, 150 / nh);
+        if (box.style.position === 'absolute') {
+            box.style.width = Math.round(nw * scale) + 'px';
+            box.style.height = Math.round(nh * scale) + 'px';
+        } else {
+            box.style.width = Math.round(nw * scale) + 'px';
+            box.style.height = Math.round(nh * scale) + 'px';
+            box.style.flexBasis = Math.round(nw * scale) + 'px';
+        }
+    }
+    function autofitBox(box) {
+        var media = box.querySelector('img, video');
+        if (!media) return;
+        var done = function () { fitBox(box, media); };
+        if (media.tagName === 'VIDEO') {
+            if (media.videoWidth) done();
+            else media.addEventListener('loadedmetadata', done);
+        } else {
+            if (media.complete && media.naturalWidth) done();
+            else media.addEventListener('load', done);
+        }
+    }
+    function autofitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.hero-banner-box'), autofitBox);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autofitAll);
+    else autofitAll();
+    window.addEventListener('load', autofitAll);
 })();
 </script>
 
