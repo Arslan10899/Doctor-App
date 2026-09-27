@@ -11,12 +11,120 @@ from werkzeug.utils import secure_filename
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
 
+
+def _load_dotenv(path):
+    """Minimal .env loader so we don't need an extra dependency."""
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            for raw in fh:
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, val = line.partition("=")
+                os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
+    except OSError:
+        pass
+
+
+_load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+
+def cfg(name, default=""):
+    v = os.environ.get(name)
+    return v if v not in (None, "") else default
+
+
+def cfg_bool(name, default=False):
+    return str(cfg(name, str(default))).strip().lower() in ("1", "true", "yes", "on")
+
+
+# --- Meta WhatsApp Cloud API ---
+META_TOKEN = cfg("META_WHATSAPP_TOKEN")
+META_PHONE_NUMBER_ID = cfg("META_PHONE_NUMBER_ID")
+META_APP_SECRET = cfg("META_APP_SECRET")
+META_GRAPH_VERSION = cfg("META_GRAPH_VERSION", "v21.0")
+WEBHOOK_VERIFY_TOKEN = cfg("WEBHOOK_VERIFY_TOKEN")
+
+# --- AI middleware (Gemini Flash) ---
+AI_ENABLED = cfg_bool("AI_ENABLED", False)
+GEMINI_API_KEY = cfg("GEMINI_API_KEY")
+AI_MODEL = cfg("AI_MODEL", "gemini-2.5-flash")
+AI_TIMEOUT = int(cfg("AI_TIMEOUT", "8"))
+
+# --- Flow behaviour ---
+APPOINTMENT_EXPIRY_HOURS = int(cfg("APPOINTMENT_EXPIRY_HOURS", "12"))
+WHATSAPP_DRY_RUN = cfg_bool("WHATSAPP_DRY_RUN", True)
+
+# Single source of truth for appointment states (SQLite has no ENUM).
+APPT_PENDING = "pending"
+APPT_DOCTOR_NOTIFIED = "doctor_notified"
+APPT_CONFIRMED = "confirmed"
+APPT_RESCHEDULE = "reschedule_requested"
+APPT_CANCELLED = "cancelled"
+APPT_EXPIRED = "expired"
+APPT_COMPLETED = "completed"
+APPT_ACTIVE_STATUSES = (APPT_PENDING, APPT_DOCTOR_NOTIFIED, APPT_CONFIRMED, APPT_RESCHEDULE)
+APPT_TERMINAL_STATUSES = (APPT_CANCELLED, APPT_EXPIRED, APPT_COMPLETED)
+APPT_STATUSES = APPT_ACTIVE_STATUSES + APPT_TERMINAL_STATUSES
+
+# Canonical appointments schema. Used for fresh installs and for the one-time
+# rebuild of older tables, so the two can never drift apart.
+APPT_COLUMNS = [
+    ("id", "INTEGER PRIMARY KEY AUTOINCREMENT"),
+    ("patient_id", "INTEGER"),
+    ("doctor_id", "INTEGER NOT NULL"),
+    ("doctor_phone", "TEXT"),
+    ("appointment_date", "TEXT NOT NULL"),
+    ("slot", "TEXT NOT NULL"),
+    ("type", "TEXT DEFAULT 'In-Clinic'"),
+    ("status", "TEXT DEFAULT 'pending'"),
+    ("patient_name", "TEXT"),
+    ("patient_phone", "TEXT"),
+    ("notes", "TEXT"),
+    ("meta_message_id", "TEXT"),
+    ("notified_at", "TIMESTAMP"),
+    ("replied_at", "TIMESTAMP"),
+    ("patient_notified_at", "TIMESTAMP"),
+    ("ai_intent", "TEXT"),
+    ("ai_clean_time", "TEXT"),
+    ("ai_clean_date", "TEXT"),
+    ("ai_summary", "TEXT"),
+    ("ai_raw", "TEXT"),
+    ("needs_human_review", "INTEGER DEFAULT 0"),
+    ("expires_at", "TIMESTAMP"),
+    ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+    ("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+]
+
 app = Flask(__name__)
 app.secret_key = "doctor-app-super-secret-key-2026"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
+
+_PK_LOCAL = re.compile(r"(?:\+?92|0)?(3\d{9})$")
+
+
+def normalize_pk_e164(raw):
+    """Normalise a Pakistani mobile number to WhatsApp E.164 (+923xxxxxxxxx).
+
+    Returns None when the value is not a usable mobile number so callers can
+    skip the row instead of firing a bad API request (2 junk values exist in
+    the doctors table, e.g. 'NA' and a full Urdu sentence).
+    """
+    if raw is None:
+        return None
+    digits = re.sub(r"\D", "", str(raw))
+    if not digits:
+        return None
+    if digits.startswith("0092"):
+        digits = digits[4:]
+    if digits.startswith("0"):
+        digits = digits[1:]
+    if not digits.startswith("92"):
+        digits = "92" + digits
+    return "+" + digits if _PK_LOCAL.match(digits) else None
 
 
 @app.context_processor
@@ -324,8 +432,9 @@ def init_db():
 
         CREATE TABLE appointments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            patient_id INTEGER NOT NULL,
+            patient_id INTEGER,
             doctor_id INTEGER NOT NULL,
+            doctor_phone TEXT,
             appointment_date TEXT NOT NULL,
             slot TEXT NOT NULL,
             type TEXT DEFAULT 'In-Clinic',
@@ -333,8 +442,19 @@ def init_db():
             patient_name TEXT,
             patient_phone TEXT,
             notes TEXT,
+            meta_message_id TEXT,
+            notified_at TIMESTAMP,
+            replied_at TIMESTAMP,
+            patient_notified_at TIMESTAMP,
+            ai_intent TEXT,
+            ai_clean_time TEXT,
+            ai_clean_date TEXT,
+            ai_summary TEXT,
+            ai_raw TEXT,
+            needs_human_review INTEGER DEFAULT 0,
+            expires_at TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (patient_id) REFERENCES patients(id),
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (doctor_id) REFERENCES doctors(id)
         );
 
@@ -503,6 +623,49 @@ def migrate(db):
                      "name": "TEXT", "autoplay": "INTEGER DEFAULT 1", "sort_order": "INTEGER DEFAULT 0"}.items():
         if col not in bcols:
             cur.execute(f"ALTER TABLE hero_banners ADD COLUMN {col} {ddl}")
+
+    # appointments: WhatsApp + AI flow columns. patient_id must become nullable
+    # (WhatsApp patients never log in) and SQLite cannot ALTER that away, so an
+    # existing table is rebuilt once.
+    appt_rows = list(cur.execute("PRAGMA table_info(appointments)").fetchall())
+    appt_cols = [r[1] for r in appt_rows]
+    patient_id_locked = any(r[1] == "patient_id" and r[3] for r in appt_rows)
+    if appt_cols and (patient_id_locked or any(c not in appt_cols for c, _ in APPT_COLUMNS)):
+        keep = [c for c, _ in APPT_COLUMNS if c in appt_cols and c != "id"]
+        cur.execute("PRAGMA foreign_keys=OFF")
+        cur.execute("ALTER TABLE appointments RENAME TO _appt_old")
+        cur.execute(
+            "CREATE TABLE appointments ("
+            + ",".join(f"{n} {d}" for n, d in APPT_COLUMNS)
+            + ",FOREIGN KEY (doctor_id) REFERENCES doctors(id))"
+        )
+        if keep:
+            cols = ",".join(keep)
+            cur.execute(
+                f"INSERT INTO appointments ({cols}) SELECT {cols} FROM _appt_old"
+            )
+        cur.execute("DROP TABLE _appt_old")
+        cur.execute("PRAGMA foreign_keys=ON")
+        print("[migrate] appointments table rebuilt: patient_id now nullable, WhatsApp/AI columns added")
+
+    # Keep doctor_phone snapshot filled for any pre-existing rows.
+    cur.execute(
+        "UPDATE appointments SET doctor_phone = ("
+        "  SELECT d.whatsapp_number FROM doctors d WHERE d.id = appointments.doctor_id"
+        ") WHERE doctor_phone IS NULL AND doctor_id IS NOT NULL"
+    )
+    # Statuses outside our known set would break the new dashboard filter.
+    cur.execute(
+        "UPDATE appointments SET status = ? WHERE status IS NULL OR status NOT IN "
+        "(" + ",".join("?" * len(APPT_STATUSES)) + ")",
+        (APPT_PENDING,) + APPT_STATUSES,
+    )
+    cur.executescript(
+        "CREATE INDEX IF NOT EXISTS ix_appt_meta ON appointments(meta_message_id);"
+        "CREATE INDEX IF NOT EXISTS ix_appt_status ON appointments(status);"
+        "CREATE INDEX IF NOT EXISTS ix_appt_docphone ON appointments(doctor_phone);"
+        "CREATE INDEX IF NOT EXISTS ix_appt_review ON appointments(needs_human_review, status);"
+    )
 
     cur.executescript("""
         CREATE TABLE IF NOT EXISTS clinics (
@@ -1045,9 +1208,10 @@ def dashboard():
         (patient["id"],),
     )
     active = [
-        a for a in appts if a["status"] in ("pending", "confirmed") and a["appointment_date"] >= date.today().isoformat()
+        a for a in appts
+        if a["status"] in APPT_ACTIVE_STATUSES and (a["appointment_date"] or "") >= date.today().isoformat()
     ]
-    past = [a for a in appts if a["status"] in ("completed", "cancelled") or a["appointment_date"] < date.today().isoformat()]
+    past = [a for a in appts if a["status"] in APPT_TERMINAL_STATUSES or (a["appointment_date"] or "") < date.today().isoformat()]
     return render_template("dashboard.html", patient=patient, active=active, past=past)
 
 
@@ -1084,9 +1248,10 @@ def book(doctor_id):
         return redirect(url_for("doctor_profile", doctor_id=doctor_id))
 
     execute(
-        "INSERT INTO appointments (patient_id, doctor_id, appointment_date, slot, type, status, patient_name, patient_phone, notes) "
-        "VALUES (?,?,?,?,?,?,?,?,?)",
-        (patient["id"], doctor_id, date_str, slot, appt_type, "confirmed", patient["full_name"], patient["phone"], notes),
+        "INSERT INTO appointments (patient_id, doctor_id, doctor_phone, appointment_date, slot, type, status, patient_name, patient_phone, notes, updated_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)",
+        (patient["id"], doctor_id, normalize_pk_e164(doc["whatsapp_number"]) or normalize_pk_e164(doc["phone"]),
+         date_str, slot, appt_type, APPT_CONFIRMED, patient["full_name"], patient["phone"], notes),
     )
     flash(
         f"Appointment confirmed with {doc['name']} on {d.strftime('%A, %d %B %Y')} at {slot}. "
