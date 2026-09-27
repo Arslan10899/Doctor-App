@@ -308,6 +308,25 @@ input, select, textarea { font-family: inherit; }
     border-color: transparent;
     transform: translateY(-1px);
 }
+.hero-cta-actions .btn-how-light { animation: none; }
+.hero-cta-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .16);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 12px 30px rgba(15, 40, 60, .16);
+}
+.hero-cta-divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(255, 255, 255, .28);
+    flex-shrink: 0;
+    margin: 0 2px;
+}
 .hero-cta-actions .btn-white { box-shadow: 0 8px 24px rgba(15, 40, 60, .18); }
 .hero-cta-actions .btn-white {
     position: relative;
@@ -412,7 +431,7 @@ input, select, textarea { font-family: inherit; }
 .hero-head {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0;
     width: 100%;
 }
@@ -433,7 +452,7 @@ input, select, textarea { font-family: inherit; }
     border: 1px solid rgba(220, 230, 245, 0.9);
     display: flex;
     align-items: center;
-    max-width: 560px;
+    max-width: 640px;
     width: 100%;
     color: var(--text);
 }
@@ -466,7 +485,7 @@ input, select, textarea { font-family: inherit; }
     align-items: center;
     gap: 6px;
     flex: 1;
-    min-width: 0;
+    min-width: 152px;
     padding: 6px 10px;
     cursor: pointer;
     user-select: none;

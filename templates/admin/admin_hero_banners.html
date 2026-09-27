@@ -46,7 +46,7 @@
 .studio-hero-head {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0;
     width: 100%;
 }
@@ -95,6 +95,8 @@
     display: flex;
     align-items: center;
     color: #334155;
+    max-width: 640px;
+    width: 100%;
 }
 .studio-search-section {
     display: flex;
@@ -220,6 +222,23 @@
     pointer-events: none;
 }
 .studio-hero-btn-how svg { flex-shrink: 0; opacity: .95; }
+.studio-cta-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .16);
+    box-shadow: 0 12px 30px rgba(15, 40, 60, .16);
+}
+.studio-cta-divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(255, 255, 255, .28);
+    flex-shrink: 0;
+    margin: 0 2px;
+}
 .studio-strip {
     position: absolute;
     inset: 0;
@@ -628,10 +647,11 @@
                         </div>
                     </div>
                     <div class="studio-hero-cta">
-                        <div class="studio-hero-actions">
+                        <div class="studio-hero-actions studio-cta-row">
                             <span class="studio-hero-btn-white">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Book an Appointment
                             </span>
+                            <span class="studio-cta-divider"></span>
                             <span class="studio-hero-btn-how"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>How it works</span>
                         </div>
                     </div>
