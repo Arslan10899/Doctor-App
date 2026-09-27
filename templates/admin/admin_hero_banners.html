@@ -77,6 +77,20 @@
     width: fit-content;
     letter-spacing: -.01em;
 }
+.studio-hero-key {
+    color: #ffd25e;
+    position: relative;
+}
+.studio-hero-key::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: .04em;
+    height: .07em;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 210, 94, .85), rgba(255, 210, 94, .15));
+}
 .studio-steps {
     display: inline-block;
     color: #ffd25e;
@@ -632,7 +646,7 @@
             <div class="studio-hero-content">
                 <div class="studio-hero-head">
                     <div class="studio-hero-head-text">
-                        <h1 class="studio-hero-h1">Need a Doctor? <span class="studio-hero-accent">We Help You Find the Right One.</span></h1>
+                        <h1 class="studio-hero-h1">Need a <span class="studio-hero-key">Doctor</span>? <span class="studio-hero-accent">We Help You Find the Right One.</span></h1>
                         <p class="studio-hero-sub"><span class="studio-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
                     </div>
                     <div class="studio-hero-search">

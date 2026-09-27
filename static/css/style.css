@@ -383,6 +383,20 @@ input, select, textarea { font-family: inherit; }
     white-space: nowrap;
 }
 .hero p.hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; white-space: nowrap; }
+.hero-title-key {
+    color: #ffd25e;
+    position: relative;
+}
+.hero-title-key::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: .04em;
+    height: .07em;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 210, 94, .85), rgba(255, 210, 94, .15));
+}
 .hero-title-accent {
     display: block;
     margin-top: 4px;
