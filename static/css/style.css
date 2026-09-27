@@ -291,6 +291,21 @@ input, select, textarea { font-family: inherit; }
 .btn-ghost-light:hover {
     background: rgba(255, 255, 255, .18);
     border-color: #fff;
+}
+.btn-how-light {
+    background: transparent;
+    color: #fff;
+    border: none;
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 600;
+}
+.btn-how-light svg { flex-shrink: 0; opacity: .95; }
+.btn-how-light:hover {
+    background: rgba(255, 255, 255, .14);
+    border-color: transparent;
     transform: translateY(-1px);
 }
 .hero-cta-actions .btn-white { box-shadow: 0 8px 24px rgba(15, 40, 60, .18); }
