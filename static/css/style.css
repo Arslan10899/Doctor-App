@@ -395,13 +395,15 @@ input, select, textarea { font-family: inherit; }
 .hero-stat span { font-size: 13px; opacity: .85; }
 
 .hero-head {
-    display: grid;
-    grid-template-columns: 0.9fr 1.5fr;
-    gap: 30px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
     width: 100%;
 }
 .hero-head-text { min-width: 0; }
+.hero-content .hero-search { margin-top: 22px; }
+.hero-content .hero-cta { margin-top: 22px; }
 .hero-search {
     background: transparent;
     padding: 0;
@@ -416,7 +418,7 @@ input, select, textarea { font-family: inherit; }
     border: 1px solid rgba(220, 230, 245, 0.9);
     display: flex;
     align-items: center;
-    max-width: none;
+    max-width: 560px;
     width: 100%;
     color: var(--text);
 }
