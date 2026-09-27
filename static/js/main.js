@@ -180,19 +180,61 @@ document.addEventListener("DOMContentLoaded", function () {
         const submitBtn = form.querySelector(".book-submit");
         const errorBox = document.getElementById("bkError");
         const successBox = document.getElementById("bkSuccess");
+        const stepType = document.getElementById("bkStepType");
+        const visitInput = document.getElementById("bkVisitTypeInput");
+        const visitSummary = document.getElementById("bkVisitSummary");
+        const visitTypeLabel = document.getElementById("bkVisitType");
+        const visitIconBox = document.getElementById("bkVisitIcon");
+        const changeBtn = document.getElementById("bkChangeVisit");
+        const stepDots = document.getElementById("bkStepDots");
+        const modalSub = document.getElementById("bkModalSub");
+        const SUB_FORM = "Fill in your details and our team will confirm your booking.";
+        const ICONS = {
+            "Clinic Visit": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 1 9l11 7 9-5.72V17h2V9L12 2zm0 12.13L4.98 9.5 12 5.64l7.02 3.86L12 14.13z"/><path d="M5 15v3c0 2.21 3.13 4 7 4s7-1.79 7-4v-3l-7 4-7-4z"/></svg>',
+            "Online Check-up": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 13h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zm2.5-2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4 6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6z"/></svg>'
+        };
         let doctorCache = [];
         let debounceTimer = null;
+        let currentStep = "type";
+        let chosenVisit = "";
+
+        function setStep(step) {
+            currentStep = step;
+            if (step === "type") {
+                stepType.hidden = false;
+                form.hidden = true;
+                modalSub.textContent = "Choose how you would like to meet the doctor.";
+                if (stepDots) stepDots.hidden = false;
+                setStepDot(0);
+            } else {
+                stepType.hidden = true;
+                form.hidden = false;
+                visitSummary.hidden = false;
+                modalSub.textContent = SUB_FORM;
+                if (stepDots) stepDots.hidden = true;
+                setTimeout(function () { if (doctorInput && !doctorInput.value) doctorInput.focus(); }, 100);
+            }
+        }
+        function setStepDot(idx) {
+            if (!stepDots) return;
+            stepDots.querySelectorAll(".book-step-dot").forEach(function (d, i) {
+                d.classList.toggle("active", i === idx);
+            });
+        }
+        function selectVisitType(value) {
+            chosenVisit = value;
+            visitInput.value = value;
+            visitTypeLabel.textContent = value;
+            visitIconBox.innerHTML = ICONS[value] || "";
+            setStep("form");
+        }
 
         function openModal() {
             bookingModal.hidden = false;
             document.body.style.overflow = "hidden";
             successBox.hidden = true;
-            form.hidden = false;
             errorBox.hidden = true;
-            setTimeout(function () {
-                const d = document.getElementById("bkDoctor");
-                if (d && !d.value) d.focus();
-            }, 100);
+            setStep("type");
             if (doctorCache.length === 0) {
                 fetch("/api/doctors-list")
                     .then(function (r) { return r.json(); })
@@ -212,6 +254,14 @@ document.addEventListener("DOMContentLoaded", function () {
         bookingModal.querySelectorAll("[data-book-close]").forEach(function (el) {
             el.addEventListener("click", closeModal);
         });
+        stepType.querySelectorAll(".book-type-card").forEach(function (card) {
+            card.addEventListener("click", function () {
+                selectVisitType(card.getAttribute("data-visit"));
+            });
+        });
+        if (changeBtn) {
+            changeBtn.addEventListener("click", function () { setStep("type"); });
+        }
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape" && !bookingModal.hidden) closeModal();
         });
@@ -261,20 +311,12 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(function () { suggestBox.classList.remove("open"); }, 150);
         });
 
-        form.querySelectorAll(".book-visit-opt").forEach(function (opt) {
-            opt.addEventListener("click", function () {
-                form.querySelectorAll(".book-visit-opt").forEach(function (o) { o.classList.remove("selected"); });
-                opt.classList.add("selected");
-                opt.querySelector("input").checked = true;
-            });
-        });
-
         form.addEventListener("submit", function (e) {
             e.preventDefault();
             const doctor = doctorInput.value.trim();
             const name = document.getElementById("bkName").value.trim();
             const whatsapp = document.getElementById("bkWhatsapp").value.trim();
-            const visitType = form.querySelector('input[name="visit_type"]:checked').value;
+            const visitType = visitInput.value;
 
             errorBox.hidden = true;
             if (!doctor) return showError("Please select a doctor.");
@@ -306,6 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         successBox.hidden = false;
                         form.reset();
                         doctorIdInput.value = "";
+                        visitInput.value = chosenVisit || "Clinic Visit";
                     } else {
                         showError(data.error || "Something went wrong. Please try again.");
                     }

@@ -2064,6 +2064,125 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     letter-spacing: -.3px;
 }
 .book-modal-head p { margin: 6px 0 18px; font-size: 13.5px; color: var(--text-light); }
+
+/* Booking modal: step 1 visit type */
+.book-step-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+.book-step-dot {
+    width: 26px;
+    height: 4px;
+    border-radius: 999px;
+    background: #dbe7ec;
+    transition: background .25s, width .25s;
+}
+.book-step-dot.active { background: var(--primary); width: 40px; }
+.book-step-label {
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+.book-type-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+.book-type-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 16px;
+    border: 1.5px solid #dbe7ec;
+    border-radius: 16px;
+    background: #fff;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
+}
+.book-type-card:hover {
+    border-color: var(--primary);
+    background: var(--primary-light, #e7f4f6);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(42, 127, 142, .16);
+}
+.book-type-ic {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background: var(--primary-light, #e7f4f6);
+    color: var(--primary);
+    transition: background .2s, color .2s;
+}
+.book-type-card:hover .book-type-ic { background: var(--primary); color: #fff; }
+.book-type-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.book-type-txt strong { font-size: 15.5px; font-weight: 700; color: var(--text); }
+.book-type-txt small { font-size: 12.5px; color: var(--text-light); line-height: 1.4; }
+.book-type-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1.5px solid #dbe7ec;
+    color: transparent;
+    transition: background .2s, border-color .2s, color .2s;
+}
+.book-type-card:hover .book-type-check {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Booking modal: step 2 selected visit summary */
+.book-visitsummary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--primary-light, #e7f4f6);
+    border: 1px solid rgba(42, 127, 142, .2);
+}
+.book-visitsummary-ic {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+}
+.book-visitsummary-txt { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.book-visitsummary-txt small { font-size: 11.5px; color: var(--text-light); font-weight: 600; }
+.book-visitsummary-txt strong { font-size: 14.5px; font-weight: 700; color: var(--primary-dark); }
+.book-visitsummary-change {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border: 1px solid var(--primary);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+.book-visitsummary-change:hover { background: var(--primary); color: #fff; }
+
 .book-form { display: flex; flex-direction: column; gap: 14px; }
 .book-field label {
     display: block;
@@ -2131,35 +2250,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest-item strong { display: inline-block; color: var(--primary); }
 .book-suggest-item small { display: block; color: var(--text-light); margin-top: 2px; }
 .book-suggest-item:hover, .book-suggest-item.active { background: var(--bg-light, #f0f5f7); }
-.book-visit {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.book-visit-opt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 10px;
-    border: 1.5px solid #dbe7ec;
-    border-radius: 14px;
-    cursor: pointer;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-    transition: border-color .2s, background .2s, color .2s;
-}
-.book-visit-opt input { display: none; }
-.book-visit-opt svg { color: var(--text-light); transition: color .2s; }
-.book-visit-opt:hover { border-color: var(--primary); }
-.book-visit-opt.selected {
-    border-color: var(--primary);
-    background: var(--primary-light);
-    color: var(--primary);
-}
-.book-visit-opt.selected svg { color: var(--primary); }
 .book-error {
     background: #fff0f0;
     color: #c0392b;

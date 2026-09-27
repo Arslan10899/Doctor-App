@@ -188,11 +188,54 @@
         <div class="book-modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
             <button class="book-modal-close" type="button" data-book-close aria-label="Close">&times;</button>
             <div class="book-modal-head">
+                <div class="book-step-dots" id="bkStepDots" aria-hidden="true">
+                    <span class="book-step-dot active"></span>
+                    <span class="book-step-dot"></span>
+                </div>
                 <h3 id="bookingModalTitle">Book an Appointment</h3>
-                <p>Fill in your details and our team will confirm your booking.</p>
+                <p id="bkModalSub">Fill in your details and our team will confirm your booking.</p>
             </div>
 
-            <form id="bookingRequestForm" class="book-form" novalidate>
+            <div class="book-step book-step-type" id="bkStepType">
+                <p class="book-step-label">How would you like to be seen?</p>
+                <div class="book-type-grid">
+                    <button type="button" class="book-type-card" data-visit="Clinic Visit">
+                        <span class="book-type-ic">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2 1 9l11 7 9-5.72V17h2V9L12 2zm0 12.13L4.98 9.5 12 5.64l7.02 3.86L12 14.13z"/><path d="M5 15v3c0 2.21 3.13 4 7 4s7-1.79 7-4v-3l-7 4-7-4z"/></svg>
+                        </span>
+                        <span class="book-type-txt">
+                            <strong>Clinic Visit</strong>
+                            <small>Meet the doctor in person at the hospital</small>
+                        </span>
+                        <span class="book-type-check" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        </span>
+                    </button>
+                    <button type="button" class="book-type-card" data-visit="Online Check-up">
+                        <span class="book-type-ic">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M4 13h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zm2.5-2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4 6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6z"/></svg>
+                        </span>
+                        <span class="book-type-txt">
+                            <strong>Online Check-up</strong>
+                            <small>Video consult with the doctor from home</small>
+                        </span>
+                        <span class="book-type-check" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <form id="bookingRequestForm" class="book-form" novalidate hidden>
+                <input type="hidden" name="visit_type" id="bkVisitTypeInput" value="Clinic Visit">
+                <div class="book-visitsummary" id="bkVisitSummary" hidden>
+                    <span class="book-visitsummary-ic" id="bkVisitIcon"></span>
+                    <span class="book-visitsummary-txt">
+                        <small>Visit type</small>
+                        <strong id="bkVisitType">Clinic Visit</strong>
+                    </span>
+                    <button type="button" class="book-visitsummary-change" id="bkChangeVisit">Change</button>
+                </div>
                 <div class="book-field">
                     <label for="bkDoctor">Select your Doctor <span>*</span></label>
                     <div class="book-input-wrap">
@@ -224,22 +267,6 @@
                     <div class="book-input-wrap">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm-5 20c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm3-3H9V4h6v14z"/></svg>
                         <input type="tel" id="bkMobile" placeholder="e.g. 03xx xxxxxxx">
-                    </div>
-                </div>
-
-                <div class="book-field">
-                    <label>Select Visit Type <span>*</span></label>
-                    <div class="book-visit">
-                        <label class="book-visit-opt selected">
-                            <input type="radio" name="visit_type" value="Clinic Visit" checked>
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2 1 9l11 7 9-5.72V17h2V9L12 2zm0 12.13L4.98 9.5 12 5.64l7.02 3.86L12 14.13z"/><path d="M5 15v3c0 2.21 3.13 4 7 4s7-1.79 7-4v-3l-7 4-7-4z"/></svg>
-                            <span>Clinic Visit</span>
-                        </label>
-                        <label class="book-visit-opt">
-                            <input type="radio" name="visit_type" value="Online Check-up">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                            <span>Online Check-up</span>
-                        </label>
                     </div>
                 </div>
 
