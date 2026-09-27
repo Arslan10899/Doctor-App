@@ -190,8 +190,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const modalSub = document.getElementById("bkModalSub");
         const SUB_FORM = "Fill in your details and our team will confirm your booking.";
         const ICONS = {
-            "Clinic Visit": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 1 9l11 7 9-5.72V17h2V9L12 2zm0 12.13L4.98 9.5 12 5.64l7.02 3.86L12 14.13z"/><path d="M5 15v3c0 2.21 3.13 4 7 4s7-1.79 7-4v-3l-7 4-7-4z"/></svg>',
-            "Online Check-up": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 13h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zm2.5-2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4 6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6z"/></svg>'
+            "Clinic Visit": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 8h-2V5a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3H5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zm-8-3h2v3h-2V5zm6 14H7v-3h4v1h2v-1h4v3zm-4-5H7v-2h2v-2h2v2h2v2h-2z"/></svg>',
+            "Online Check-up": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17 1H7a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm-5 20a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4zm5-4H7V4h10v13z"/></svg>'
+        };
+        const THEMES = {
+            "Clinic Visit": { c: "#12876f", bg: "#e3f6ef", bd: "rgba(18,135,111,.28)" },
+            "Online Check-up": { c: "#2b6fd4", bg: "#e6f0fe", bd: "rgba(43,111,212,.28)" }
         };
         let doctorCache = [];
         let debounceTimer = null;
@@ -226,6 +230,12 @@ document.addEventListener("DOMContentLoaded", function () {
             visitInput.value = value;
             visitTypeLabel.textContent = value;
             visitIconBox.innerHTML = ICONS[value] || "";
+            const th = THEMES[value];
+            if (th) {
+                visitSummary.style.setProperty("--vs-c", th.c);
+                visitSummary.style.setProperty("--vs-bg", th.bg);
+                visitSummary.style.setProperty("--vs-bd", th.bd);
+            }
             setStep("form");
         }
 
@@ -234,6 +244,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.style.overflow = "hidden";
             successBox.hidden = true;
             errorBox.hidden = true;
+            visitSummary.style.removeProperty("--vs-c");
+            visitSummary.style.removeProperty("--vs-bg");
+            visitSummary.style.removeProperty("--vs-bd");
             setStep("type");
             if (doctorCache.length === 0) {
                 fetch("/api/doctors-list")
