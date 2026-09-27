@@ -183,7 +183,7 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-grid > * { min-width: 0; }
 .hero-content { display: flex; flex-direction: column; }
-.hero-content .hero-search { margin-top: 24px; }
+.hero-content .hero-search { margin-top: 0; }
 .hero-content h1 { margin-top: 6px; }
 .hero-content .hero-sub { margin-top: 8px; }
 .hero-content .hero-stats { margin-top: auto; padding-top: 30px; }
@@ -394,63 +394,71 @@ input, select, textarea { font-family: inherit; }
 .hero-stat strong { display: block; font-size: 23px; font-weight: 800; }
 .hero-stat span { font-size: 13px; opacity: .85; }
 
+.hero-head {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 30px;
+    align-items: center;
+    width: 100%;
+}
+.hero-head-text { min-width: 0; }
 .hero-search {
     background: #fff;
-    border-radius: 16px;
-    padding: 7px;
+    border-radius: 14px;
+    padding: 6px;
     box-shadow: 0 18px 50px rgba(15, 40, 60, .18);
     color: var(--text);
     margin-top: 0;
     display: flex;
 }
-.search-row { display: flex; align-items: center; width: 100%; gap: 8px; }
+.search-row { display: flex; align-items: center; width: 100%; gap: 6px; }
 .search-field {
     flex: 1 1 auto;
     min-width: 0;
-    height: 56px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0 16px;
-    border-radius: 11px;
+    gap: 9px;
+    padding: 0 12px;
+    border-radius: 9px;
     background: var(--bg-light);
     transition: background .2s, box-shadow .2s;
 }
 .search-field:focus-within { background: #fff; box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px rgba(42, 127, 142, .15); }
 .field-city {
-    flex: 0 0 160px;
+    flex: 0 0 128px;
     transition: background .2s, box-shadow .2s;
 }
 .field-city select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    padding-right: 24px;
+    padding-right: 20px;
     font-weight: 600;
-    font-size: 14.5px;
+    font-size: 13.5px;
     color: var(--primary-dark);
     cursor: pointer;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232a7f8e' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 2px center;
-    background-size: 15px;
+    background-size: 14px;
     transition: color .2s;
 }
 .search-field svg { color: var(--primary); flex-shrink: 0; }
-.search-field input { border: none; background: transparent; outline: none; font-size: 15px; width: 100%; min-width: 0; color: var(--text); }
-.search-field select { border: none; background: transparent; outline: none; font-size: 14.5px; width: 100%; color: var(--text); cursor: pointer; }
+.search-field input { border: none; background: transparent; outline: none; font-size: 14px; width: 100%; min-width: 0; color: var(--text); }
+.search-field select { border: none; background: transparent; outline: none; font-size: 13.5px; width: 100%; color: var(--text); cursor: pointer; }
 .btn-search {
     flex-shrink: 0;
-    height: 56px;
-    padding: 0 30px;
-    border-radius: 11px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 9px;
     font-weight: 700;
     font-size: 15px;
     letter-spacing: .01em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     color: #fff;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     box-shadow: 0 10px 24px rgba(31, 101, 114, .35);
@@ -1452,10 +1460,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 1100px) {
     .field-city { border-left: none; }
 }
+@media (max-width: 1000px) {
+    .hero-head { grid-template-columns: 1fr; gap: 22px; }
+}
 @media (max-width: 640px) {
     .field-city { display: none; }
-    .hero-search { padding: 6px 6px 6px 12px; }
-    .btn-search { padding: 0 18px; }
+    .hero-search { padding: 6px 6px 6px 10px; }
+    .btn-search { border-radius: 10px; }
+    .hero-head { gap: 18px; }
 }
 
 @media (max-width: 640px) {

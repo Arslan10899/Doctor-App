@@ -43,9 +43,17 @@
     animation: floaty 5s ease-in-out infinite;
 }
 .studio-hero-content { display: flex; flex-direction: column; }
+.studio-hero-head {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 30px;
+    align-items: center;
+    width: 100%;
+}
+.studio-hero-head-text { min-width: 0; }
 .studio-hero-h1 {
     font-family: Arial, sans-serif;
-    font-size: 32px;
+    font-size: 30px;
     line-height: 1.15;
     margin: 10px 0 8px;
     font-weight: 800;
@@ -74,48 +82,45 @@
 }
 .studio-hero-search {
     background: #fff;
-    border-radius: 16px;
-    padding: 7px;
+    border-radius: 14px;
+    padding: 6px;
     box-shadow: 0 18px 50px rgba(15, 40, 60, .18);
     color: #333;
-    margin-top: 22px;
-    max-width: 620px;
+    margin-top: 0;
 }
-.studio-search-row { display: flex; align-items: center; width: 100%; gap: 8px; }
+.studio-search-row { display: flex; align-items: center; width: 100%; gap: 6px; }
 .studio-search-field {
     flex: 1 1 auto;
     min-width: 0;
-    height: 56px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0 16px;
-    border-radius: 11px;
+    gap: 9px;
+    padding: 0 12px;
+    border-radius: 9px;
     background: #f0f6f8;
 }
 .studio-search-field input {
     border: none;
     background: transparent;
     outline: none;
-    font-size: 15px;
+    font-size: 14px;
     width: 100%;
     min-width: 0;
     color: #333;
 }
 .studio-search-city {
-    flex: 0 0 160px;
+    flex: 0 0 128px;
     font-weight: 600;
-    font-size: 14.5px;
+    font-size: 13.5px;
     color: #1f6572;
 }
 .studio-search-city svg { color: #2a7f8e; flex-shrink: 0; }
 .studio-search-btn {
     flex-shrink: 0;
-    height: 56px;
-    padding: 0 30px;
-    border-radius: 11px;
-    font-weight: 700;
-    font-size: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -571,18 +576,23 @@
                 </div>
             </div>
             <div class="studio-hero-content">
-                <h1 class="studio-hero-h1">Need a Doctor? <span class="studio-hero-accent">We Help You Find the Right One.</span></h1>
-                <p class="studio-hero-sub"><span class="studio-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
-                <div class="studio-hero-search">
-                    <div class="studio-search-row">
-                        <div class="studio-search-field">
-                            <input type="text" placeholder="Search doctors, hospitals, specialties..." readonly>
+                <div class="studio-hero-head">
+                    <div class="studio-hero-head-text">
+                        <h1 class="studio-hero-h1">Need a Doctor? <span class="studio-hero-accent">We Help You Find the Right One.</span></h1>
+                        <p class="studio-hero-sub"><span class="studio-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
+                    </div>
+                    <div class="studio-hero-search">
+                        <div class="studio-search-row">
+                            <div class="studio-search-field">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" placeholder="Search doctors, hospitals, specialties..." readonly>
+                            </div>
+                            <div class="studio-search-field studio-search-city">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                <input type="text" placeholder="Select City" readonly>
+                            </div>
+                            <span class="studio-search-btn" aria-label="Search"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
                         </div>
-                        <div class="studio-search-field studio-search-city">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            <input type="text" placeholder="All Cities" readonly>
-                        </div>
-                        <span class="studio-search-btn">Search</span>
                     </div>
                 </div>
                 <div class="studio-hero-cta">
