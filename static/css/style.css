@@ -419,6 +419,8 @@ input, select, textarea { font-family: inherit; }
     max-width: none;
     width: 100%;
     color: var(--text);
+    position: relative;
+    top: 8px;
 }
 .search-section {
     display: flex;
