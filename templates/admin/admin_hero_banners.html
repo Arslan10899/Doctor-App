@@ -65,31 +65,24 @@
 .studio-hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; margin: 0; }
 .studio-hero-accent {
     display: block;
-    margin-top: 4px;
+    margin-top: 12px;
     font-size: .62em;
     font-weight: 700;
     line-height: 1.3;
     color: #fff;
     background: rgba(255, 255, 255, .14);
-    border-left: 4px solid #ffd25e;
+    border-left: 4px solid #7ff0dc;
     border-radius: 0 10px 10px 0;
-    padding: 8px 14px;
+    padding: 9px 16px;
     width: fit-content;
     letter-spacing: -.01em;
 }
 .studio-hero-key {
     color: #7ff0dc;
-    position: relative;
 }
-.studio-hero-key::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: .04em;
-    height: .07em;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(127, 240, 220, .85), rgba(127, 240, 220, .15));
+.studio-hero-tail {
+    color: rgba(255, 255, 255, .72);
+    font-weight: 600;
 }
 .studio-steps {
     display: inline-block;
@@ -221,36 +214,43 @@
     animation: ctaGlow 2s infinite;
 }
 .studio-hero-btn-white:hover { background: #fff; }
+.studio-cta-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 6px 6px 7px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .07));
+    border: 1px solid rgba(255, 255, 255, .22);
+    box-shadow: 0 14px 34px rgba(8, 32, 48, .22), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+.studio-hero-btn-white,
+.studio-hero-btn-how {
+    border-radius: 9999px;
+    padding: 12px 24px;
+    font-size: 15px;
+    line-height: 1.2;
+    font-family: inherit;
+    cursor: default;
+    pointer-events: none;
+}
+.studio-hero-btn-white { font-weight: 700; color: #12626f; }
 .studio-hero-btn-how {
     display: inline-flex;
     align-items: center;
     gap: 9px;
-    padding: 13px 26px;
-    border-radius: 10px;
-    font-size: 15.5px;
     font-weight: 600;
+    font-size: 15px;
     line-height: 1.2;
-    font-family: inherit;
-    background: transparent;
+    background: rgba(255, 255, 255, .1);
     color: #fff;
-    cursor: default;
-    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
 }
 .studio-hero-btn-how svg { flex-shrink: 0; opacity: .95; }
-.studio-cta-row {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px 6px;
-    border-radius: 9999px;
-    background: rgba(255, 255, 255, .1);
-    border: 1px solid rgba(255, 255, 255, .16);
-    box-shadow: 0 12px 30px rgba(15, 40, 60, .16);
-}
 .studio-cta-divider {
     width: 1px;
-    height: 22px;
-    background: rgba(255, 255, 255, .28);
+    height: 26px;
+    background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .34), transparent);
     flex-shrink: 0;
     margin: 0 2px;
 }
@@ -646,7 +646,7 @@
             <div class="studio-hero-content">
                 <div class="studio-hero-head">
                     <div class="studio-hero-head-text">
-                        <h1 class="studio-hero-h1">Need a <span class="studio-hero-key">Doctor</span>? <span class="studio-hero-accent">We Help You Find the Right One.</span></h1>
+                        <h1 class="studio-hero-h1">Need a <span class="studio-hero-key">Doctor</span>? <span class="studio-hero-accent">We Help You Find the Right One <span class="studio-hero-tail">&mdash; anytime, anywhere.</span></span></h1>
                         <p class="studio-hero-sub"><span class="studio-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;for clinic visits or online check-ups.</p>
                     </div>
                     <div class="studio-hero-search">
