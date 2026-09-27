@@ -483,10 +483,11 @@ input, select, textarea { font-family: inherit; }
     position: relative;
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 152px;
-    padding: 6px 10px;
+    gap: 4px;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 130px;
+    padding: 6px 4px;
     cursor: pointer;
     user-select: none;
     color: #334155;
@@ -496,7 +497,7 @@ input, select, textarea { font-family: inherit; }
 }.city-drop {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
     border: none;
     background: transparent;
     font-size: 14px;
@@ -505,8 +506,8 @@ input, select, textarea { font-family: inherit; }
     cursor: pointer;
     min-width: 0;
     width: 100%;
-    padding: 4px 8px;
-    border-radius: 10px;
+    padding: 3px 5px;
+    border-radius: 8px;
     transition: background .15s;
 }
 .city-drop:hover { background: #f1f5f9; }
