@@ -472,8 +472,7 @@ input, select, textarea { font-family: inherit; }
     width: 100%;
 }
 .dropdown-section .chevron { margin-left: auto; color: #64748b; flex-shrink: 0; }
-.search-section .icon,
-.dropdown-section > svg:first-of-type { color: #0284c7; width: 18px; height: 18px; flex-shrink: 0; }
+.search-section .icon { width: 0; height: 0; flex-shrink: 0; }
 .search-btn {
     background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 100%);
     color: white;
