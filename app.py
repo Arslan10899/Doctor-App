@@ -793,14 +793,14 @@ def api_doctors_list():
         docs = query(
             "SELECT d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name "
             "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
-            "WHERE d.name LIKE ? ORDER BY d.rating DESC, d.reviews DESC LIMIT 8",
+            "WHERE d.name LIKE ? ORDER BY d.rating DESC, d.reviews DESC",
             (like,),
         )
     else:
         docs = query(
             "SELECT d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name "
             "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
-            "ORDER BY d.rating DESC, d.reviews DESC LIMIT 8"
+            "ORDER BY d.rating DESC, d.reviews DESC"
         )
     return jsonify([dict(r) for r in docs])
 

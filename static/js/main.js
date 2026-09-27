@@ -282,9 +282,10 @@ document.addEventListener("DOMContentLoaded", function () {
         doctorInput.addEventListener("input", function () {
             const q = doctorInput.value.trim();
             clearTimeout(debounceTimer);
-            if (q.length < 2) {
+            if (q.length < 1) {
                 suggestBox.classList.remove("open");
                 doctorIdInput.value = "";
+                renderSuggestions(doctorCache);
                 return;
             }
             debounceTimer = setTimeout(function () {
@@ -292,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     function (d) {
                         return (d.doctor_name + " " + d.specialty_name + " " + d.city_name).toLowerCase().indexOf(q.toLowerCase()) !== -1;
                     }
-                ).slice(0, 6);
+                );
                 renderSuggestions(matches);
             }, 160);
         });
@@ -303,7 +304,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 suggestBox.classList.remove("open");
                 return;
             }
-            matches.forEach(function (d, idx) {
+            const head = document.createElement("div");
+            head.className = "book-suggest-head";
+            head.textContent = matches.length + (matches.length === 1 ? " doctor found" : " doctors found");
+            suggestBox.appendChild(head);
+            matches.forEach(function (d) {
                 const item = document.createElement("div");
                 item.className = "book-suggest-item";
                 item.innerHTML = "<strong>" + d.doctor_name + "</strong><small>" + d.specialty_name + " \u00b7 " + d.city_name + "</small>";
@@ -320,6 +325,11 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorIdInput.value = d.id;
             suggestBox.classList.remove("open");
         }
+        doctorInput.addEventListener("focus", function () {
+            if (doctorCache.length && !doctorInput.value.trim()) {
+                renderSuggestions(doctorCache);
+            }
+        });
         doctorInput.addEventListener("blur", function () {
             setTimeout(function () { suggestBox.classList.remove("open"); }, 150);
         });
