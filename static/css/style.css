@@ -421,7 +421,17 @@ input, select, textarea { font-family: inherit; }
     letter-spacing: -.02em;
     white-space: nowrap;
 }
-.hero p.hero-sub { font-size: 15.5px; opacity: .92; max-width: 520px; white-space: nowrap; }
+.hero p.hero-sub {
+    font-size: 15.5px;
+    opacity: 1;
+    max-width: 520px;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, .82);
+}
+.hero-sub-tail {
+    color: #fff;
+    font-weight: 600;
+}
 .hero-title-key {
     color: #7ff0dc;
 }
@@ -445,7 +455,7 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-steps {
     display: inline-block;
-    color: #ffd25e;
+    color: #7ff0dc;
     font-weight: 800;
 }
 .how-play-btn {
