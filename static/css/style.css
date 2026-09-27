@@ -181,6 +181,7 @@ input, select, textarea { font-family: inherit; }
     gap: 10px;
     align-items: stretch;
 }
+.hero-grid > * { min-width: 0; }
 .hero-content { display: flex; flex-direction: column; }
 .hero-content .hero-search { margin-top: 24px; }
 .hero-content h1 { margin-top: 6px; }
@@ -604,7 +605,7 @@ animation: none;
 .service-card p { font-size: 14px; color: var(--text-muted); }
 
 /* ---------- Specialty chips ---------- */
-.chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.chip-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .chip {
     display: flex;
     align-items: center;
@@ -616,7 +617,10 @@ animation: none;
     font-weight: 600;
     font-size: 14.5px;
     transition: all .2s;
+    min-width: 0;
+    overflow: hidden;
 }
+.chip > span { min-width: 0; }
 .chip:hover { border-color: var(--primary); color: var(--primary); box-shadow: var(--shadow); transform: translateY(-2px); }
 .chip-icon {
     width: 40px; height: 40px; border-radius: 10px;
@@ -826,6 +830,7 @@ animation: none;
     background: var(--bg-light);
     outline: none;
     transition: border .2s;
+    min-width: 0;
 }
 .filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); background: #fff; }
 
@@ -1067,7 +1072,9 @@ animation: none;
     border-radius: var(--radius);
     padding: 24px;
     transition: all .2s;
+    min-width: 0;
 }
+.hospital-card-lg > div { min-width: 0; }
 .hospital-card-lg:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
 .hospital-card-lg .hospital-logo { width: 68px; height: 68px; }
 .hospital-card-lg h3 { font-size: 19px; }
@@ -1387,8 +1394,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 1024px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
     .doctor-grid { grid-template-columns: repeat(2, 1fr); }
-    .chip-grid { grid-template-columns: repeat(3, 1fr); }
-    .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(3, 1fr); }
+    .chip-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .hospital-grid { grid-template-columns: repeat(2, 1fr); }
     .reviews-grid { grid-template-columns: repeat(2, 1fr); }
     .footer-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1435,7 +1442,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .phone-frame { width: 200px; }
     .services-grid { grid-template-columns: 1fr 1fr; }
     .doctor-grid { grid-template-columns: 1fr; }
-    .chip-grid, .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    .chip-grid, .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .hospital-grid, .reviews-grid { grid-template-columns: 1fr; }
     .search-row { flex-direction: column; }
     .contact-grid { grid-template-columns: 1fr; }
