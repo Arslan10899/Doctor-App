@@ -186,8 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const visitTypeLabel = document.getElementById("bkVisitType");
         const visitIconBox = document.getElementById("bkVisitIcon");
         const changeBtn = document.getElementById("bkChangeVisit");
-        const typeBackBtn = document.getElementById("bkTypeBack");
-        const formBackBtn = document.getElementById("bkFormBack");
+        const modalBackBtn = document.getElementById("bkModalBack");
         const stepDots = document.getElementById("bkStepDots");
         const modalSub = document.getElementById("bkModalSub");
         const SUB_FORM = "Fill in your details and our team will confirm your booking.";
@@ -297,8 +296,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (changeBtn) {
             changeBtn.addEventListener("click", function () { setStep("type"); });
         }
-        if (typeBackBtn) {
-            typeBackBtn.addEventListener("click", function () {
+        if (modalBackBtn) {
+            modalBackBtn.addEventListener("click", function () {
                 // walk back through the steps we came from; if the type step is
                 // where the modal was opened, there is nothing to go back to
                 // except the page itself
@@ -307,15 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else {
                     closeModal();
                 }
-            });
-        }
-        if (formBackBtn) {
-            formBackBtn.addEventListener("click", function () {
-                // Back is not a new step: drop the entry that led here so the
-                // type step's own Back closes the modal instead of bouncing
-                // straight back to the form
-                stepHistory.pop();
-                setStep("type", { back: true });
             });
         }
         document.addEventListener("keydown", function (e) {

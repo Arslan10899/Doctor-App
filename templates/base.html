@@ -198,6 +198,10 @@
         <div class="book-modal-backdrop" data-book-close></div>
         <div class="book-modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
             <button class="book-modal-close" type="button" data-book-close aria-label="Close">&times;</button>
+            <button type="button" class="book-modal-back" id="bkModalBack" aria-label="Go back">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+                <span>Back</span>
+            </button>
             <div class="book-modal-head">
                 <div class="book-step-dots" id="bkStepDots" aria-hidden="true">
                     <span class="book-step-dot active"></span>
@@ -208,10 +212,6 @@
             </div>
 
             <div class="book-step book-step-type" id="bkStepType">
-                <button type="button" class="book-type-back" id="bkTypeBack" aria-label="Go back">
-                    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-                    <span>Back</span>
-                </button>
                 <p class="book-step-label">How would you like to be seen?</p>
                 <div class="book-type-grid">
                     <button type="button" class="book-type-card book-type-clinic" data-visit="Clinic Visit">
@@ -243,10 +243,6 @@
 
             <form id="bookingRequestForm" class="book-form" novalidate hidden>
                 <input type="hidden" name="visit_type" id="bkVisitTypeInput" value="Clinic Visit">
-                <button type="button" class="book-form-back" id="bkFormBack" aria-label="Go back to visit type">
-                    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-                    <span>Back</span>
-                </button>
                 <div class="book-visitsummary" id="bkVisitSummary" hidden>
                     <span class="book-visitsummary-ic" id="bkVisitIcon"></span>
                     <span class="book-visitsummary-txt">
