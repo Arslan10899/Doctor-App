@@ -1440,6 +1440,56 @@ def admin_logout():
     return redirect(url_for("index"))
 
 
+@app.route("/admin/signup", methods=["GET", "POST"])
+def admin_signup():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not username or not password:
+            flash("Username aur password zaroori hain.", "danger")
+            return render_template("admin/admin_signup.html")
+
+        if password != confirm_password:
+            flash("Password match nahi ho raha.", "danger")
+            return render_template("admin/admin_signup.html")
+
+        if len(password) < 6:
+            flash("Password kam az kam 6 characters ka hona chahiye.", "danger")
+            return render_template("admin/admin_signup.html")
+
+        exists = query("SELECT id FROM admins WHERE username=?", (username,), one=True)
+        if exists:
+            flash("Ye username already use ho raha hai. Dusra choose karein.", "danger")
+            return render_template("admin/admin_signup.html")
+
+        if email:
+            exists_email = query("SELECT id FROM admins WHERE email=?", (email,), one=True)
+            if exists_email:
+                flash("Ye email already register hai.", "danger")
+                return render_template("admin/admin_signup.html")
+
+        execute(
+            "INSERT INTO admins (username, password, name, email) VALUES (?, ?, ?, ?)",
+            (username, password, name or username, email),
+        )
+        row = query("SELECT * FROM admins WHERE username=?", (username,), one=True)
+        if row:
+            session["admin_logged_in"] = True
+            session["admin_name"] = row["name"] or row["username"]
+            session.permanent = True
+            flash("Account create ho chuka hai! Welcome to Admin Panel.", "success")
+            return redirect(url_for("admin_dashboard"))
+
+        flash("Account create ho chuka hai. Ab login karein.", "success")
+        return redirect(url_for("admin_login"))
+
+    return render_template("admin/admin_signup.html")
+
+
 @app.route("/admin/booking-requests")
 @admin_required
 def admin_booking_requests():
