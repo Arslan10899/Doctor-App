@@ -885,6 +885,24 @@ def _active_announcements():
         active.append(a)
     return active
 
+IMG_EXTS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif", ".bmp")
+VID_EXTS = (".mp4", ".webm", ".ogg", ".mov", ".m4v", ".avi")
+
+
+def media_kind(url, default="image"):
+    """Guess image vs video from a URL's file extension, else use default.
+
+    Lets the admin paste or upload a mixed list of images and videos without
+    having to say which is which.
+    """
+    path = (url or "").split("?")[0].split("#")[0].lower()
+    if path.endswith(VID_EXTS):
+        return "video"
+    if path.endswith(IMG_EXTS):
+        return "image"
+    return default
+
+
 def safe_link(raw):
     """Return a link that is safe to put in an href, or None.
 
@@ -2289,15 +2307,28 @@ def admin_mobile_cards_action():
 
     if section == "add":
         mt, img, vid, name, link, autoplay, so = media_fields()
-        if has_media(mt, img, vid):
-            execute(
-                "INSERT INTO mobile_cards (name, media_type, image_url, video_url, link_url, autoplay, sort_order, active) "
-                "VALUES (?,?,?,?,?,?,?,1)",
-                (name, mt, img, vid, link, autoplay, so),
-            )
-            flash("Mobile card added.", "success")
-        else:
+        # One URL per line, so a single submit can create many cards with
+        # images and videos mixed together. Falls back to the single URL
+        # field so an older/simple form post still works.
+        raw = request.form.get("media_urls", "")
+        if not raw.strip():
+            raw = (vid if mt == "video" else img) or ""
+        urls = [u.strip() for u in raw.replace("\r", "\n").split("\n") if u.strip()]
+        if not urls:
             flash("Image ya video upload/URL karna zaroori hai.", "warning")
+        else:
+            for n, url in enumerate(urls):
+                kind = media_kind(url, mt)
+                execute(
+                    "INSERT INTO mobile_cards (name, media_type, image_url, video_url, link_url, autoplay, sort_order, active) "
+                    "VALUES (?,?,?,?,?,?,?,1)",
+                    (name, kind,
+                     url if kind == "image" else None,
+                     url if kind == "video" else None,
+                     link, autoplay, so + n),
+                )
+            flash("%d card(s) added." % len(urls) if len(urls) > 1 else "Mobile card added.",
+                  "success")
     elif section == "toggle":
         cid = request.form.get("mobile_card_id", request.form.get("id", type=int))
         val = 1 if request.form.get("active") == "1" else 0

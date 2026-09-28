@@ -56,6 +56,7 @@
 <form method="post" action="{{ url_for('admin_mobile_cards_action') }}" id="mcAddForm"
       style="border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin-bottom:22px;background:#fff;">
     <input type="hidden" name="section" value="add">
+    <textarea name="media_urls" id="mcMediaUrls" rows="1" style="display:none;"></textarea>
 
     <h2 style="margin:0 0 12px;font-size:17px;">Add new card</h2>
 
@@ -72,13 +73,14 @@
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;">
         <div>
-            <label class="flabel">Card name (admin ke liye, page par nahi dikhta)</label>
-            <input type="text" name="name" id="mc-name" placeholder="e.g. Free consultation offer">
+            <label class="flabel">Card name (optional)</label>
+            <input type="text" name="name" id="mc-name" placeholder="Khali chhore to auto number">
+            <p class="mc-muted" style="margin:4px 0 0;">Ye sirf admin ke liye hai, page par nahi dikhta.</p>
         </div>
         <div>
             <label class="flabel">Order number</label>
             <input type="number" name="sort_order" min="0" step="1" value="{{ mobile_cards|length + 1 }}">
-            <p class="mc-muted" style="margin:4px 0 0;">1 = sabse pehle, 2 = uske baad.</p>
+            <p class="mc-muted" style="margin:4px 0 0;">1 = sabse pehle. Multiple cards add karne par har card ka order is ke baad khud barh jayega.</p>
         </div>
     </div>
 
@@ -88,22 +90,22 @@
     </div>
 
     <div id="mcImageFields">
-        <label class="flabel">Image *</label>
+        <label class="flabel">Image</label>
         <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" name="image_url" id="mc-image" placeholder="https://...jpg" required style="flex:1;">
+            <input type="text" name="image_url" id="mc-image" data-mc-field="image" placeholder="https://...jpg" style="flex:1;">
             <button class="btn btn-sm" type="button" data-mc-browse="image">Browse &amp; Upload</button>
         </div>
-        <input type="file" data-mc-file="image" accept="image/*" style="display:none;">
+        <input type="file" data-mc-file="image" data-mc-scope="add" accept="image/*" multiple style="display:none;">
         <p class="mc-preview" data-mc-preview="image"></p>
     </div>
 
     <div id="mcVideoFields" style="display:none;">
-        <label class="flabel">Video *</label>
+        <label class="flabel">Video</label>
         <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" name="video_url" id="mc-video" placeholder="https://...mp4" style="flex:1;">
+            <input type="text" name="video_url" id="mc-video" data-mc-field="video" placeholder="https://...mp4" style="flex:1;">
             <button class="btn btn-sm" type="button" data-mc-browse="video">Browse &amp; Upload</button>
         </div>
-        <input type="file" data-mc-file="video" accept="video/*" style="display:none;">
+        <input type="file" data-mc-file="video" data-mc-scope="add" accept="video/*" multiple style="display:none;">
         <p class="mc-preview" data-mc-preview="video"></p>
         <label class="mc-toggle" style="margin-top:10px;">
             <input type="checkbox" name="autoplay" value="1" checked> Video khud chalay (muted loop)
@@ -111,8 +113,21 @@
         <p class="mc-muted" style="margin:4px 0 0;">Sirf tab hi ON rakhein jab video silent ho &mdash; browser awaaz wale video par autoplay rok deta hai.</p>
     </div>
 
+    <div id="mcQueue" style="display:none;margin-top:14px;border:1px solid #d1d5db;border-radius:11px;padding:12px;background:#f9fafb;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+            <strong style="font-size:13.5px;"><span id="mcQueueCount">0</span> card(s) ready &mdash; ek hi card jaisa karein</strong>
+            <button class="btn btn-sm" type="button" id="mcQueueClear" style="color:#b91c1c;">Sab hatao</button>
+        </div>
+        <ul id="mcQueueList" style="margin:0;padding-left:20px;font-size:12.5px;color:#4b5563;word-break:break-all;"></ul>
+    </div>
+
+    <p class="mc-hint" style="margin:12px 0 0;">
+        Aap ek saath <strong>kai images aur videos</strong> upload kar sakte hain (Browse &amp; Upload par multiple select karein)
+        ya links box mein <strong>ek line par ek link</strong> paste kar sakte hain. Har link ka apna card ban jayega.
+    </p>
+
     <div style="margin-top:16px;display:flex;gap:8px;">
-        <button class="btn" type="submit">Save card</button>
+        <button class="btn" type="submit">Save card(s)</button>
     </div>
 </form>
 
@@ -184,8 +199,8 @@
                         <button class="btn btn-sm" type="button" data-mc-browse="image" data-id="{{ c['id'] }}">Upload image</button>
                         <button class="btn btn-sm" type="button" data-mc-browse="video" data-id="{{ c['id'] }}">Upload video</button>
                     </div>
-                    <input type="file" data-mc-file="image" data-id="{{ c['id'] }}" accept="image/*" style="display:none;">
-                    <input type="file" data-mc-file="video" data-id="{{ c['id'] }}" accept="video/*" style="display:none;">
+                    <input type="file" data-mc-file="image" data-id="{{ c['id'] }}" data-mc-scope="edit" accept="image/*" style="display:none;">
+                    <input type="file" data-mc-file="video" data-id="{{ c['id'] }}" data-mc-scope="edit" accept="video/*" style="display:none;">
 
                     <label class="flabel">Link URL (optional)</label>
                     <input type="text" name="link_url" value="{{ c['link_url'] or '' }}">
@@ -222,55 +237,125 @@
 
 <script>
 (function () {
-    function post(fileInput, urlInput) {
-        if (!fileInput.files.length) return Promise.resolve(null);
+    // Uploads queued for the add form. Each entry becomes its own card, so a
+    // single submit can create many cards with images and videos mixed.
+    var queue = [];
+
+    function addForm() { return document.getElementById('mcAddForm'); }
+    function visibleInput() {
+        var form = addForm();
+        if (!form) return null;
+        return form.querySelector('input[type="text"][name$="_url"][data-mc-field]');
+    }
+
+    function renderQueue() {
+        var box = document.getElementById('mcQueue');
+        var list = document.getElementById('mcQueueList');
+        var count = document.getElementById('mcQueueCount');
+        var ta = document.getElementById('mcMediaUrls');
+        if (!box || !list || !count || !ta) return;
+        ta.value = queue.join('\n');
+        count.textContent = String(queue.length);
+        box.style.display = queue.length ? 'block' : 'none';
+        list.innerHTML = '';
+        queue.forEach(function (u) {
+            var li = document.createElement('li');
+            li.textContent = u;
+            list.appendChild(li);
+        });
+    }
+
+    function queueAdd(url) {
+        if (!url) return;
+        if (queue.indexOf(url) === -1) queue.push(url);
+        renderQueue();
+        // Show the first queued URL in the visible box too, so the admin can
+        // see what is staged. Never mark it required: the hidden textarea
+        // above is the real payload.
+        var vis = visibleInput();
+        if (vis && !vis.value) vis.value = url;
+    }
+
+    function uploadOne(file, onDone) {
         var fd = new FormData();
-        fd.append('file', fileInput.files[0]);
-        var preview = document.querySelector('[data-mc-preview="' + fileInput.dataset.mcFile + '"]');
-        if (preview) preview.textContent = 'Uploading...';
+        fd.append('file', file);
         return fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
             .then(function (res) {
-                if (res.ok) {
-                    urlInput.value = res.url;
-                    if (preview) preview.textContent = 'Uploaded: ' + res.url;
-                    return res.url;
-                }
-                if (preview) preview.textContent = 'Error: ' + (res.error || 'upload failed');
-                return null;
+                if (res.ok && res.body && res.body.ok) onDone(res.body.url);
+                else onDone(null, (res.body && res.body.error) || 'upload failed');
             })
-            .catch(function () {
-                if (preview) preview.textContent = 'Upload failed. Check server.';
-                return null;
+            .catch(function () { onDone(null, 'Upload failed. Check server.'); });
+    }
+
+    function uploadMany(files, kind, preview) {
+        var list = Array.prototype.slice.call(files || []);
+        if (!list.length) return;
+        var failed = [];
+        var chain = list.reduce(function (p, file) {
+            return p.then(function () {
+                return new Promise(function (resolve) {
+                    uploadOne(file, function (url, err) {
+                        if (url) queueAdd(url);
+                        else failed.push(file.name + (err ? ' (' + err + ')' : ''));
+                        resolve();
+                    });
+                });
             });
+        }, Promise.resolve());
+        chain.then(function () {
+            if (preview) {
+                preview.textContent = failed.length
+                    ? list.length + ' file(s) me se ' + failed.length + ' fail: ' + failed.join(', ')
+                    : list.length + ' file(s) uploaded.';
+            }
+        });
     }
 
     window.mcType = function (type) {
+        var form = addForm();
+        if (!form) return;
         var img = document.getElementById('mcImageFields');
         var vid = document.getElementById('mcVideoFields');
         if (img) img.style.display = type === 'image' ? '' : 'none';
         if (vid) vid.style.display = type === 'video' ? '' : 'none';
-        var labels = document.querySelectorAll('.mc-seg label');
+        var labels = form.querySelectorAll('.mc-seg label');
         for (var i = 0; i < labels.length; i++) {
             labels[i].classList.toggle('is-active', labels[i].dataset.mt === type);
         }
-        // only the visible field may be required, otherwise the browser blocks
-        // submit with an invisible validation error on the hidden one
-        var i2 = document.getElementById('mc-image');
-        var v2 = document.getElementById('mc-video');
-        if (i2) i2.required = (type === 'image');
-        if (v2) v2.required = (type === 'video');
     };
 
     document.addEventListener('DOMContentLoaded', function () {
         window.mcType('image');
+        var form = addForm();
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (queue.length) return;              // handled via textarea
+                var vis = visibleInput();
+                if (!vis || !vis.value.trim()) {
+                    e.preventDefault();
+                    window.alert('Pehle image ya video upload karein, ya link paste karein.');
+                }
+            });
+        }
+
+        var clear = document.getElementById('mcQueueClear');
+        if (clear) {
+            clear.addEventListener('click', function () {
+                queue = [];
+                var vis = visibleInput();
+                if (vis) vis.value = '';
+                renderQueue();
+            });
+        }
 
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-mc-browse]');
             if (!btn) return;
             var kind = btn.dataset.mcBrowse;
             var id = btn.dataset.id || '';
-            var file = document.querySelector('[data-mc-file="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : ''));
+            var sel = '[data-mc-file="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : '');
+            var file = document.querySelector(sel);
             if (file) file.click();
         });
 
@@ -279,9 +364,29 @@
             if (!f) return;
             var kind = f.dataset.mcFile;
             var id = f.dataset.id || '';
-            var sel = '[data-mc-field="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : '');
+            var preview = document.querySelector('[data-mc-preview="' + kind + '"]');
+
+            if (!id) {
+                // add form: many files, each becomes a card
+                uploadMany(f.files, kind, preview);
+                f.value = '';
+                return;
+            }
+            // edit form: single file replaces that card's existing media
+            var sel = '[data-mc-field="' + kind + '"][data-id="' + id + '"]';
             var input = document.querySelector(sel);
-            if (input) post(f, input);
+            if (!input) return;
+            var files = Array.prototype.slice.call(f.files || []);
+            if (!files.length) return;
+            uploadOne(files[0], function (url, err) {
+                if (url) {
+                    input.value = url;
+                    if (preview) preview.textContent = 'Uploaded: ' + url;
+                } else if (preview) {
+                    preview.textContent = 'Error: ' + err;
+                }
+            });
+            f.value = '';
         });
 
         // per-card edit forms: switching media type shows the matching URL box
@@ -299,6 +404,8 @@
                 if (fldI) fldI.style.display = isVideo ? 'none' : '';
             });
         });
+
+        renderQueue();
     });
 })();
 </script>
