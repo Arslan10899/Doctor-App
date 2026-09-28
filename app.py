@@ -55,6 +55,10 @@ AI_TIMEOUT = int(cfg("AI_TIMEOUT", "8"))
 APPOINTMENT_EXPIRY_HOURS = int(cfg("APPOINTMENT_EXPIRY_HOURS", "12"))
 WHATSAPP_DRY_RUN = cfg_bool("WHATSAPP_DRY_RUN", True)
 
+# --- Public contact details (single source of truth for the whole site) ---
+SITE_PHONE = cfg("SITE_PHONE", "+923461992469")
+SITE_PHONE_DISPLAY = cfg("SITE_PHONE_DISPLAY", "+92 346 1992469")
+
 # Single source of truth for appointment states (SQLite has no ENUM).
 APPT_PENDING = "pending"
 APPT_DOCTOR_NOTIFIED = "doctor_notified"
@@ -134,7 +138,8 @@ def inject_globals():
         specs = [r["name"] for r in query("SELECT name FROM specialties ORDER BY name")]
     except Exception:
         cities, specs = CITIES, SPECIALTIES
-    return {"cities": cities, "all_specialties": specs, "current_year": 2026, "yt_embed": yt_embed, "yt_thumb": yt_thumb}
+    return {"cities": cities, "all_specialties": specs, "current_year": 2026, "yt_embed": yt_embed, "yt_thumb": yt_thumb,
+            "site_phone": SITE_PHONE, "site_phone_display": SITE_PHONE_DISPLAY, "site_whatsapp": SITE_PHONE}
 
 def yt_video_id(url):
     """Extract YouTube video id from any common link form."""

@@ -235,6 +235,38 @@ input, select, textarea { font-family: inherit; }
     gap: 12px;
 }
 .hero-cta-actions .btn { border-radius: 12px; font-weight: 700; }
+
+/* Mobile-only Call / WhatsApp row. Hidden on desktop where the two big
+   buttons live; the two are swapped in by the media query below. */
+.hero-quick-call { display: none; gap: 10px; }
+.hero-quick-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1 1 0;
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform .15s, box-shadow .2s, background .2s;
+}
+.hero-quick-btn:active { transform: scale(.97); }
+.hero-quick-btn svg { flex-shrink: 0; }
+.hero-quick-call {
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 8px 22px rgba(15, 40, 60, .2);
+}
+.hero-quick-wa {
+    background: #25d366;
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(37, 211, 102, .32);
+}
+.hero-quick-wa:hover { background: #1eb955; color: #fff; }
+.hero-quick-call:hover { background: #f2f8f9; color: var(--primary); }
 .hero-banners {
     margin-top: 22px;
     display: flex;
@@ -412,17 +444,16 @@ input, select, textarea { font-family: inherit; }
     55%, 100% { left: 130%; }
 }
 @media (max-width: 640px) {
-    .hero-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
-    .hero-cta-text { font-size: 16px; }
-    .hero-cta-actions { flex-direction: column; width: 100%; }
-    .hero-cta-actions .btn { width: 100%; text-align: center; }
-    .hero-cta-row {
-        flex-direction: row;
-        width: auto;
-        align-self: flex-start;
-        max-width: 100%;
-    }
-    .hero-cta-row .btn { width: auto; }
+.hero-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
+.hero-cta-text { font-size: 16px; }
+.hero-cta-actions { flex-direction: column; width: 100%; }
+.hero-cta-actions .btn { width: 100%; text-align: center; }
+.hero-cta-row {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+.hero-cta-row .btn { width: auto; }
 }
 .hero-badge {
     display: inline-flex;
@@ -843,6 +874,126 @@ animation: none;
 .service-body { display: block; padding: 20px 22px 22px; }
 .service-card h3 { font-size: 18px; margin-bottom: 6px; }
 .service-card p { font-size: 14px; color: var(--text-muted); }
+
+/* ---------- Asymmetric help grid ---------- */
+/* One tall card on the left, two stacked equal-height cards on the right.
+   This is the CSS equivalent of a ConstraintLayout where the left card is
+   constrained top+bottom against both right cards, so it always matches
+   their combined height. */
+.asym-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+.asym-col {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+    min-width: 0;
+}
+.asym-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-width: 0;
+    overflow: hidden;               /* keeps media clipped to the rounded bounds */
+    border-radius: 20px;
+    text-decoration: none;
+    color: inherit;
+    isolation: isolate;
+    transition: transform .22s, box-shadow .22s;
+}
+.asym-card:hover { transform: translateY(-4px); }
+.asym-card:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+.asym-blue  { background: #e8f2ff; box-shadow: 0 4px 14px rgba(37, 99, 235, .10); }
+.asym-blue:hover  { box-shadow: 0 14px 30px rgba(37, 99, 235, .18); }
+.asym-peach { background: #ffeee2; box-shadow: 0 4px 14px rgba(234, 88, 12, .10); }
+.asym-peach:hover { box-shadow: 0 14px 30px rgba(234, 88, 12, .18); }
+.asym-cream { background: #fff8e7; box-shadow: 0 4px 14px rgba(217, 119, 6, .10); }
+.asym-cream:hover { box-shadow: 0 14px 30px rgba(217, 119, 6, .18); }
+
+/* Text block stays top-left and always sits above the artwork */
+.asym-text {
+    position: relative;
+    z-index: 2;
+    display: block;
+    padding: 26px 26px 0;
+    max-width: 100%;
+}
+.asym-badge {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .92);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(15, 40, 60, .08);
+}
+.asym-blue  .asym-badge { color: #1d4ed8; }
+.asym-peach .asym-badge { color: #c2410c; }
+.asym-cream .asym-badge { color: #b45309; }
+
+.asym-text h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.2px; }
+.asym-text p { font-size: 14.5px; line-height: 1.6; color: #42525f; }
+
+/* Artwork: anchored to the bottom-right, faded on the side facing the text,
+   and clipped by the card's own overflow + border-radius */
+.asym-media {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    bottom: 0;
+    width: 42%;
+    height: 100%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to left, #000 52%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 52%, transparent 100%);
+}
+.asym-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;               /* fills the box without stretching */
+    object-position: center;
+}
+/* The online-consult PNG is portrait with the doctor at the top */
+.asym-media img[src*="consult-online"] { object-position: top center; }
+
+/* Tall left card: artwork sits in the lower portion, faded from the top */
+.asym-card-tall .asym-text { padding: 30px 30px 0; }
+.asym-card-tall .asym-text h3 { font-size: 24px; }
+.asym-card-tall .asym-text p { font-size: 15px; max-width: 34ch; }
+.asym-card-tall .asym-media {
+    width: 100%;
+    height: 58%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 42%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 42%, #000 100%);
+}
+
+@media (max-width: 900px) {
+    .asym-grid { grid-template-columns: 1fr; }
+    .asym-col { grid-template-rows: none; }
+    .asym-card-tall .asym-media { height: 46%; }
+    .asym-text h3 { font-size: 18px; }
+    .asym-card-tall .asym-text h3 { font-size: 20px; }
+}
+@media (max-width: 420px) {
+    .asym-card { border-radius: 16px; }
+    .asym-text { padding: 20px 20px 0; }
+    .asym-card-tall .asym-text { padding: 22px 22px 0; }
+    .asym-text h3 { font-size: 17px; }
+    .asym-card-tall .asym-text h3 { font-size: 19px; }
+    .asym-text p { font-size: 13.5px; }
+    .asym-card-tall .asym-text p { font-size: 13.5px; }
+    .asym-media { width: 46%; }
+    .asym-card-tall .asym-media { width: 100%; height: 40%; }
+}
 
 /* ---------- Specialty chips ---------- */
 .chip-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -1700,6 +1851,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         padding: 8px 13px;
     }
     .hero p.hero-sub { font-size: 14px; max-width: 100%; }
+
+    /* On phones swap "Book an Appointment" + "How it works" for Call + WhatsApp */
+    .hero-quick-call { display: flex; width: 100%; }
+    .hero-cta-actions.hero-cta-row { display: none; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
