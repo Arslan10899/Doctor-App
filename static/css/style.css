@@ -138,6 +138,25 @@ input, select, textarea { font-family: inherit; }
 
 .header-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; }
 
+/* Admin shortcut - always visible so the owner never has to scroll to the footer */
+.admin-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1.5px dashed var(--primary);
+    border-radius: 999px;
+    color: var(--primary);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+    background: rgba(42, 127, 142, .06);
+    white-space: nowrap;
+    transition: all .2s;
+}
+.admin-entry:hover { background: var(--primary); color: #fff; border-style: solid; }
+.admin-entry svg { flex-shrink: 0; }
+
 .nav-toggle {
     display: none;
     flex-direction: column;
@@ -1655,7 +1674,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         display: none;
     }
     .main-nav.open { display: flex; }
-    .header-actions { display: none; }
+    /* Keep the admin shortcut in the bar on phones; patient login lives in the menu. */
+    .header-actions { display: flex; }
+    .header-actions > .btn { display: none; }
+    .admin-entry { padding: 6px 10px; font-size: 12.5px; }
     .hero h1 { font-size: 30px; }
     .hero-stats { flex-wrap: wrap; gap: 18px; }
     .app-section { grid-template-columns: 1fr; padding: 34px 22px; text-align: center; gap: 26px; }
