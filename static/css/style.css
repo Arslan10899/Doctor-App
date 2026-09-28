@@ -236,37 +236,60 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-cta-actions .btn { border-radius: 12px; font-weight: 700; }
 
-/* Mobile-only Call / WhatsApp row. Hidden on desktop where the two big
-   buttons live; the two are swapped in by the media query below. */
-.hero-quick-call { display: none; gap: 10px; }
-.hero-quick-btn {
+/* Mobile-only "Book an Appointment" box holding two visit-type buttons.
+   Desktop keeps the white Book + How-it-works row instead, so this stays
+   display:none until the <=768px media query switches it on. */
+.hero-book-box {
+    display: none;
+    width: 100%;
+    background: #fff;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 12px 30px -10px rgba(15, 40, 60, .30), 0 2px 6px rgba(15, 40, 60, .05);
+}
+.hero-book-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 4px 11px;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+}
+.hero-book-label svg { color: var(--primary); flex-shrink: 0; }
+.hero-book-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hero-book-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    flex: 1 1 0;
-    padding: 13px 16px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
+    min-height: 50px;
+    padding: 12px 10px;
+    border: 0;
+    border-radius: 14px;
+    font-size: 14.5px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
     transition: transform .15s, box-shadow .2s, background .2s;
 }
-.hero-quick-btn:active { transform: scale(.97); }
-.hero-quick-btn svg { flex-shrink: 0; }
-.hero-quick-call {
-    background: #fff;
+.hero-book-btn:active { transform: scale(.975); }
+.hero-book-btn svg { flex-shrink: 0; }
+.hero-book-clinic {
+    background: #f1f7f9;
     color: var(--primary);
-    box-shadow: 0 8px 22px rgba(15, 40, 60, .2);
+    box-shadow: inset 0 0 0 1.5px rgba(13, 148, 136, .30);
 }
-.hero-quick-wa {
-    background: #25d366;
+.hero-book-clinic:hover { background: #e6f2f4; }
+.hero-book-online {
+    background: linear-gradient(135deg, #0d9488, #0f766e);
     color: #fff;
-    box-shadow: 0 8px 22px rgba(37, 211, 102, .32);
+    box-shadow: 0 8px 18px -6px rgba(13, 148, 136, .60);
 }
-.hero-quick-wa:hover { background: #1eb955; color: #fff; }
-.hero-quick-call:hover { background: #f2f8f9; color: var(--primary); }
+.hero-book-online:hover { background: linear-gradient(135deg, #0f766e, #115e59); }
 .hero-banners {
     margin-top: 22px;
     display: flex;
@@ -877,122 +900,188 @@ animation: none;
 
 /* ---------- Asymmetric help grid ---------- */
 /* One tall card on the left, two stacked equal-height cards on the right.
-   This is the CSS equivalent of a ConstraintLayout where the left card is
-   constrained top+bottom against both right cards, so it always matches
-   their combined height. */
+   CSS equivalent of a ConstraintLayout where the left card is constrained
+   top+bottom against both right cards, so it always matches their combined
+   height. Each variant sets its own accent + tint via custom properties. */
 .asym-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 22px;
     align-items: stretch;
 }
 .asym-col {
     display: grid;
     grid-template-rows: 1fr 1fr;
-    gap: 20px;
+    gap: 22px;
     min-width: 0;
 }
 .asym-card {
+    --ac: #2563eb;
+    --a1: #eaf3ff;
+    --a2: #d8e8ff;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     min-width: 0;
-    overflow: hidden;               /* keeps media clipped to the rounded bounds */
+    min-height: 178px;
+    padding: 26px 28px;
+    overflow: hidden;                 /* keeps the artwork clipped to the rounded bounds */
     border-radius: 20px;
+    background: linear-gradient(145deg, var(--a1) 0%, var(--a2) 100%);
+    box-shadow: 0 1px 2px rgba(15, 40, 60, .04), 0 12px 26px -14px rgba(15, 40, 60, .20);
     text-decoration: none;
     color: inherit;
     isolation: isolate;
-    transition: transform .22s, box-shadow .22s;
+    transition: transform .28s cubic-bezier(.2, .7, .3, 1), box-shadow .28s;
 }
-.asym-card:hover { transform: translateY(-4px); }
-.asym-card:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.asym-blue  { --ac: #2563eb; --a1: #eaf3ff; --a2: #d6e7ff; }
+.asym-peach { --ac: #ea580c; --a1: #fff3e9; --a2: #ffe1cd; }
+.asym-cream { --ac: #d97706; --a1: #fffbee; --a2: #fdeacd; }
 
-.asym-blue  { background: #e8f2ff; box-shadow: 0 4px 14px rgba(37, 99, 235, .10); }
-.asym-blue:hover  { box-shadow: 0 14px 30px rgba(37, 99, 235, .18); }
-.asym-peach { background: #ffeee2; box-shadow: 0 4px 14px rgba(234, 88, 12, .10); }
-.asym-peach:hover { box-shadow: 0 14px 30px rgba(234, 88, 12, .18); }
-.asym-cream { background: #fff8e7; box-shadow: 0 4px 14px rgba(217, 119, 6, .10); }
-.asym-cream:hover { box-shadow: 0 14px 30px rgba(217, 119, 6, .18); }
+.asym-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 2px 4px rgba(15, 40, 60, .05), 0 26px 48px -20px rgba(15, 40, 60, .32);
+}
+.asym-card:focus-visible { outline: 3px solid var(--ac); outline-offset: 3px; }
+
+/* soft highlight bloom, kept behind the content */
+.asym-card::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: -62px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, .95), rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+}
 
 /* Text block stays top-left and always sits above the artwork */
 .asym-text {
     position: relative;
     z-index: 2;
     display: block;
-    padding: 26px 26px 0;
-    max-width: 100%;
+    max-width: 58%;                  /* keeps copy clear of the bottom-right art */
 }
-.asym-badge {
-    display: inline-block;
-    margin-bottom: 12px;
-    padding: 5px 11px;
+.asym-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 14px;
+    padding: 5px 12px 5px 10px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, .92);
-    font-size: 11.5px;
+    background: rgba(255, 255, 255, .88);
+    border: 1px solid rgba(255, 255, 255, .95);
+    box-shadow: 0 2px 8px rgba(15, 40, 60, .07);
+    color: var(--ac);
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: .3px;
+    letter-spacing: .5px;
     text-transform: uppercase;
-    box-shadow: 0 2px 6px rgba(15, 40, 60, .08);
 }
-.asym-blue  .asym-badge { color: #1d4ed8; }
-.asym-peach .asym-badge { color: #c2410c; }
-.asym-cream .asym-badge { color: #b45309; }
+.asym-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ac); }
+.asym-title { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+.asym-title-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .92);
+    color: var(--ac);
+    box-shadow: 0 3px 10px rgba(15, 40, 60, .08);
+}
+.asym-text h3 {
+    font-size: 19.5px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -.2px;
+    color: #0f283c;
+}
+.asym-text p { font-size: 14px; line-height: 1.62; color: #4b5c69; }
 
-.asym-text h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.2px; }
-.asym-text p { font-size: 14.5px; line-height: 1.6; color: #42525f; }
+/* round arrow, top-right, moves on hover */
+.asym-arrow {
+    position: absolute;
+    z-index: 3;
+    top: 22px;
+    right: 22px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .78);
+    color: var(--ac);
+    box-shadow: 0 2px 8px rgba(15, 40, 60, .08);
+    transition: transform .28s, background .28s;
+}
+.asym-card:hover .asym-arrow { transform: translateX(3px); background: #fff; }
 
-/* Artwork: anchored to the bottom-right, faded on the side facing the text,
-   and clipped by the card's own overflow + border-radius */
+/* Artwork: anchored bottom-right, faded toward the text, and clipped by the
+   card's own overflow + border-radius. object-fit keeps it undistorted. */
 .asym-media {
     position: absolute;
     z-index: 1;
     right: 0;
     bottom: 0;
-    width: 42%;
+    width: 40%;
     height: 100%;
     pointer-events: none;
-    -webkit-mask-image: linear-gradient(to left, #000 52%, transparent 100%);
-    mask-image: linear-gradient(to left, #000 52%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, #000 58%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 58%, transparent 100%);
 }
 .asym-media img {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;               /* fills the box without stretching */
+    object-fit: cover;
     object-position: center;
+    transition: transform .5s cubic-bezier(.2, .7, .3, 1);
 }
-/* The online-consult PNG is portrait with the doctor at the top */
+.asym-card:hover .asym-media img { transform: scale(1.06); }
+/* the online-consult PNG is portrait with the doctor at the top */
 .asym-media img[src*="consult-online"] { object-position: top center; }
 
-/* Tall left card: artwork sits in the lower portion, faded from the top */
-.asym-card-tall .asym-text { padding: 30px 30px 0; }
-.asym-card-tall .asym-text h3 { font-size: 24px; }
-.asym-card-tall .asym-text p { font-size: 15px; max-width: 34ch; }
+/* Tall left card: artwork fills the lower portion, fading in from the top */
+.asym-card-tall { min-height: 380px; padding: 30px 32px; }
+.asym-card-tall .asym-text { max-width: 100%; }
+.asym-card-tall .asym-text h3 { font-size: 26px; }
+.asym-card-tall .asym-text p { font-size: 15px; max-width: 30ch; }
+.asym-card-tall .asym-arrow { top: 26px; right: 26px; }
 .asym-card-tall .asym-media {
     width: 100%;
-    height: 58%;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 42%, #000 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 42%, #000 100%);
+    height: 54%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 40%, #000 100%);
 }
 
+@media (max-width: 1024px) {
+    .asym-card-tall { min-height: 344px; }
+}
 @media (max-width: 900px) {
     .asym-grid { grid-template-columns: 1fr; }
     .asym-col { grid-template-rows: none; }
-    .asym-card-tall .asym-media { height: 46%; }
-    .asym-text h3 { font-size: 18px; }
-    .asym-card-tall .asym-text h3 { font-size: 20px; }
+    .asym-card { min-height: 160px; }
+    .asym-card-tall { min-height: 332px; }
 }
 @media (max-width: 420px) {
-    .asym-card { border-radius: 16px; }
-    .asym-text { padding: 20px 20px 0; }
-    .asym-card-tall .asym-text { padding: 22px 22px 0; }
+    .asym-card { border-radius: 18px; padding: 20px 20px 22px; min-height: 152px; }
+    .asym-card-tall { padding: 22px 22px 24px; min-height: 300px; }
+    .asym-text { max-width: 62%; }
     .asym-text h3 { font-size: 17px; }
-    .asym-card-tall .asym-text h3 { font-size: 19px; }
+    .asym-card-tall .asym-text h3 { font-size: 20px; }
     .asym-text p { font-size: 13.5px; }
-    .asym-card-tall .asym-text p { font-size: 13.5px; }
-    .asym-media { width: 46%; }
-    .asym-card-tall .asym-media { width: 100%; height: 40%; }
+    .asym-title { gap: 10px; margin-bottom: 8px; }
+    .asym-title-icon { flex-basis: 34px; width: 34px; height: 34px; }
+    .asym-eyebrow { margin-bottom: 12px; font-size: 10.5px; }
+    .asym-arrow { top: 18px; right: 18px; width: 30px; height: 30px; }
+    .asym-card-tall .asym-arrow { top: 20px; right: 20px; }
+    .asym-card-tall .asym-media { height: 40%; }
 }
 
 /* ---------- Specialty chips ---------- */
@@ -1852,9 +1941,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .hero p.hero-sub { font-size: 14px; max-width: 100%; }
 
-    /* On phones swap "Book an Appointment" + "How it works" for Call + WhatsApp */
-    .hero-quick-call { display: flex; width: 100%; }
+    /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
+    .hero-book-box { display: block; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
@@ -1876,6 +1965,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .search-section input::placeholder,
     .city-drop { font-size: 11.5px; }
     .dropdown-section { max-width: 104px; }
+    .hero-book-box { padding: 12px; border-radius: 16px; }
+    .hero-book-label { font-size: 11px; padding-bottom: 9px; }
+    .hero-book-actions { gap: 8px; }
+    .hero-book-btn { font-size: 13.5px; min-height: 48px; gap: 7px; }
 }
 
 @media (max-width: 640px) {

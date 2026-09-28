@@ -262,7 +262,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         document.querySelectorAll(".js-book-now").forEach(function (btn) {
-            btn.addEventListener("click", openModal);
+            btn.addEventListener("click", function () {
+                openModal();
+                // Mobile hero buttons preselect the visit type so the user does
+                // not have to tap through the "type" step again.
+                var preset = btn.getAttribute("data-book-visit");
+                if (preset) selectVisitType(preset);
+            });
         });
         bookingModal.querySelectorAll("[data-book-close]").forEach(function (el) {
             el.addEventListener("click", closeModal);

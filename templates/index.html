@@ -66,15 +66,21 @@
                             <span class="hero-cta-divider" aria-hidden="true"></span>
                             <a href="https://www.youtube.com/watch?v=dbA-U_x5yOo" target="_blank" rel="noopener" class="btn btn-how-light btn-lg"><span class="how-play-ring"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg></span>How it works</a>
                         </div>
-                        <div class="hero-quick-call">
-                            <a href="tel:{{ site_phone }}" class="hero-quick-btn hero-quick-call">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                                <span>Call Now</span>
-                            </a>
-                            <a href="https://wa.me/{{ site_whatsapp }}" target="_blank" rel="noopener" class="hero-quick-btn hero-quick-wa">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.86 1.21 3.06c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z"/></svg>
-                                <span>WhatsApp</span>
-                            </a>
+                        <div class="hero-book-box">
+                            <span class="hero-book-label">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+                                Book an Appointment
+                            </span>
+                            <span class="hero-book-actions">
+                                <button type="button" class="hero-book-btn hero-book-clinic js-book-now" data-book-visit="Clinic Visit">
+                                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+                                    Clinic Visit
+                                </button>
+                                <button type="button" class="hero-book-btn hero-book-online js-book-now" data-book-visit="Online Check-up">
+                                    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="14" height="11" rx="2.5"/><path d="M16 10.5l6-3.5v10l-6-3.5z"/></svg>
+                                    Online Checkup
+                                </button>
+                            </span>
                         </div>
                     </div>
                     </div>
@@ -268,10 +274,14 @@
         <div class="asym-grid">
             <!-- Left: one tall card spanning both rows of the right column -->
             <a href="{{ url_for('doctors', online='1') }}" class="asym-card asym-card-tall asym-blue">
+                <span class="asym-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                 <span class="asym-text">
-                    <span class="asym-badge">Fastest</span>
-                    <h3>Video Consultation</h3>
-                    <p>Talk to a verified specialist from home in minutes. No travel, no waiting room.</p>
+                    <span class="asym-eyebrow"><span class="asym-eyebrow-dot"></span>Fastest</span>
+                    <span class="asym-title">
+                        <span class="asym-title-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="14" height="11" rx="2.5"/><path d="M16 10.5l6-3.5v10l-6-3.5z"/></svg></span>
+                        <h3>Video Consultation</h3>
+                    </span>
+                    <p>Talk to a verified specialist from home in minutes. No travel, no waiting room, no extra cost.</p>
                 </span>
                 <span class="asym-media">
                     <img src="{{ url_for('static', filename='img/services/consult-online.png') }}" alt="Online video consultation with a doctor">
@@ -281,9 +291,13 @@
             <!-- Right: two stacked horizontal cards of equal height -->
             <div class="asym-col">
                 <a href="{{ url_for('doctors') }}" class="asym-card asym-peach">
+                    <span class="asym-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     <span class="asym-text">
-                        <span class="asym-badge">Most booked</span>
-                        <h3>Clinic Appointment</h3>
+                        <span class="asym-eyebrow"><span class="asym-eyebrow-dot"></span>Most booked</span>
+                        <span class="asym-title">
+                            <span class="asym-title-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg></span>
+                            <h3>Clinic Appointment</h3>
+                        </span>
                         <p>Reserve a slot at the doctor's clinic near you.</p>
                     </span>
                     <span class="asym-media">
@@ -291,9 +305,13 @@
                     </span>
                 </a>
                 <a href="{{ url_for('doctors', specialty='Cardiology') }}" class="asym-card asym-cream">
+                    <span class="asym-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     <span class="asym-text">
-                        <span class="asym-badge">24/7</span>
-                        <h3>Heart &amp; Emergency</h3>
+                        <span class="asym-eyebrow"><span class="asym-eyebrow-dot"></span>24/7</span>
+                        <span class="asym-title">
+                            <span class="asym-title-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4l1.4 1.4L12 22l7.4-7.6 1.4-1.4a5.2 5.2 0 0 0 0-7.4z"/></svg></span>
+                            <h3>Heart &amp; Emergency</h3>
+                        </span>
                         <p>Immediate help for chest pain and critical conditions.</p>
                     </span>
                     <span class="asym-media">
