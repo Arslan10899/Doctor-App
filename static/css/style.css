@@ -1939,7 +1939,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         margin-top: 10px;
         padding: 8px 13px;
     }
-    .hero p.hero-sub { font-size: 14px; max-width: 100%; }
+    /* "Search . Connect . Book - for Clinic visits & Online check-ups." is
+       desktop-only copy; on phones it pushed the search bar down for a line
+       nobody reads. The title now runs straight into the search bar, so pull
+       the 22px base margin back to keep the usual breathing room. */
+    .hero p.hero-sub { display: none; }
+    .hero-content .hero-search { margin-top: 4px; }
 
     /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
