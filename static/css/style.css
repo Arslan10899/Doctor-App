@@ -1962,7 +1962,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .hero-book-box {
         display: block;
-        margin-top: -9px;
+        /* was -9px, which squeezed the box up against the search bar to 4px of
+           breathing room. Dropping it back to 0 leaves the 13px the hero-cta
+           above already provides, so the box sits a touch lower. */
+        margin-top: 0;
         padding: 10px 12px;
         border-radius: 15px;
         /* transparent with a light border - the hero gradient shows through */
@@ -2025,7 +2028,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .search-section input::placeholder,
     .city-drop { font-size: 11.5px; }
     .dropdown-section { max-width: 104px; }
-    .hero-book-box { padding: 9px 10px; border-radius: 14px; margin-top: -8px; }
+    .hero-book-box { padding: 9px 10px; border-radius: 14px; }
     .hero-book-label { font-size: 10px; padding-bottom: 7px; }
     .hero-book-actions { gap: 5px; }
     .hero-book-btn { font-size: 12.5px; min-height: 40px; gap: 6px; padding: 8px 8px; }
