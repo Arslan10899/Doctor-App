@@ -1949,17 +1949,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
 
-    /* Centre the booking box on the hero-cta rule and pull it up against that
-       line so the CTA band stops costing 44px of dead space.
+    /* Centre the booking box on the hero-cta rule and pull it up close under
+       the search bar so the CTA band stops costing dead space.
        Uses .hero-content prefix to outrank the base
        `.hero-content .hero-cta { margin-top: 22px }`. */
     .hero-content .hero-cta {
         align-items: center;
-        margin-top: 13px;
-        padding-top: 13px;
+        margin-top: 4px;
+        padding-top: 0;
         gap: 8px;
         border-top: 0;                /* drop the rule between search bar and the box */
     }
+
+    /* The search bar and the box live in different wrappers (.hero-head-text
+       and .hero-content), so the 18px column gap from .hero-head was also
+       landing between them. Drop it to 4px, matching the box's own margin. */
+    .hero-head { gap: 4px; }
     /* The booking box is the last thing in the hero, but the <=1024px rule
        still adds 52px of bottom padding, so 52px of empty green hung below it
        before the slider started. Drop it to 0 and the box finishes exactly
@@ -1968,9 +1973,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
     .hero-book-box {
         display: block;
-        /* was -9px, which squeezed the box up against the search bar to 4px of
-           breathing room. Dropping it back to 0 leaves the 13px the hero-cta
-           above already provides, so the box sits a touch lower. */
+        /* was -9px, which squeezed the box up against the search bar. It is 0
+           now: the hero-cta margin above plus the 4px .hero-head gap give the
+           8px of breathing room under the search bar. */
         margin-top: 0;
         padding: 10px 12px;
         border-radius: 15px;
