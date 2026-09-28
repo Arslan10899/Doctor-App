@@ -1943,7 +1943,26 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
     /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
-    .hero-book-box { display: block; }
+
+    /* Centre the booking box on the hero-cta rule and pull it up against that
+       line so the CTA band stops costing 44px of dead space.
+       Uses .hero-content prefix to outrank the base
+       `.hero-content .hero-cta { margin-top: 22px }`. */
+    .hero-content .hero-cta {
+        align-items: center;
+        margin-top: 13px;
+        padding-top: 13px;
+        gap: 8px;
+    }
+    .hero-book-box {
+        display: block;
+        margin-top: -9px;
+        padding: 10px 12px;
+        border-radius: 15px;
+    }
+    .hero-book-label { padding: 0 2px 8px; font-size: 10.5px; letter-spacing: .6px; }
+    .hero-book-actions { gap: 6px; }
+    .hero-book-btn { min-height: 42px; padding: 9px 12px; font-size: 13.5px; border-radius: 12px; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
@@ -1965,10 +1984,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .search-section input::placeholder,
     .city-drop { font-size: 11.5px; }
     .dropdown-section { max-width: 104px; }
-    .hero-book-box { padding: 12px; border-radius: 16px; }
-    .hero-book-label { font-size: 11px; padding-bottom: 9px; }
-    .hero-book-actions { gap: 8px; }
-    .hero-book-btn { font-size: 13.5px; min-height: 48px; gap: 7px; }
+    .hero-book-box { padding: 9px 10px; border-radius: 14px; margin-top: -8px; }
+    .hero-book-label { font-size: 10px; padding-bottom: 7px; }
+    .hero-book-actions { gap: 5px; }
+    .hero-book-btn { font-size: 12.5px; min-height: 40px; gap: 6px; padding: 8px 8px; }
 }
 
 @media (max-width: 640px) {
