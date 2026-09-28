@@ -187,6 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const visitIconBox = document.getElementById("bkVisitIcon");
         const changeBtn = document.getElementById("bkChangeVisit");
         const typeBackBtn = document.getElementById("bkTypeBack");
+        const formBackBtn = document.getElementById("bkFormBack");
         const stepDots = document.getElementById("bkStepDots");
         const modalSub = document.getElementById("bkModalSub");
         const SUB_FORM = "Fill in your details and our team will confirm your booking.";
@@ -308,6 +309,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
+        if (formBackBtn) {
+            formBackBtn.addEventListener("click", function () {
+                setStep("type");
+            });
+        }
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape" && !bookingModal.hidden) closeModal();
         });
@@ -416,6 +422,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return true;
         }
 
+        function autoPickSlot() {
+            // Preferred Time is hidden on phones, so pre-select the first
+            // available slot - otherwise submit fails with no way to pick one.
+            if (!MOBILE_MQ.matches || !slotGrid) return;
+            var first = slotGrid.querySelector(".book-slot");
+            if (first) first.click();
+        }
+
         function loadSlots() {
             if (!slotGrid) return;
             var dateVal = dateInput ? dateInput.value : "";
@@ -454,6 +468,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                         slotGrid.appendChild(b);
                     });
+                    autoPickSlot();
                 })
                 .catch(function () {
                     slotGrid.innerHTML = "";
@@ -471,6 +486,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                         slotGrid.appendChild(b);
                     });
+                    autoPickSlot();
                 });
         }
         if (dateInput) {

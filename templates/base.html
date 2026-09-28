@@ -243,6 +243,10 @@
 
             <form id="bookingRequestForm" class="book-form" novalidate hidden>
                 <input type="hidden" name="visit_type" id="bkVisitTypeInput" value="Clinic Visit">
+                <button type="button" class="book-form-back" id="bkFormBack" aria-label="Go back to visit type">
+                    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+                    <span>Back</span>
+                </button>
                 <div class="book-visitsummary" id="bkVisitSummary" hidden>
                     <span class="book-visitsummary-ic" id="bkVisitIcon"></span>
                     <span class="book-visitsummary-txt">
@@ -293,7 +297,7 @@
                     </div>
                 </div>
 
-                <div class="book-field book-field-when">
+                <div class="book-field book-field-when book-field-time">
                     <label>Preferred Time <span>*</span></label>
                     <div class="book-slots" id="bkSlotGrid">
                         <p class="book-slots-hint">Pick a date first</p>
