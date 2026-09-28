@@ -2320,6 +2320,40 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .bs-online { background: #e3f6ef; color: #12876f; }
 .bs-offline { background: #eef2f4; color: #5b7480; }
 .book-suggest-item:hover, .book-suggest-item.active { background: var(--bg-light, #f0f5f7); }
+.book-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 7px;
+}
+.book-slots-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 11px 2px;
+    font-size: 12.5px;
+    color: var(--text-light);
+}
+.book-slot {
+    padding: 9px 4px;
+    border: 1.5px solid #dbe7ec;
+    border-radius: 9px;
+    background: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color .15s, background .15s, color .15s;
+}
+.book-slot:hover { border-color: var(--primary); color: var(--primary); }
+.book-slot.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+}
+@media (max-width: 480px) {
+    .book-slots { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+    .book-slot { padding: 8px 2px; font-size: 12px; }
+}
 .book-error {
     background: #fff0f0;
     color: #c0392b;

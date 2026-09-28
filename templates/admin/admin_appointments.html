@@ -1,0 +1,65 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Appointments{% endblock %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<div class="actions-top">
+    <a class="btn {% if not active_status %}btn-primary{% else %}btn-outline{% endif %}" href="{{ url_for('admin_appointments') }}">All ({{ total }})</a>
+    {% for st in statuses %}
+    <a class="btn {% if active_status == st %}btn-primary{% else %}btn-outline{% endif %}" href="{{ url_for('admin_appointments', status=st) }}">{{ st|replace('_', ' ')|capitalize }} ({{ counts.get(st, 0) }})</a>
+    {% endfor %}
+</div>
+<div class="card">
+    <h2>Appointments ({{ requests|length }})</h2>
+    {% if requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th><th>Received</th><th>Patient</th><th>Phone</th><th>Doctor</th><th>Date</th><th>Slot</th><th>Type</th><th>Status</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r['id'] }}</td>
+                <td style="font-size:12px;color:#6b7280;white-space:nowrap;">{{ r['created_at'] }}</td>
+                <td><strong>{{ r['patient_name'] }}</strong></td>
+                <td>
+                    <a href="{{ r['wa_link'] }}" target="_blank" rel="noopener noreferrer" style="color:#059669;font-weight:600;">{{ r['patient_phone'] }}</a>
+                </td>
+                <td>
+                    {% if r['doctor_id'] %}
+                        <a href="{{ url_for('doctor_profile', doctor_id=r['doctor_id']) }}">{{ r['doctor_name'] or 'Doctor #' ~ r['doctor_id'] }}</a>
+                    {% else %}
+                        <span style="color:#9ca3af;">Any doctor</span>
+                    {% endif %}
+                </td>
+                <td style="font-size:12px;">{{ r['appointment_date'] or '-' }}</td>
+                <td style="font-size:12px;">{{ r['slot'] or '-' }}</td>
+                <td><span class="tag {{ 'tag-on' if r['type'] == 'Online Check-up' else 'tag-off' }}">{{ r['type'] }}</span></td>
+                <td>
+                    <span class="tag {{ 'tag-on' if r['status'] == 'confirmed' else ('tag-off' if r['status'] in ('cancelled','expired') else ('tag-gray' if r['status'] == 'completed' else '')) }}">{{ r['status']|replace('_', ' ')|capitalize }}</span>
+                    {% if r['needs_human_review'] %}
+                    <span class="tag tag-off" title="AI could not parse the doctor reply">Needs review</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form class="inline" method="post" action="{{ url_for('admin_appointment_status', appt_id=r['id']) }}">
+                        <input type="hidden" name="filter" value="{{ active_status }}">
+                        {% if r['status'] not in ('cancelled', 'expired', 'completed') %}
+                            <button class="btn btn-primary btn-sm" type="submit" name="status" value="confirmed" {% if r['status'] == 'confirmed' %}disabled{% endif %}>Confirm</button>
+                            <button class="btn btn-outline btn-sm" type="submit" name="status" value="cancelled" {% if r['status'] == 'cancelled' %}disabled{% endif %}>Cancel</button>
+                            <button class="btn btn-outline btn-sm" type="submit" name="status" value="completed" {% if r['status'] == 'completed' %}disabled{% endif %}>Completed</button>
+                        {% else %}
+                            <button class="btn btn-outline btn-sm" type="submit" name="status" value="reopen">Reopen</button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">No appointments yet. Book one from the website to get started.</div>
+    {% endif %}
+</div>
+{% endblock %}

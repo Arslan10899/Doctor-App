@@ -974,20 +974,96 @@ def api_doctors_list():
 
 @app.route("/booking-request", methods=["POST"])
 def booking_request():
+    """Create an appointment from the public booking modal.
+
+    `appointments` is the single source of truth. New rows start as `pending`;
+    the WhatsApp doctor alert flips them to `doctor_notified`.
+    Requests without a date/slot are still accepted for backwards
+    compatibility and land in the legacy `booking_requests` table.
+    """
     doctor_id = request.form.get("doctor_id", "").strip()
     doctor_name = request.form.get("doctor_name", "").strip()
     patient_name = request.form.get("patient_name", "").strip()
     whatsapp = request.form.get("whatsapp", "").strip()
-    mobile = request.form.get("mobile", "").strip()
     visit_type = request.form.get("visit_type", "").strip()
+    appt_date = request.form.get("appointment_date", "").strip()
+    slot = request.form.get("slot", "").strip()
     notes = request.form.get("notes", "").strip()
+
     if not patient_name or not whatsapp:
         return jsonify({"ok": False, "error": "Please enter the patient name and WhatsApp number."}), 400
+
+    patient_e164 = normalize_pk_e164(whatsapp)
+    if not patient_e164:
+        return jsonify({"ok": False, "error": "Please enter a valid WhatsApp number (e.g. 0300 1234567)."}), 400
+
+    # --- New flow: date + slot selected -> `appointments` (source of truth) ---
+    if appt_date or slot:
+        if not (appt_date and slot):
+            return jsonify({"ok": False, "error": "Please choose both a date and a time slot."}), 400
+        try:
+            chosen = datetime.strptime(appt_date, "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({"ok": False, "error": "Please choose a valid date."}), 400
+        if chosen < datetime.now().date():
+            return jsonify({"ok": False, "error": "Please pick today or a later date."}), 400
+
+        doc = None
+        if doctor_id.isdigit():
+            doc = query("SELECT * FROM doctors WHERE id=?", (int(doctor_id),), one=True)
+        if not doc:
+            return jsonify({"ok": False, "error": "Please select a doctor from the list."}), 400
+
+        taken = query(
+            "SELECT id FROM appointments "
+            "WHERE doctor_id=? AND appointment_date=? AND slot=? "
+            "AND status IN ('pending','doctor_notified','confirmed','reschedule_requested')",
+            (doc["id"], appt_date, slot),
+            one=True,
+        )
+        if taken:
+            return jsonify({"ok": False, "error": "Sorry, that slot was just booked. Please choose another time."}), 409
+
+        doctor_phone = normalize_pk_e164(doc["whatsapp_number"] or doc["phone"] or "")
+        expires_at = datetime.now() + timedelta(hours=APPOINTMENT_EXPIRY_HOURS)
+        execute(
+            "INSERT INTO appointments (doctor_id, doctor_phone, appointment_date, slot, type, status, "
+            "patient_name, patient_phone, notes, expires_at, updated_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)",
+            (
+                doc["id"],
+                doctor_phone,
+                appt_date,
+                slot,
+                "Online Check-up" if visit_type == "Online Check-up" else "Clinic Visit",
+                APPT_PENDING,
+                patient_name,
+                patient_e164,
+                notes,
+                expires_at.strftime("%Y-%m-%d %H:%M:%S"),
+            ),
+        )
+        appt_id = query("SELECT last_insert_rowid() AS id", one=True)["id"]
+        if not doctor_phone:
+            execute(
+                "UPDATE appointments SET needs_human_review=1 WHERE id=? AND needs_human_review IS NULL",
+                (appt_id,),
+            )
+        else:
+            try:
+                from whatsapp_flow import notify_doctor_of_appointment
+
+                notify_doctor_of_appointment(appt_id)
+            except Exception as exc:  # never block the booking on a notification failure
+                app.logger.warning("doctor notify failed for appt %s: %s", appt_id, exc)
+        return jsonify({"ok": True, "id": appt_id})
+
+    # --- Legacy flow: no date/slot -> old `booking_requests` table ---
     execute(
         "INSERT INTO booking_requests "
-        "(doctor_id, doctor_name, patient_name, whatsapp, mobile, visit_type, notes) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (doctor_id or None, doctor_name, patient_name, whatsapp, mobile, visit_type, notes),
+        "(doctor_id, doctor_name, patient_name, whatsapp, visit_type, notes) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (doctor_id or None, doctor_name, patient_name, whatsapp, visit_type, notes),
     )
     return jsonify({"ok": True})
 
@@ -1400,6 +1476,54 @@ def admin_booking_request_status(req_id):
     execute("UPDATE booking_requests SET status=? WHERE id=?", (status, req_id))
     flash("Request #%s marked as %s." % (req_id, status), "success")
     return redirect(url_for("admin_booking_requests", status=request.form.get("filter", "").strip()))
+
+
+@app.route("/admin/appointments")
+@admin_required
+def admin_appointments():
+    f = request.args.get("status", "").strip()
+    if f in APPT_STATUSES:
+        rows = query(
+            "SELECT a.*, d.name AS doctor_name, d.urdu_name AS doctor_urdu_name "
+            "FROM appointments a LEFT JOIN doctors d ON d.id = a.doctor_id "
+            "WHERE a.status = ? ORDER BY a.appointment_date DESC, a.id DESC",
+            (f,),
+        )
+    else:
+        rows = query(
+            "SELECT a.*, d.name AS doctor_name, d.urdu_name AS doctor_urdu_name "
+            "FROM appointments a LEFT JOIN doctors d ON d.id = a.doctor_id "
+            "ORDER BY a.appointment_date DESC, a.id DESC"
+        )
+    rows = [dict(r) for r in rows]
+    for r in rows:
+        r["wa_link"] = "https://wa.me/" + (r["patient_phone"] or "").lstrip("+")
+    counts = {r["status"]: r["n"] for r in query("SELECT status, COUNT(*) AS n FROM appointments GROUP BY status")}
+    total = query("SELECT COUNT(*) AS n FROM appointments")[0]["n"]
+    return render_template(
+        "admin/admin_appointments.html",
+        requests=rows,
+        counts=counts,
+        statuses=APPT_STATUSES,
+        active_status=f,
+        total=total,
+    )
+
+
+@app.route("/admin/appointments/<int:appt_id>/status", methods=["POST"])
+@admin_required
+def admin_appointment_status(appt_id):
+    status = request.form.get("status", "").strip()
+    if status == "reopen":
+        status = APPT_PENDING
+    if status not in APPT_STATUSES:
+        status = APPT_PENDING
+    execute(
+        "UPDATE appointments SET status=?, needs_human_review=0, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+        (status, appt_id),
+    )
+    flash("Appointment #%s marked as %s." % (appt_id, status), "success")
+    return redirect(url_for("admin_appointments", status=request.form.get("filter", "").strip()))
 
 
 @app.route("/admin")
@@ -2176,6 +2300,15 @@ def admin_lookups():
 
 
 init_db()
+
+# Meta WhatsApp Cloud API webhook (registers GET handshake + POST receiver).
+try:
+    import whatsapp_webhook
+
+    whatsapp_webhook.register_routes(app)
+except Exception as _exc:  # pragma: no cover - keep the site bootable
+    app.logger.warning("whatsapp webhook routes not registered: %s", _exc)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

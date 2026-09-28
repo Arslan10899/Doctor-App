@@ -270,6 +270,22 @@
                     </div>
                 </div>
 
+                <div class="book-field book-field-when">
+                    <label for="bkDate">Preferred Date <span>*</span></label>
+                    <div class="book-input-wrap">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+                        <input type="date" id="bkDate" min="{{ min_date or '' }}">
+                    </div>
+                </div>
+
+                <div class="book-field book-field-when">
+                    <label>Preferred Time <span>*</span></label>
+                    <div class="book-slots" id="bkSlotGrid">
+                        <p class="book-slots-hint">Pick a date first</p>
+                    </div>
+                    <input type="hidden" id="bkSlot">
+                </div>
+
                 <div class="book-error" id="bkError" hidden></div>
 
                 <button type="submit" class="btn btn-primary btn-block btn-lg book-submit">

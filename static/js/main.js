@@ -342,6 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorInput.value = d.doctor_name;
             doctorIdInput.value = d.id;
             suggestBox.classList.remove("open");
+            loadSlots();
         }
         doctorInput.addEventListener("focus", function () {
             if (doctorCache.length && !doctorInput.value.trim()) {
@@ -352,24 +353,109 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(function () { suggestBox.classList.remove("open"); }, 150);
         });
 
+        // --- date + time slots -------------------------------------------
+        const dateInput = document.getElementById("bkDate");
+        const slotGrid = document.getElementById("bkSlotGrid");
+        const slotInput = document.getElementById("bkSlot");
+        const GENERIC_SLOTS = [
+            "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+            "12:00 PM", "12:30 PM", "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM",
+            "07:00 PM", "07:30 PM"
+        ];
+
+        function setSlotHint(text) {
+            if (!slotGrid) return;
+            slotGrid.innerHTML = "";
+            var p = document.createElement("p");
+            p.className = "book-slots-hint";
+            p.textContent = text;
+            slotGrid.appendChild(p);
+        }
+
+        function loadSlots() {
+            if (!slotGrid) return;
+            var dateVal = dateInput ? dateInput.value : "";
+            var doctorId = doctorIdInput.value || "";
+            slotInput.value = "";
+            if (!dateVal) return setSlotHint("Pick a date first");
+            if (dateInput.min && dateVal < dateInput.min) return setSlotHint("Please pick today or a later date");
+
+            slotGrid.innerHTML = '<p class="book-slots-hint">Loading slots...</p>';
+            var url = "/slots";
+            var parts = [];
+            if (doctorId) parts.push("doctor_id=" + encodeURIComponent(doctorId));
+            parts.push("date=" + encodeURIComponent(dateVal));
+            fetch(url + "?" + parts.join("&"))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var list = (data && data.slots && data.slots.length) ? data.slots : GENERIC_SLOTS;
+                    slotGrid.innerHTML = "";
+                    if (!list.length) {
+                        return setSlotHint("No slots available on this date. Please try another day.");
+                    }
+                    list.forEach(function (t) {
+                        var b = document.createElement("button");
+                        b.type = "button";
+                        b.className = "book-slot";
+                        b.textContent = t;
+                        b.addEventListener("click", function () {
+                            slotInput.value = t;
+                            slotGrid.querySelectorAll(".book-slot").forEach(function (x) {
+                                x.classList.remove("selected");
+                            });
+                            b.classList.add("selected");
+                        });
+                        slotGrid.appendChild(b);
+                    });
+                })
+                .catch(function () {
+                    slotGrid.innerHTML = "";
+                    GENERIC_SLOTS.forEach(function (t) {
+                        var b = document.createElement("button");
+                        b.type = "button";
+                        b.className = "book-slot";
+                        b.textContent = t;
+                        b.addEventListener("click", function () {
+                            slotInput.value = t;
+                            slotGrid.querySelectorAll(".book-slot").forEach(function (x) {
+                                x.classList.remove("selected");
+                            });
+                            b.classList.add("selected");
+                        });
+                        slotGrid.appendChild(b);
+                    });
+                });
+        }
+        if (dateInput) {
+            dateInput.addEventListener("change", loadSlots);
+        }
+
         form.addEventListener("submit", function (e) {
             e.preventDefault();
             const doctor = doctorInput.value.trim();
             const name = document.getElementById("bkName").value.trim();
             const whatsapp = document.getElementById("bkWhatsapp").value.trim();
             const visitType = visitInput.value;
+            const dateVal = dateInput ? dateInput.value : "";
+            const slotVal = slotInput ? slotInput.value : "";
 
             errorBox.hidden = true;
-            if (!name) return showError("Please enter your name.");
+            if (!name) return showError("Please enter the patient name.");
             if (!whatsapp) return showError("Please enter your WhatsApp number.");
+            if (!/^\+?92?\d{10,13}$/.test(whatsapp.replace(/[\s-]/g, ""))) {
+                return showError("Please enter a valid WhatsApp number (e.g. 0300 1234567).");
+            }
+            if (!dateVal) return showError("Please choose your preferred date.");
+            if (!slotVal) return showError("Please choose a time slot.");
 
             const payload = new URLSearchParams();
             payload.append("doctor_id", doctorIdInput.value || "");
             payload.append("doctor_name", doctor);
             payload.append("patient_name", name);
             payload.append("whatsapp", whatsapp);
-            payload.append("mobile", "");
             payload.append("visit_type", visitType);
+            payload.append("appointment_date", dateVal);
+            payload.append("slot", slotVal);
             payload.append("notes", document.getElementById("bkNotes").value.trim());
 
             submitBtn.disabled = true;
@@ -379,18 +465,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: payload,
                 headers: { "Content-Type": "application/x-www-form-urlencoded" }
             })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
+                .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+                .then(function (res) {
                     submitBtn.disabled = false;
                     submitBtn.classList.remove("loading");
-                    if (data.ok) {
+                    if (res.ok && res.data.ok) {
                         form.hidden = true;
                         successBox.hidden = false;
                         form.reset();
                         doctorIdInput.value = "";
+                        if (slotGrid) setSlotHint("Pick a date first");
                         visitInput.value = chosenVisit || "Clinic Visit";
                     } else {
-                        showError(data.error || "Something went wrong. Please try again.");
+                        showError((res.data && res.data.error) || "Something went wrong. Please try again.");
                     }
                 })
                 .catch(function () {
