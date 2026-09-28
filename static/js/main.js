@@ -214,8 +214,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 stepHistory.push(currentStep);
             }
             currentStep = step;
-            // lets CSS target the active step (e.g. drop the modal heading on
-            // the form step on phones)
+            // lets CSS target the active step (phones hide the modal heading
+            // and the close button on the form step)
             bookingModal.dataset.step = step;
             if (step === "type") {
                 stepType.hidden = false;

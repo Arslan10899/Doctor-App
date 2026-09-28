@@ -1986,10 +1986,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-book-online:hover { background: #e9f5f6; }
 
     /* ---- Mobile booking modal trimming ----
-       On the form step the "Book an Appointment" / "Fill in your details"
-       header is dropped (the visit-type chip acts as the header instead) and
+       The "Book an Appointment" title and the "Choose how you would like to
+       meet the doctor" / "Fill in your details" subtitle are dropped on every
+       step, so after Change the type step is just the back control and the two
+       cards. The back pill at the top of each step is the way out instead.
        Preferred Date is hidden, so main.js defaults the date to today. */
-    .book-modal[data-step="form"] .book-modal-head { display: none; }
+    .book-modal .book-modal-head { display: none; }
     .book-field-date { display: none; }
     /* Preferred Time goes too - the back control below replaces the X, and
        main.js pre-selects the first available slot so the booking still
