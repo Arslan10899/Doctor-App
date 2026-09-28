@@ -106,7 +106,7 @@ input, select, textarea { font-family: inherit; }
     border: none;
     box-shadow: none;
 }
-.site-header .logo { gap: 11px; }
+.site-header .logo { gap: 11px; flex-shrink: 0; }
 .site-header .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .site-header .logo-tagline {
     font-size: 10px;
@@ -119,7 +119,7 @@ input, select, textarea { font-family: inherit; }
 .logo-text { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
 .logo-accent { color: var(--primary); }
 
-.main-nav { display: flex; gap: 4px; margin-left: 8px; flex: 1; }
+.main-nav { display: flex; gap: 4px; margin-left: 8px; flex: 1; flex-wrap: nowrap; }
 .nav-link {
     padding: 9px 14px;
     border-radius: 8px;
@@ -127,6 +127,8 @@ input, select, textarea { font-family: inherit; }
     font-weight: 550;
     color: var(--text);
     transition: all .15s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 .nav-link:hover { background: var(--primary-light); color: var(--primary); }
 .nav-link.active {
@@ -136,7 +138,7 @@ input, select, textarea { font-family: inherit; }
     box-shadow: inset 0 -2px 0 var(--primary);
 }
 
-.header-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+.header-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; flex-shrink: 0; }
 
 /* Admin shortcut - always visible so the owner never has to scroll to the footer */
 .admin-entry {
@@ -1661,9 +1663,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-head { gap: 18px; }
 }
 
-@media (max-width: 1180px) {
-    /* The full nav + logo + action buttons no longer fit on a single row,
-       so collapse the nav into the toggle well before it starts to wrap. */
+@media (max-width: 1200px) {
+    /* Container caps at 1200px (1160px of content). Above that the inline nav
+       is guaranteed to fit; below it we collapse before anything can wrap. */
     .nav-toggle { display: flex; }
     .main-nav {
         position: fixed;
