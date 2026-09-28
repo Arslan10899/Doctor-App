@@ -1960,6 +1960,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         gap: 8px;
         border-top: 0;                /* drop the rule between search bar and the box */
     }
+    /* The booking box is the last thing in the hero, but the <=1024px rule
+       still adds 52px of bottom padding, so 52px of empty green hung below it
+       before the slider started. Drop it to 0 and the box finishes exactly
+       where the green does. */
+    .hero { padding-bottom: 0; }
+
     .hero-book-box {
         display: block;
         /* was -9px, which squeezed the box up against the search bar to 4px of
