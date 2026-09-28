@@ -940,15 +940,39 @@ def index():
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
     # Mobile-only strip between the search bar and the booking box. Ordered
     # ascending by sort_order so admin "Number" 1 really is the first card.
+    # Active rows, but keep a card if EITHER media column is filled. Older
+    # rows (and rows written before media_type was auto-detected) can have
+    # media_type='image' with only video_url set, which the previous
+    # media_type-strict filter silently dropped, making a card look like it
+    # was never added. A card with no media at all is still skipped.
     mobile_cards = [dict(r) for r in query(
         "SELECT * FROM mobile_cards WHERE active=1 "
-        "AND (media_type='image' AND image_url IS NOT NULL AND image_url<>'' "
-        "  OR media_type='video' AND video_url IS NOT NULL AND video_url<>'') "
+        "AND (TRIM(COALESCE(image_url,'')) <> '' OR TRIM(COALESCE(video_url,'')) <> '') "
         "ORDER BY sort_order ASC, id ASC"
     )]
-    # Re-validate on read too, so a bad value that reached the table by any
-    # other route (direct SQL, a future importer) still cannot become an href.
     for _c in mobile_cards:
+        # Decide the type from the data that actually exists, so the template
+        # can never render an <img> with an empty or whitespace src. When both
+        # columns are filled, media_type is the admin's stated intent, so it
+        # wins rather than being overridden here.
+        has_img = bool((_c.get("image_url") or "").strip())
+        has_vid = bool((_c.get("video_url") or "").strip())
+        if has_img and has_vid:
+            _c["media_type"] = "video" if _c.get("media_type") == "video" else "image"
+        elif has_vid:
+            _c["media_type"] = "video"
+        else:
+            _c["media_type"] = "image"
+        # Drop the column that is not being used so the template picks the
+        # right branch, and blank out whitespace-only values.
+        if _c["media_type"] == "image":
+            _c["video_url"] = None
+            _c["image_url"] = _c["image_url"].strip()
+        else:
+            _c["image_url"] = None
+            _c["video_url"] = _c["video_url"].strip()
+        # Re-validate on read too, so a bad value that reached the table by any
+        # other route (direct SQL, a future importer) still cannot become an href.
         _c["link_url"] = safe_link(_c.get("link_url"))
     hero_banners = [dict(r) for r in query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")]
     banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
@@ -2360,6 +2384,26 @@ def admin_mobile_cards_action():
         if cid:
             execute("DELETE FROM mobile_cards WHERE id=?", (cid,))
             flash("Mobile card deleted.", "info")
+    elif section == "repair":
+        # A card saved before the upload bug could have been fixed kept an
+        # empty media column and was then skipped on the homepage. This fills
+        # the column in place instead of making the admin delete and re-add.
+        cid = request.form.get("mobile_card_id", request.form.get("id", type=int))
+        if not cid:
+            flash("Card select karein.", "warning")
+            return redirect(url_for("admin_mobile_cards"))
+        row = query("SELECT * FROM mobile_cards WHERE id=?", (cid,), one=True)
+        if not row:
+            flash("Card nahi mila.", "warning")
+            return redirect(url_for("admin_mobile_cards"))
+        mt = "video" if request.form.get("media_type") == "video" else "image"
+        url = request.form.get(("video_url" if mt == "video" else "image_url"), "").strip()
+        if not url:
+            flash("Repair ke liye image ya video URL/Upload zaroori hai.", "warning")
+            return redirect(url_for("admin_mobile_cards"))
+        execute("UPDATE mobile_cards SET media_type=?, image_url=?, video_url=? WHERE id=?",
+                (mt, url if mt == "image" else None, url if mt == "video" else None, cid))
+        flash("Card repair ho gaya - ab homepage par dikhega.", "success")
     elif section == "duplicate":
         cid = request.form.get("id", request.form.get("mobile_card_id", type=int))
         row = query("SELECT * FROM mobile_cards WHERE id=?", (cid,)) if cid else []

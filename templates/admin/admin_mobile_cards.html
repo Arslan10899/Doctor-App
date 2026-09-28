@@ -133,6 +133,14 @@
 
 <!-- ============ EXISTING CARDS ============ -->
 {% if mobile_cards %}
+{% set broken = mobile_cards | rejectattr('image_url') | rejectattr('video_url') | list %}
+{% if broken %}
+<div style="border:1px solid #fca5a5;background:#fef2f2;color:#991b1b;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13.5px;">
+    <strong>{{ broken | length }} card(s) ka media missing hai</strong> — inki image/video URL khaali hai, isliye ye
+    homepage par <em>bilkul nahi dikhengi</em> (chahe active hon). Neeche <strong>Edit</strong> khol kar image ya video
+    dobara upload kar dein.
+</div>
+{% endif %}
 <div class="mc-grid">
     {% for c in mobile_cards %}
     <div class="mc-card{% if not c['active'] %} is-off{% endif %}" data-mc-item="{{ c['id'] }}">
@@ -142,10 +150,16 @@
             {% elif c['image_url'] %}
                 <img src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Card' }}" loading="lazy">
             {% else %}
-                <div class="mc-empty" style="padding:20px;">No media</div>
+                <div class="mc-empty" style="padding:20px;">
+                    <strong style="color:#b91c1c;">Media missing</strong><br>
+                    Homepage par nahi dikhegi
+                </div>
             {% endif %}
             <span class="mc-badge">{{ c['media_type'] }}</span>
             <span class="mc-state {{ 'on' if c['active'] else 'off' }}">{{ 'Active' if c['active'] else 'Inactive' }}</span>
+            {% if not c['image_url'] and not c['video_url'] %}
+            <span class="mc-state" style="background:#b91c1c;">Media missing</span>
+            {% endif %}
         </div>
         <div class="mc-body">
             <strong style="font-size:14.5px;">{{ c['name'] or 'Untitled card' }} <span class="mc-muted">#{{ c['sort_order'] }}</span></strong>
@@ -173,6 +187,28 @@
                     <button class="btn btn-sm" type="submit">Duplicate</button>
                 </form>
             </div>
+
+            {% if not c['image_url'] and not c['video_url'] %}
+            <form method="post" action="{{ url_for('admin_mobile_cards_action') }}"
+                  style="border:1px solid #fca5a5;background:#fff1f2;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px;">
+                <input type="hidden" name="section" value="repair">
+                <input type="hidden" name="mobile_card_id" value="{{ c['id'] }}">
+                <strong style="font-size:13px;color:#b91c1c;">Ye card homepage par nahi dikh rahi - media missing hai</strong>
+                <div style="display:flex;gap:7px;align-items:center;">
+                    <select name="media_type" data-mc-repair-type data-id="{{ c['id'] }}" style="flex:0 0 auto;">
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                    </select>
+                    <input type="text" name="image_url" data-mc-field="image" data-id="{{ c['id'] }}" placeholder="image ya video URL" style="flex:1;">
+                    <input type="text" name="video_url" data-mc-field="video" data-id="{{ c['id'] }}" placeholder="video URL" style="flex:1;display:none;">
+                    <button class="btn btn-sm" type="button" data-mc-browse="image" data-id="{{ c['id'] }}">Upload</button>
+                </div>
+                <input type="file" data-mc-file="image" data-id="{{ c['id'] }}" data-mc-scope="edit" accept="image/*" style="display:none;">
+                <input type="file" data-mc-file="video" data-id="{{ c['id'] }}" data-mc-scope="edit" accept="video/*" style="display:none;">
+                <p class="mc-preview" data-mc-preview="image" style="margin:0;"></p>
+                <button class="btn btn-sm" type="submit" style="align-self:flex-start;">Repair card</button>
+            </form>
+            {% endif %}
 
             <details>
                 <summary style="cursor:pointer;font-size:13.5px;font-weight:700;">Edit</summary>
@@ -345,7 +381,20 @@
                 queue = [];
                 var vis = visibleInput();
                 if (vis) vis.value = '';
-                renderQueue();
+        renderQueue();
+
+        // repair form: image/video switch for a card with no media
+        Array.prototype.forEach.call(document.querySelectorAll('[data-mc-repair-type]'), function (sel) {
+            sel.addEventListener('change', function () {
+                var id = sel.dataset.id;
+                var scope = sel.closest('form') || document;
+                var isVideo = sel.value === 'video';
+                var fldI = scope.querySelector('[data-mc-field="image"][data-id="' + id + '"]');
+                var fldV = scope.querySelector('[data-mc-field="video"][data-id="' + id + '"]');
+                if (fldI) { fldI.style.display = isVideo ? 'none' : ''; fldI.value = ''; }
+                if (fldV) { fldV.style.display = isVideo ? '' : 'none'; fldV.value = ''; }
+            });
+        });
             });
         }
 
@@ -354,8 +403,12 @@
             if (!btn) return;
             var kind = btn.dataset.mcBrowse;
             var id = btn.dataset.id || '';
+            // Look inside the button's own form. The edit and repair forms both
+            // contain an image + video input for the same card, so a document
+            // wide query could hit the wrong one.
+            var scope = btn.closest('form') || document;
             var sel = '[data-mc-file="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : '');
-            var file = document.querySelector(sel);
+            var file = scope.querySelector(sel);
             if (file) file.click();
         });
 
@@ -364,7 +417,8 @@
             if (!f) return;
             var kind = f.dataset.mcFile;
             var id = f.dataset.id || '';
-            var preview = document.querySelector('[data-mc-preview="' + kind + '"]');
+            var scope = f.closest('form') || document;
+            var preview = scope.querySelector('[data-mc-preview="' + kind + '"]');
 
             if (!id) {
                 // add form: many files, each becomes a card
@@ -372,9 +426,9 @@
                 f.value = '';
                 return;
             }
-            // edit form: single file replaces that card's existing media
+            // edit / repair form: single file fills that card's media
             var sel = '[data-mc-field="' + kind + '"][data-id="' + id + '"]';
-            var input = document.querySelector(sel);
+            var input = scope.querySelector(sel);
             if (!input) return;
             var files = Array.prototype.slice.call(f.files || []);
             if (!files.length) return;
@@ -394,10 +448,13 @@
             sel.addEventListener('change', function () {
                 var id = sel.dataset.id;
                 var isVideo = sel.value === 'video';
-                var lblI = document.querySelector('[data-mc-label="image"][data-id="' + id + '"]');
-                var lblV = document.querySelector('[data-mc-label="video"][data-id="' + id + '"]');
-                var fldI = document.querySelector('[data-mc-field="image"][data-id="' + id + '"]');
-                var fldV = document.querySelector('[data-mc-field="video"][data-id="' + id + '"]');
+                // Stay inside this select's own form: the repair form has an
+                // image + video input for the same card id.
+                var scope = sel.closest('form') || document;
+                var lblI = scope.querySelector('[data-mc-label="image"][data-id="' + id + '"]');
+                var lblV = scope.querySelector('[data-mc-label="video"][data-id="' + id + '"]');
+                var fldI = scope.querySelector('[data-mc-field="image"][data-id="' + id + '"]');
+                var fldV = scope.querySelector('[data-mc-field="video"][data-id="' + id + '"]');
                 if (lblV) lblV.style.display = isVideo ? '' : 'none';
                 if (fldV) fldV.style.display = isVideo ? '' : 'none';
                 if (lblI) lblI.style.display = isVideo ? 'none' : '';
