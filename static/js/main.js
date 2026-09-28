@@ -186,6 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const visitTypeLabel = document.getElementById("bkVisitType");
         const visitIconBox = document.getElementById("bkVisitIcon");
         const changeBtn = document.getElementById("bkChangeVisit");
+        const typeBackBtn = document.getElementById("bkTypeBack");
         const stepDots = document.getElementById("bkStepDots");
         const modalSub = document.getElementById("bkModalSub");
         const SUB_FORM = "Fill in your details and our team will confirm your booking.";
@@ -200,10 +201,21 @@ document.addEventListener("DOMContentLoaded", function () {
         let doctorCache = [];
         let debounceTimer = null;
         let currentStep = "type";
+        let stepHistory = [];
         let chosenVisit = "";
+        const MOBILE_MQ = window.matchMedia("(max-width: 768px)");
 
-        function setStep(step) {
+        function setStep(step, opts) {
+            opts = opts || {};
+            if (opts.reset) {
+                stepHistory = [];
+            } else if (!opts.back && currentStep !== step) {
+                stepHistory.push(currentStep);
+            }
             currentStep = step;
+            // lets CSS target the active step (e.g. drop the modal heading on
+            // the form step on phones)
+            bookingModal.dataset.step = step;
             if (step === "type") {
                 stepType.hidden = false;
                 form.hidden = true;
@@ -216,6 +228,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 visitSummary.hidden = false;
                 modalSub.textContent = SUB_FORM;
                 if (stepDots) stepDots.hidden = true;
+                // the date field is hidden on phones, so default it or the
+                // time slots and the submit check would both fail
+                if (ensureMobileDate() && slotGrid) loadSlots();
                 setTimeout(function () { if (doctorInput && !doctorInput.value) doctorInput.focus(); }, 100);
             }
         }
@@ -247,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
             visitSummary.style.removeProperty("--vs-c");
             visitSummary.style.removeProperty("--vs-bg");
             visitSummary.style.removeProperty("--vs-bd");
-            setStep("type");
+            setStep("type", { reset: true });
             if (doctorCache.length === 0) {
                 fetch("/api/doctors-list")
                     .then(function (r) { return r.json(); })
@@ -280,6 +295,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         if (changeBtn) {
             changeBtn.addEventListener("click", function () { setStep("type"); });
+        }
+        if (typeBackBtn) {
+            typeBackBtn.addEventListener("click", function () {
+                // walk back through the steps we came from; if the type step is
+                // where the modal was opened, there is nothing to go back to
+                // except the page itself
+                if (stepHistory.length) {
+                    setStep(stepHistory.pop(), { back: true });
+                } else {
+                    closeModal();
+                }
+            });
         }
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape" && !bookingModal.hidden) closeModal();
@@ -378,12 +405,26 @@ document.addEventListener("DOMContentLoaded", function () {
             slotGrid.appendChild(p);
         }
 
+        function ensureMobileDate() {
+            // The Preferred Date field is hidden on phones, so the appointment
+            // would otherwise have no date and fail the submit check.
+            if (!dateInput || !MOBILE_MQ.matches) return false;
+            if (dateInput.value) return false;
+            var today = new Date();
+            var iso = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+            dateInput.value = (dateInput.min && dateInput.min > iso) ? dateInput.min : iso;
+            return true;
+        }
+
         function loadSlots() {
             if (!slotGrid) return;
             var dateVal = dateInput ? dateInput.value : "";
             var doctorId = doctorIdInput.value || "";
             slotInput.value = "";
-            if (!dateVal) return setSlotHint("Pick a date first");
+            if (!dateVal) {
+                if (ensureMobileDate()) dateVal = dateInput.value;
+                else return setSlotHint("Pick a date first");
+            }
             if (dateInput.min && dateVal < dateInput.min) return setSlotHint("Please pick today or a later date");
 
             slotGrid.innerHTML = '<p class="book-slots-hint">Loading slots...</p>';

@@ -1953,6 +1953,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         margin-top: 13px;
         padding-top: 13px;
         gap: 8px;
+        border-top: 0;                /* drop the rule between search bar and the box */
     }
     .hero-book-box {
         display: block;
@@ -1983,6 +1984,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         box-shadow: 0 8px 18px -8px rgba(3, 32, 38, .50);
     }
     .hero-book-online:hover { background: #e9f5f6; }
+
+    /* ---- Mobile booking modal trimming ----
+       On the form step the "Book an Appointment" / "Fill in your details"
+       header is dropped (the visit-type chip acts as the header instead) and
+       Preferred Date is hidden, so main.js defaults the date to today. */
+    .book-modal[data-step="form"] .book-modal-head { display: none; }
+    .book-field-date { display: none; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
@@ -2449,26 +2457,55 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     flex-direction: column;
     gap: 10px;
 }
+
+/* Back control at the top of the visit-type step. It walks the modal's step
+   history, and closes the modal when the type step is the first one. */
+.book-type-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 0 14px;
+    padding: 7px 13px 7px 10px;
+    border: 1.5px solid #dbe7ec;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s, transform .15s;
+}
+.book-type-back:hover {
+    background: #f2f7f9;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.book-type-back:active { transform: scale(.96); }
+.book-type-back:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 .book-type-card {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 14px;
     width: 100%;
-    padding: 14px;
+    padding: 15px 15px;
     border: 1.5px solid #dbe7ec;
-    border-radius: 14px;
+    border-radius: 16px;
     background: linear-gradient(135deg, var(--tc-bg, #fff) 0%, #fff 62%);
     font-family: inherit;
     text-align: left;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 40, 60, .04);
     transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
 }
 .book-type-card:hover {
     border-color: var(--tc, var(--primary));
     background: var(--tc-bg, var(--primary-light, #e7f4f6));
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px var(--tc-shadow, rgba(42, 127, 142, .16));
+    box-shadow: 0 12px 26px var(--tc-shadow, rgba(42, 127, 142, .16));
 }
+.book-type-card:active { transform: translateY(0) scale(.99); }
+.book-type-card:focus-visible { outline: 3px solid var(--tc, var(--primary)); outline-offset: 2px; }
 .book-type-ic {
     display: inline-flex;
     align-items: center;
