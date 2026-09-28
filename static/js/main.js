@@ -298,6 +298,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (modalBackBtn) {
             modalBackBtn.addEventListener("click", function () {
+                // On phones the form is the only step worth going back to, and
+                // re-showing the bare visit-type window underneath it just
+                // looked unfinished - leave the booking instead. Change on the
+                // visit chip is what reopens it.
+                if (MOBILE_MQ.matches) {
+                    closeModal();
+                    return;
+                }
                 // walk back through the steps we came from; if the type step is
                 // where the modal was opened, there is nothing to go back to
                 // except the page itself

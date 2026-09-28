@@ -1988,8 +1988,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* ---- Mobile booking modal trimming ----
        The "Book an Appointment" title and the "Choose how you would like to
        meet the doctor" / "Fill in your details" subtitle are dropped on every
-       step, so after Change the type step is just the back control and the two
-       cards. The back pill above the heading is the way out instead.
+       step, so the type step is just the back control, the question and the
+       two cards. On phones the back pill closes the booking outright, so the
+       type step is only ever reached by tapping Change.
        Preferred Date is hidden, so main.js defaults the date to today. */
     .book-modal .book-modal-head { display: none; }
     .book-field-date { display: none; }
@@ -1998,9 +1999,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        records against a real time. */
     .book-field-time { display: none; }
     .book-modal[data-step="form"] .book-modal-close { display: none; }
-    /* the visit chip is a plain label on phones - the Back pill is the only
-       way out, so two controls going to the same place is just noise */
-    .book-visitsummary-change { display: none; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
