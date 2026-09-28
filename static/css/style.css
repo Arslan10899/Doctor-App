@@ -1959,10 +1959,30 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         margin-top: -9px;
         padding: 10px 12px;
         border-radius: 15px;
+        /* transparent with a light border - the hero gradient shows through */
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, .45);
+        box-shadow: 0 10px 26px -14px rgba(3, 32, 38, .55);
     }
     .hero-book-label { padding: 0 2px 8px; font-size: 10.5px; letter-spacing: .6px; }
+    .hero-book-label,
+    .hero-book-label svg { color: rgba(255, 255, 255, .92); }
     .hero-book-actions { gap: 6px; }
     .hero-book-btn { min-height: 42px; padding: 9px 12px; font-size: 13.5px; border-radius: 12px; }
+    /* ghost button for clinic, solid white for the primary online action, so the
+       two still separate cleanly now that the container has no white fill */
+    .hero-book-clinic {
+        background: rgba(255, 255, 255, .16);
+        color: #fff;
+        box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .50);
+    }
+    .hero-book-clinic:hover { background: rgba(255, 255, 255, .26); }
+    .hero-book-online {
+        background: #fff;
+        color: var(--primary);
+        box-shadow: 0 8px 18px -8px rgba(3, 32, 38, .50);
+    }
+    .hero-book-online:hover { background: #e9f5f6; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so
