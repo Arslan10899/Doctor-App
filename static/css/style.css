@@ -2387,6 +2387,92 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .doctor-avatar.no-img, .avatar-lg.no-img { background: transparent; border: none; }
 .doctor-avatar.no-img img, .avatar-lg.no-img img { border-radius: 12px; }
 
+/* -------------------- Mobile promo cards (mobile only) --------------------
+   Lives between the hero search bar and the "Book an Appointment" box. The
+   track is a native scroll-snap scroller so touch momentum works without any
+   JS transform maths; the arrows and dots below are progressive enhancement. */
+.mcard-strip { display: none; }
+.mcard-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: 16px;
+}
+.mcard-track::-webkit-scrollbar { display: none; }
+.mcard {
+    position: relative;
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: block;
+    height: 124px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 24px -14px rgba(3, 32, 38, .55);
+    text-decoration: none;
+}
+.mcard-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 16px;
+}
+.mcard-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, .92);
+    color: var(--primary);
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(3, 32, 38, .28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 2px;
+}
+.mcard-nav.prev { left: 6px; }
+.mcard-nav.next { right: 6px; }
+.mcard-nav:disabled { opacity: 0; pointer-events: none; }
+.mcard-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 8px;
+}
+.mcard-dots button {
+    width: 6px;
+    height: 6px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .45);
+    cursor: pointer;
+    transition: width .2s, background .2s;
+}
+.mcard-dots button.active { background: #fff; width: 18px; }
+
+@media (max-width: 768px) {
+    .mcard-strip { display: block; position: relative; }
+    .mcard { height: 118px; }
+}
+
+@media (max-width: 400px) {
+    .mcard { height: 108px; border-radius: 14px; }
+    .mcard-media { border-radius: 14px; }
+    .mcard-track, .mcard-media { border-radius: 14px; }
+}
+
 /* -------------------- Booking modal -------------------- */
 .book-modal {
     position: fixed;

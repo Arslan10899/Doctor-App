@@ -84,6 +84,116 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    // Mobile promo cards (mobile only). The track is a CSS scroll-snap
+    // scroller, so touch already works; this only adds arrows, dots and
+    // autoplay, and pauses autoplay whenever the user takes over.
+    const mcardStrip = document.getElementById("mcardStrip");
+    if (mcardStrip) {
+        const track = document.getElementById("mcardTrack");
+        const cards = Array.prototype.slice.call(mcardStrip.querySelectorAll(".mcard"));
+        const prevBtn = mcardStrip.querySelector(".mcard-prev");
+        const nextBtn = mcardStrip.querySelector(".mcard-next");
+        const dotsWrap = document.getElementById("mcardDots");
+        let index = 0;
+        let timer = null;
+        const MCARD_INTERVAL = 4000;
+
+        function cardStep() {
+            if (!cards.length) return 0;
+            // one full card plus the gap, measured from the live layout
+            const gap = parseFloat(getComputedStyle(track).columnGap || "0") || 0;
+            return cards[0].getBoundingClientRect().width + gap;
+        }
+        function nearestIndex() {
+            const step = cardStep();
+            if (!step) return 0;
+            return Math.max(0, Math.min(cards.length - 1, Math.round(track.scrollLeft / step)));
+        }
+        function paint() {
+            if (prevBtn) prevBtn.disabled = index <= 0;
+            if (nextBtn) nextBtn.disabled = index >= cards.length - 1;
+            if (!dotsWrap) return;
+            const dots = dotsWrap.querySelectorAll("button");
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].classList.toggle("active", i === index);
+            }
+        }
+        function scrollToCard(i, smooth) {
+            index = Math.max(0, Math.min(cards.length - 1, i));
+            const step = cardStep();
+            if (step) {
+                track.scrollTo({ left: index * step, behavior: smooth ? "smooth" : "auto" });
+            }
+            paint();
+        }
+        function stop() {
+            if (timer) { clearInterval(timer); timer = null; }
+        }
+        function play() {
+            stop();
+            if (cards.length < 2) return;
+            timer = setInterval(function () {
+                // stop on the last card instead of wrapping into a dead end
+                if (document.hidden) return;
+                if (nearestIndex() >= cards.length - 1) { stop(); paint(); return; }
+                scrollToCard(nearestIndex() + 1, true);
+            }, MCARD_INTERVAL);
+        }
+        function buildDots() {
+            if (!dotsWrap) return;
+            dotsWrap.innerHTML = "";
+            cards.forEach(function (_, i) {
+                const d = document.createElement("button");
+                d.type = "button";
+                d.setAttribute("aria-label", "Go to card " + (i + 1));
+                d.addEventListener("click", function () {
+                    stop();
+                    scrollToCard(i, true);
+                });
+                dotsWrap.appendChild(d);
+            });
+        }
+        buildDots();
+        paint();
+        if (prevBtn) {
+            prevBtn.addEventListener("click", function () { stop(); scrollToCard(index - 1, true); });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener("click", function () { stop(); scrollToCard(index + 1, true); });
+        }
+        let rafPending = false;
+        track.addEventListener("scroll", function () {
+            // scroll fires a lot during momentum; only re-read the index once
+            // per frame instead of on every event
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(function () {
+                rafPending = false;
+                index = nearestIndex();
+                paint();
+            });
+        });
+        ["touchstart", "pointerdown", "wheel"].forEach(function (ev) {
+            track.addEventListener(ev, stop, { passive: true });
+        });
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) stop();
+            else if (!timer) play();
+        });
+        // only autoplay once the strip is actually on screen
+        if ("IntersectionObserver" in window) {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                    if (en.isIntersecting) play();
+                    else stop();
+                });
+            }, { threshold: 0.35 });
+            io.observe(mcardStrip);
+        } else {
+            play();
+        }
+    }
+
     // Hero image slider (3 per view, auto-play)
     const heroSlider = document.getElementById("heroSlider");
     if (heroSlider) {

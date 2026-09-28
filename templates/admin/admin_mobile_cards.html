@@ -1,0 +1,305 @@
+{% extends "admin/admin_base.html" %}
+{% block pagetitle %}Mobile Cards{% endblock %}
+{% block title %}Mobile Promo Cards{% endblock %}
+{% block content %}
+<style>
+    .mc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .mc-card { border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; background: #fff; }
+    .mc-card.is-off { opacity: .58; }
+    .mc-thumb { position: relative; aspect-ratio: 16 / 7; background: #f3f4f6; }
+    .mc-thumb img, .mc-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mc-badge {
+        position: absolute; top: 8px; left: 8px; padding: 3px 9px; border-radius: 999px;
+        background: rgba(17, 24, 39, .78); color: #fff; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .04em;
+    }
+    .mc-state {
+        position: absolute; top: 8px; right: 8px; padding: 3px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .mc-state.on { background: #047857; color: #fff; }
+    .mc-state.off { background: #6b7280; color: #fff; }
+    .mc-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .mc-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mc-row > * { flex: 1 1 auto; }
+    .mc-empty { text-align: center; padding: 40px 16px; color: #6b7280; }
+    .mc-preview {
+        display: none; margin-top: 8px; font-size: 12px; color: #6b7280;
+        word-break: break-all;
+    }
+    .mc-seg { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .mc-seg label {
+        display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px;
+        border: 1.5px solid #d1d5db; font-size: 13.5px; font-weight: 700; cursor: pointer; background: #fff;
+    }
+    .mc-seg label.is-active { border-color: #0d9488; color: #0d9488; background: #ecfeff; }
+    .mc-hint { font-size: 12.5px; color: #6b7280; margin: 0 0 12px; }
+    .mc-toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; }
+    .mc-muted { color: #9ca3af; font-size: 12.5px; }
+</style>
+
+<div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+    <div>
+        <h1 style="margin:0 0 4px;">Mobile Promo Cards</h1>
+        <p class="mc-hint" style="margin:0;">
+            Ye cards <strong>sirf mobile</strong> par dikhte hain &mdash; homepage ke search bar aur
+            &ldquo;Book an Appointment&rdquo; box ke darmiyan. Desktop par inhein hide kiya gaya hai.
+            {% if mobile_cards %}
+            <br>{{ mobile_cards|length }} card(s) &middot; {{ active_count }} active
+            {% endif %}
+        </p>
+    </div>
+    <a class="btn" href="{{ url_for('admin_dashboard') }}">&larr; Dashboard</a>
+</div>
+
+<!-- ============ ADD NEW CARD ============ -->
+<form method="post" action="{{ url_for('admin_mobile_cards_action') }}" id="mcAddForm"
+      style="border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin-bottom:22px;background:#fff;">
+    <input type="hidden" name="section" value="add">
+
+    <h2 style="margin:0 0 12px;font-size:17px;">Add new card</h2>
+
+    <div class="mc-seg">
+        <label class="is-active" data-mt="image">
+            <input type="radio" name="media_type" value="image" checked onchange="mcType('image')" style="display:none;">
+            Image
+        </label>
+        <label data-mt="video">
+            <input type="radio" name="media_type" value="video" onchange="mcType('video')" style="display:none;">
+            Video
+        </label>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;">
+        <div>
+            <label class="flabel">Card name (admin ke liye, page par nahi dikhta)</label>
+            <input type="text" name="name" id="mc-name" placeholder="e.g. Free consultation offer">
+        </div>
+        <div>
+            <label class="flabel">Order number</label>
+            <input type="number" name="sort_order" min="0" step="1" value="{{ mobile_cards|length + 1 }}">
+            <p class="mc-muted" style="margin:4px 0 0;">1 = sabse pehle, 2 = uske baad.</p>
+        </div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label class="flabel">Link URL (optional)</label>
+        <input type="text" name="link_url" id="mc-link" placeholder="/doctors ya https://... &mdash; khali chhore to card clickable nahi hoga">
+    </div>
+
+    <div id="mcImageFields">
+        <label class="flabel">Image *</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" name="image_url" id="mc-image" placeholder="https://...jpg" required style="flex:1;">
+            <button class="btn btn-sm" type="button" data-mc-browse="image">Browse &amp; Upload</button>
+        </div>
+        <input type="file" data-mc-file="image" accept="image/*" style="display:none;">
+        <p class="mc-preview" data-mc-preview="image"></p>
+    </div>
+
+    <div id="mcVideoFields" style="display:none;">
+        <label class="flabel">Video *</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" name="video_url" id="mc-video" placeholder="https://...mp4" style="flex:1;">
+            <button class="btn btn-sm" type="button" data-mc-browse="video">Browse &amp; Upload</button>
+        </div>
+        <input type="file" data-mc-file="video" accept="video/*" style="display:none;">
+        <p class="mc-preview" data-mc-preview="video"></p>
+        <label class="mc-toggle" style="margin-top:10px;">
+            <input type="checkbox" name="autoplay" value="1" checked> Video khud chalay (muted loop)
+        </label>
+        <p class="mc-muted" style="margin:4px 0 0;">Sirf tab hi ON rakhein jab video silent ho &mdash; browser awaaz wale video par autoplay rok deta hai.</p>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:8px;">
+        <button class="btn" type="submit">Save card</button>
+    </div>
+</form>
+
+<!-- ============ EXISTING CARDS ============ -->
+{% if mobile_cards %}
+<div class="mc-grid">
+    {% for c in mobile_cards %}
+    <div class="mc-card{% if not c['active'] %} is-off{% endif %}" data-mc-item="{{ c['id'] }}">
+        <div class="mc-thumb">
+            {% if c['media_type'] == 'video' and c['video_url'] %}
+                <video src="{{ c['video_url'] }}" muted playsinline preload="metadata"></video>
+            {% elif c['image_url'] %}
+                <img src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Card' }}" loading="lazy">
+            {% else %}
+                <div class="mc-empty" style="padding:20px;">No media</div>
+            {% endif %}
+            <span class="mc-badge">{{ c['media_type'] }}</span>
+            <span class="mc-state {{ 'on' if c['active'] else 'off' }}">{{ 'Active' if c['active'] else 'Inactive' }}</span>
+        </div>
+        <div class="mc-body">
+            <strong style="font-size:14.5px;">{{ c['name'] or 'Untitled card' }} <span class="mc-muted">#{{ c['sort_order'] }}</span></strong>
+            {% if c['link_url'] %}
+                <span class="mc-muted">Link: {{ c['link_url'][:48] }}{% if c['link_url']|length > 48 %}&hellip;{% endif %}</span>
+            {% endif %}
+
+            <div class="mc-row">
+                <form method="post" action="{{ url_for('admin_mobile_cards_action') }}" style="display:contents;">
+                    <input type="hidden" name="section" value="toggle">
+                    <input type="hidden" name="mobile_card_id" value="{{ c['id'] }}">
+                    <input type="hidden" name="active" value="{{ 0 if c['active'] else 1 }}">
+                    <button class="btn btn-sm" type="submit">{{ 'Deactivate' if c['active'] else 'Activate' }}</button>
+                </form>
+                {% if c['media_type'] == 'video' %}
+                <form method="post" action="{{ url_for('admin_mobile_cards_action') }}" style="display:contents;">
+                    <input type="hidden" name="section" value="autoplay_toggle">
+                    <input type="hidden" name="mobile_card_id" value="{{ c['id'] }}">
+                    <button class="btn btn-sm" type="submit">Autoplay {{ 'OFF' if c['autoplay'] else 'ON' }}</button>
+                </form>
+                {% endif %}
+                <form method="post" action="{{ url_for('admin_mobile_cards_action') }}" style="display:contents;">
+                    <input type="hidden" name="section" value="duplicate">
+                    <input type="hidden" name="id" value="{{ c['id'] }}">
+                    <button class="btn btn-sm" type="submit">Duplicate</button>
+                </form>
+            </div>
+
+            <details>
+                <summary style="cursor:pointer;font-size:13.5px;font-weight:700;">Edit</summary>
+                <form method="post" action="{{ url_for('admin_mobile_cards_action') }}" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+                    <input type="hidden" name="section" value="edit">
+                    <input type="hidden" name="mobile_card_id" value="{{ c['id'] }}">
+
+                    <label class="flabel">Name</label>
+                    <input type="text" name="name" value="{{ c['name'] or '' }}">
+
+                    <label class="flabel">Media type</label>
+                    <select name="media_type" class="mc-edit-type" data-id="{{ c['id'] }}">
+                        <option value="image"{% if c['media_type'] != 'video' %} selected{% endif %}>Image</option>
+                        <option value="video"{% if c['media_type'] == 'video' %} selected{% endif %}>Video</option>
+                    </select>
+
+                    <label class="flabel" data-mc-label="image" data-id="{{ c['id'] }}">Image URL</label>
+                    <input type="text" name="image_url" data-mc-field="image" data-id="{{ c['id'] }}" value="{{ c['image_url'] or '' }}">
+
+                    <label class="flabel" data-mc-label="video" data-id="{{ c['id'] }}"{% if c['media_type'] != 'video' %} style="display:none;"{% endif %}>Video URL</label>
+                    <input type="text" name="video_url" data-mc-field="video" data-id="{{ c['id'] }}" value="{{ c['video_url'] or '' }}">
+
+                    <div class="mc-row">
+                        <button class="btn btn-sm" type="button" data-mc-browse="image" data-id="{{ c['id'] }}">Upload image</button>
+                        <button class="btn btn-sm" type="button" data-mc-browse="video" data-id="{{ c['id'] }}">Upload video</button>
+                    </div>
+                    <input type="file" data-mc-file="image" data-id="{{ c['id'] }}" accept="image/*" style="display:none;">
+                    <input type="file" data-mc-file="video" data-id="{{ c['id'] }}" accept="video/*" style="display:none;">
+
+                    <label class="flabel">Link URL (optional)</label>
+                    <input type="text" name="link_url" value="{{ c['link_url'] or '' }}">
+
+                    <label class="flabel">Order number</label>
+                    <input type="number" name="sort_order" min="0" step="1" value="{{ c['sort_order'] or 0 }}">
+
+                    <label class="mc-toggle">
+                        <input type="checkbox" name="autoplay" value="1"{% if c['autoplay'] %} checked{% endif %}> Autoplay video
+                    </label>
+
+                    <div class="mc-row" style="margin-top:4px;">
+                        <button class="btn btn-sm" type="submit">Save changes</button>
+                    </div>
+                </form>
+            </details>
+
+            <form method="post" action="{{ url_for('admin_mobile_cards_action') }}"
+                  onsubmit="return confirm('Delete this card?');">
+                <input type="hidden" name="section" value="delete">
+                <input type="hidden" name="record_id" value="{{ c['id'] }}">
+                <button class="btn btn-sm" type="submit" style="color:#b91c1c;">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="mc-empty" style="border:1px dashed #d1d5db;border-radius:14px;">
+    <strong>Abhi koi card nahi hai.</strong><br>
+    Upar se pehla card add karein &mdash; wo homepage ke search bar aur Book an Appointment box ke darmiyan mobile par dikhega.
+</div>
+{% endif %}
+
+<script>
+(function () {
+    function post(fileInput, urlInput) {
+        if (!fileInput.files.length) return Promise.resolve(null);
+        var fd = new FormData();
+        fd.append('file', fileInput.files[0]);
+        var preview = document.querySelector('[data-mc-preview="' + fileInput.dataset.mcFile + '"]');
+        if (preview) preview.textContent = 'Uploading...';
+        return fetch('/admin/upload', { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res.ok) {
+                    urlInput.value = res.url;
+                    if (preview) preview.textContent = 'Uploaded: ' + res.url;
+                    return res.url;
+                }
+                if (preview) preview.textContent = 'Error: ' + (res.error || 'upload failed');
+                return null;
+            })
+            .catch(function () {
+                if (preview) preview.textContent = 'Upload failed. Check server.';
+                return null;
+            });
+    }
+
+    window.mcType = function (type) {
+        var img = document.getElementById('mcImageFields');
+        var vid = document.getElementById('mcVideoFields');
+        if (img) img.style.display = type === 'image' ? '' : 'none';
+        if (vid) vid.style.display = type === 'video' ? '' : 'none';
+        var labels = document.querySelectorAll('.mc-seg label');
+        for (var i = 0; i < labels.length; i++) {
+            labels[i].classList.toggle('is-active', labels[i].dataset.mt === type);
+        }
+        // only the visible field may be required, otherwise the browser blocks
+        // submit with an invisible validation error on the hidden one
+        var i2 = document.getElementById('mc-image');
+        var v2 = document.getElementById('mc-video');
+        if (i2) i2.required = (type === 'image');
+        if (v2) v2.required = (type === 'video');
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.mcType('image');
+
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-mc-browse]');
+            if (!btn) return;
+            var kind = btn.dataset.mcBrowse;
+            var id = btn.dataset.id || '';
+            var file = document.querySelector('[data-mc-file="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : ''));
+            if (file) file.click();
+        });
+
+        document.addEventListener('change', function (e) {
+            var f = e.target.closest('[data-mc-file]');
+            if (!f) return;
+            var kind = f.dataset.mcFile;
+            var id = f.dataset.id || '';
+            var sel = '[data-mc-field="' + kind + '"]' + (id ? '[data-id="' + id + '"]' : '');
+            var input = document.querySelector(sel);
+            if (input) post(f, input);
+        });
+
+        // per-card edit forms: switching media type shows the matching URL box
+        Array.prototype.forEach.call(document.querySelectorAll('.mc-edit-type'), function (sel) {
+            sel.addEventListener('change', function () {
+                var id = sel.dataset.id;
+                var isVideo = sel.value === 'video';
+                var lblI = document.querySelector('[data-mc-label="image"][data-id="' + id + '"]');
+                var lblV = document.querySelector('[data-mc-label="video"][data-id="' + id + '"]');
+                var fldI = document.querySelector('[data-mc-field="image"][data-id="' + id + '"]');
+                var fldV = document.querySelector('[data-mc-field="video"][data-id="' + id + '"]');
+                if (lblV) lblV.style.display = isVideo ? '' : 'none';
+                if (fldV) fldV.style.display = isVideo ? '' : 'none';
+                if (lblI) lblI.style.display = isVideo ? 'none' : '';
+                if (fldI) fldI.style.display = isVideo ? 'none' : '';
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

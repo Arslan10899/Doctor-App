@@ -629,6 +629,29 @@ def migrate(db):
         if col not in bcols:
             cur.execute(f"ALTER TABLE hero_banners ADD COLUMN {col} {ddl}")
 
+    # mobile_cards: the mobile-only promo strip that sits between the hero
+    # search bar and the "Book an Appointment" box. Same shape as
+    # hero_banners but no pin/resize columns - it is a fixed one-card-per-view
+    # scroller, so those would be dead weight.
+    cur.execute("CREATE TABLE IF NOT EXISTS mobile_cards ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "name TEXT,"
+                "media_type TEXT DEFAULT 'image',"
+                "image_url TEXT,"
+                "video_url TEXT,"
+                "link_url TEXT,"
+                "autoplay INTEGER DEFAULT 1,"
+                "sort_order INTEGER DEFAULT 0,"
+                "active INTEGER DEFAULT 1,"
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+
+    mcols = [r[1] for r in cur.execute("PRAGMA table_info(mobile_cards)").fetchall()]
+    for col, ddl in {"name": "TEXT", "media_type": "TEXT DEFAULT 'image'", "image_url": "TEXT",
+                     "video_url": "TEXT", "link_url": "TEXT", "autoplay": "INTEGER DEFAULT 1",
+                     "sort_order": "INTEGER DEFAULT 0", "active": "INTEGER DEFAULT 1"}.items():
+        if col not in mcols:
+            cur.execute(f"ALTER TABLE mobile_cards ADD COLUMN {col} {ddl}")
+
     # appointments: WhatsApp + AI flow columns. patient_id must become nullable
     # (WhatsApp patients never log in) and SQLite cannot ALTER that away, so an
     # existing table is rebuilt once.
@@ -730,6 +753,18 @@ def migrate(db):
             pos_y REAL,
             bw INTEGER DEFAULT 260,
             bh INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS mobile_cards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            media_type TEXT DEFAULT 'image',
+            image_url TEXT,
+            video_url TEXT,
+            link_url TEXT,
+            autoplay INTEGER DEFAULT 1,
+            sort_order INTEGER DEFAULT 0,
+            active INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
@@ -850,6 +885,23 @@ def _active_announcements():
         active.append(a)
     return active
 
+def safe_link(raw):
+    """Return a link that is safe to put in an href, or None.
+
+    Only same-site paths and http(s) URLs are allowed. Without this a
+    `javascript:` value would be rendered as a clickable card link.
+    """
+    val = (raw or "").strip()
+    if not val:
+        return None
+    low = val.lower()
+    if val.startswith("/") and not val.startswith("//"):
+        return val
+    if low.startswith("http://") or low.startswith("https://"):
+        return val
+    return None
+
+
 @app.route("/")
 def index():
     specialties = query("SELECT * FROM specialties ORDER BY name")
@@ -868,6 +920,18 @@ def index():
     online_count = query("SELECT COUNT(*) c FROM doctors WHERE online=1")[0]["c"]
     announcements = _active_announcements()
     carousel = query("SELECT * FROM carousel_images ORDER BY id DESC")
+    # Mobile-only strip between the search bar and the booking box. Ordered
+    # ascending by sort_order so admin "Number" 1 really is the first card.
+    mobile_cards = [dict(r) for r in query(
+        "SELECT * FROM mobile_cards WHERE active=1 "
+        "AND (media_type='image' AND image_url IS NOT NULL AND image_url<>'' "
+        "  OR media_type='video' AND video_url IS NOT NULL AND video_url<>'') "
+        "ORDER BY sort_order ASC, id ASC"
+    )]
+    # Re-validate on read too, so a bad value that reached the table by any
+    # other route (direct SQL, a future importer) still cannot become an href.
+    for _c in mobile_cards:
+        _c["link_url"] = safe_link(_c.get("link_url"))
     hero_banners = [dict(r) for r in query("SELECT * FROM hero_banners WHERE active=1 ORDER BY sort_order ASC, id ASC")]
     banner_pinned = any(b["pos_x"] is not None for b in hero_banners)
     pinned_height = 190
@@ -901,6 +965,7 @@ def index():
         cities=[r["name"] for r in query("SELECT name FROM cities ORDER BY name")],
         announcements=announcements,
         carousel=carousel,
+        mobile_cards=mobile_cards,
         hero_banners=hero_banners,
         banner_pinned=banner_pinned,
         pinned_height=pinned_height,
@@ -2204,6 +2269,94 @@ def admin_hero_banners_save():
     return jsonify({"ok": True})
 
 
+@app.route("/admin/mobile-cards", methods=["POST"])
+@admin_required
+def admin_mobile_cards_action():
+    section = request.form.get("section")
+
+    def media_fields():
+        media_type = "video" if request.form.get("media_type") == "video" else "image"
+        return (media_type,
+                request.form.get("image_url", "").strip(),
+                request.form.get("video_url", "").strip(),
+                request.form.get("name", "").strip() or None,
+                safe_link(request.form.get("link_url", "")),
+                1 if request.form.get("autoplay") == "1" else 0,
+                request.form.get("sort_order", type=int) or 0)
+
+    def has_media(media_type, image_url, video_url):
+        return bool(video_url) if media_type == "video" else bool(image_url)
+
+    if section == "add":
+        mt, img, vid, name, link, autoplay, so = media_fields()
+        if has_media(mt, img, vid):
+            execute(
+                "INSERT INTO mobile_cards (name, media_type, image_url, video_url, link_url, autoplay, sort_order, active) "
+                "VALUES (?,?,?,?,?,?,?,1)",
+                (name, mt, img, vid, link, autoplay, so),
+            )
+            flash("Mobile card added.", "success")
+        else:
+            flash("Image ya video upload/URL karna zaroori hai.", "warning")
+    elif section == "toggle":
+        cid = request.form.get("mobile_card_id", request.form.get("id", type=int))
+        val = 1 if request.form.get("active") == "1" else 0
+        if cid:
+            execute("UPDATE mobile_cards SET active=? WHERE id=?", (val, cid))
+            flash("Mobile card " + ("active." if val else "inactive."), "success")
+    elif section == "autoplay_toggle":
+        cid = request.form.get("mobile_card_id", request.form.get("id", type=int))
+        if cid:
+            row = query("SELECT * FROM mobile_cards WHERE id=?", (cid,))
+            if row:
+                execute("UPDATE mobile_cards SET autoplay=? WHERE id=?",
+                        (0 if row[0]["autoplay"] else 1, cid))
+                flash("Autoplay " + ("ON." if not row[0]["autoplay"] else "OFF."), "success")
+    elif section == "edit":
+        cid = request.form.get("mobile_card_id", request.form.get("id", type=int))
+        mt, img, vid, name, link, autoplay, so = media_fields()
+        if cid and has_media(mt, img, vid):
+            execute(
+                "UPDATE mobile_cards SET name=?, media_type=?, image_url=?, video_url=?, "
+                "link_url=?, autoplay=?, sort_order=? WHERE id=?",
+                (name, mt, img, vid, link, autoplay, so, cid),
+            )
+            flash("Mobile card updated.", "success")
+        else:
+            flash("Media URL required hai update karne ke liye.", "warning")
+    elif section == "delete":
+        cid = request.form.get("record_id", request.form.get("id", type=int))
+        if cid:
+            execute("DELETE FROM mobile_cards WHERE id=?", (cid,))
+            flash("Mobile card deleted.", "info")
+    elif section == "duplicate":
+        cid = request.form.get("id", request.form.get("mobile_card_id", type=int))
+        row = query("SELECT * FROM mobile_cards WHERE id=?", (cid,)) if cid else []
+        if row:
+            c = row[0]
+            nxt = (query("SELECT COALESCE(MAX(sort_order), 0) m FROM mobile_cards")[0]["m"] or 0) + 1
+            execute(
+                "INSERT INTO mobile_cards (name, media_type, image_url, video_url, link_url, autoplay, sort_order, active) "
+                "VALUES (?,?,?,?,?,?,?,?)",
+                ((c["name"] or "Card") + " (copy)", c["media_type"], c["image_url"], c["video_url"],
+                 c["link_url"], c["autoplay"], nxt, c["active"]),
+            )
+            flash("Mobile card duplicated.", "success")
+    return redirect(url_for("admin_mobile_cards"))
+
+
+@app.route("/admin/mobile-cards")
+@admin_required
+def admin_mobile_cards():
+    cards = query("SELECT * FROM mobile_cards ORDER BY sort_order ASC, id ASC")
+    active_count = sum(1 for c in cards if c["active"])
+    return render_template(
+        "admin/admin_mobile_cards.html",
+        mobile_cards=cards,
+        active_count=active_count,
+    )
+
+
 @app.route("/admin/upload", methods=["POST"])
 @admin_required
 def admin_upload():
@@ -2214,6 +2367,22 @@ def admin_upload():
     ext = os.path.splitext(f.filename)[1].lower()
     if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".mp4", ".webm", ".ogg", ".mov"):
         return jsonify({"ok": False, "error": "Only images (png/jpg/jpeg/gif/webp/svg) or videos (mp4/webm/ogg/mov) are allowed."}), 400
+    # Generous enough for a short promo clip, small enough that a mistyped
+    # multi-GB file cannot fill the disk. FileStorage.content_length is not
+    # reliably populated for multipart parts, so measure the stream instead.
+    max_bytes = int(os.environ.get("UPLOAD_MAX_BYTES", 100 * 1024 * 1024))
+    size = f.content_length or 0
+    if not size:
+        try:
+            pos = f.stream.tell()
+            f.stream.seek(0, os.SEEK_END)
+            size = f.stream.tell()
+            f.stream.seek(pos)
+        except (AttributeError, OSError, ValueError):
+            size = 0
+    if size and size > max_bytes:
+        return jsonify({"ok": False, "error": "File is too large (max %d MB)."
+                        % max(1, round(max_bytes / (1024 * 1024)))}), 400
     up_dir = os.path.join(BASE_DIR, "static", "uploads")
     os.makedirs(up_dir, exist_ok=True)
     fname = secure_filename(f.filename)
