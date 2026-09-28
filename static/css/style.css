@@ -1999,6 +1999,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .book-field-time { display: none; }
     .book-modal[data-step="form"] .book-modal-close { display: none; }
     .book-form-back { display: inline-flex; }
+    /* the visit chip is a plain label on phones - the Back pill is the only
+       way out, so two controls going to the same place is just noise */
+    .book-visitsummary-change { display: none; }
 
     /* ---- Mobile search bar + city dropdown ----
        14px placeholder text was too wide next to the Select City button, so

@@ -311,7 +311,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (formBackBtn) {
             formBackBtn.addEventListener("click", function () {
-                setStep("type");
+                // Back is not a new step: drop the entry that led here so the
+                // type step's own Back closes the modal instead of bouncing
+                // straight back to the form
+                stepHistory.pop();
+                setStep("type", { back: true });
             });
         }
         document.addEventListener("keydown", function (e) {
