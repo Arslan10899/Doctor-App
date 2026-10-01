@@ -2367,97 +2367,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .announce-close { display: none; }
 
 @media (max-width: 768px) {
-    /* ---- Professional announcement bar ----
-       The old phone ticker was a glowing teal wedge with a rainbow colour cycle
-       running behind the text, and it read as an ad banner rather than as
-       information. On a phone it is now a quiet strip of solid dark teal with a
-       small tag chip and no glow, no colour cycling and no motion of its own.
+    /* ---- No announcement bar on a phone ----
+       The bar is wanted on a desktop and not on a phone, so it is removed here
+       rather than restyled again. A phone has no room to spend a sticky strip
+       on: the header is already 68px there, and the hero is what someone opened
+       the app for. Every announcement is still rendered and still in the page,
+       so nothing is lost from the document or from a screen reader, and a
+       tablet at 769px and up is untouched.
 
-       The announcements themselves are deliberately left to the desktop rules
-       below, so a phone scrolls the same single line on the same loop a desktop
-       does. An earlier version stepped through one announcement at a time on a
-       timer, which meant a phone and a desktop could be showing different
-       things at the same moment. */
-    .announcement-bar {
-        background: #0b2b36;
-        padding: 0;
-        min-height: 42px;
-        font-size: 12.5px;
-        font-weight: 500;
-        box-shadow: none;
-        border-bottom: 1px solid #16404b;
-    }
-    .announce-tag {
-        position: static;
-        flex-shrink: 0;
-        gap: 5px;
-        margin: 0 0 0 14px;
-        padding: 3px 8px;
-        border-radius: 7px;
-        background: #0f4148;
-        border: 1px solid #14575a;
-        color: #7fdbcd;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: .05em;
-        clip-path: none;
-        box-shadow: none;
-        animation: none;
-        text-shadow: none;
-    }
-    .announce-tag svg { display: block; width: 12px; height: 12px; color: #5eead4; }
-    .announce-tag-text { white-space: nowrap; }
-
-    /* ---- The line runs left across the bar, and nothing on it is see-through --
-       A phone gets the same travelling line a desktop gets. The desktop rule
-       animates the whole list leftwards on an 80s loop behind a one-screen
-       lead-in, so every announcement gets its turn rather than one of them
-       holding the bar while the rest go unread. There is deliberately no rule
-       here for the motion, the width, the lead-in or the items, so the desktop
-       values above are what a phone gets. Overriding them here is how the two
-       drifted apart in the first place.
-
-       The one thing a phone does not get is the fading ends. The desktop mask
-       runs 110px in from the left and 40px from the right, which on a 1280px
-       screen is a soft edge. On a 390px phone that same fade is a quarter of
-       the line, and on a 524px screen it is still a fifth, so the announcement
-       read as half transparent rather than as information. Turning the mask off
-       is what makes the line fully opaque.
-
-       Every surface is written out as a flat colour for the same reason. The
-       desktop builds the tag chip, the title pill and the dividers out of
-       rgba(), and over the dark bar on a phone those read as a wash instead of
-       a surface, so each is the solid colour it was blending to. */
-    .announcement-list {
-        -webkit-mask: none;
-        mask: none;
-    }
-    .announcement-item { border-right: 1px solid #11494f; }
-    .announcement-item:first-child { border-left: 1px solid #11494f; }
-    .announcement-title {
-        flex: 0 0 auto;
-        background: #134b57;
-        border: 1px solid #2a6b78;
-    }
-    /* A finger never produces :hover, so the desktop hover pause is unreachable
-       on a phone and the loop could not be stopped at all. Pressing the strip
-       stands in for it. */
-    .announcement-bar:active .announcement-list { animation-play-state: paused; }
-    .announce-close {
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        width: 34px;
-        height: 34px;
-        margin: 0 8px 0 4px;
-        border: 0;
-        border-radius: 999px;
-        background: #16333d;
-        color: #9fc4c6;
-        cursor: pointer;
-    }
-    .announce-close:hover { background: #1e4553; color: #fff; }
-    .announce-close:active { transform: scale(.94); }
+       This also retires the phone-only announcement skin that used to sit in
+       this block: the solid tag chip, the opaque title pill, the dividers, the
+       masked-off marquee and the dismiss button, along with the rules that
+       stripped the motion. All of it is unreachable while the bar is display
+       none, and leaving it behind would only invite the next person to tune
+       rules that cannot be seen. It is in git history, in the commits that
+       built it, so bringing the bar back to a phone is a revert away. */
+    .announcement-bar { display: none; }
 
     /* ---- Header breathing room ----
        The mascot tile is 38px with an 11px gap, which pushed the wordmark close
