@@ -59,6 +59,37 @@
                 </div>
             </div>
             <div class="hero-content">
+                {% if mobile_cards %}
+                {% set mn = mobile_cards|length %}
+                {% set mmode = 'one' if mn == 1 else ('two' if mn == 2 else 'many') %}
+                <div class="mcard-strip mcard-strip--{{ mmode }}" id="mcardStrip" data-mode="{{ mmode }}" data-count="{{ mn }}" aria-label="Featured offers">
+                    <div class="mcard-track" id="mcardTrack" tabindex="0">
+                        {% for c in mobile_cards %}
+                        {% set href = c['link_url'] or '' %}
+                        {% if href %}
+                        <a class="mcard" href="{{ href }}">
+                        {% else %}
+                        <div class="mcard">
+                        {% endif %}
+                            {% if c['media_type'] == 'video' and c['video_url'] %}
+                            <video class="mcard-media" src="{{ c['video_url'] }}"{% if c['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"></video>
+                            {% elif c['image_url'] %}
+                            <img class="mcard-media" src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy"{% if mmode == 'one' %} data-contain="1"{% endif %}>
+                            {% else %}
+                            <div class="mcard-placeholder">{{ c['name'] or 'Coming soon' }}</div>
+                            {% endif %}
+                        {% if href %}
+                        </a>
+                        {% else %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% if mmode == 'many' %}
+                    <div class="mcard-dots" id="mcardDots"></div>
+                    {% endif %}
+                </div>
+                {% endif %}
                 <div class="hero-head">
                     <div class="hero-head-text">
                         <h1>Need a <span class="hero-title-key">Doctor</span>? <span class="hero-title-accent">We Help You Find the Right One <span class="hero-title-tail">&mdash; anytime, anywhere.</span></span></h1>
