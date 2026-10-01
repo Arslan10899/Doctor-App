@@ -2367,22 +2367,25 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .announce-close { display: none; }
 
 @media (max-width: 768px) {
-    /* ---- No announcement bar on a phone ----
-       The bar is wanted on a desktop and not on a phone, so it is removed here
-       rather than restyled again. A phone has no room to spend a sticky strip
-       on: the header is already 68px there, and the hero is what someone opened
-       the app for. Every announcement is still rendered and still in the page,
-       so nothing is lost from the document or from a screen reader, and a
-       tablet at 769px and up is untouched.
+    /* ---- No announcement styling of its own on a phone ----
+       A phone shows the same bar a desktop shows, so there is deliberately no
+       rule for the bar, the tag, the list, the items, the title or the motion
+       inside this block. The base rules above are what every width gets, down
+       to the skewed tag, the gradient pill, the 80s marquee and the 110px fade.
 
-       This also retires the phone-only announcement skin that used to sit in
-       this block: the solid tag chip, the opaque title pill, the dividers, the
-       masked-off marquee and the dismiss button, along with the rules that
-       stripped the motion. All of it is unreachable while the bar is display
-       none, and leaving it behind would only invite the next person to tune
-       rules that cannot be seen. It is in git history, in the commits that
-       built it, so bringing the bar back to a phone is a revert away. */
-    .announcement-bar { display: none; }
+       That is the point: there was a phone-only skin here once, and it is what
+       made the two drift apart in the first place. It restyled the tag into a
+       chip, made the surfaces opaque, switched the fade off and added a dismiss
+       button, so a phone and a desktop could be showing visibly different bars
+       for the same announcements. The announcements are one thing and the bar
+       is one bar, so it is defined once and used at every width. If the bar ever
+       does need to differ, that has to be a decision with a reason behind it,
+       not a leftover.
+
+       The dismiss button and the close-script guard stay in place for the
+       markup, but the base rule keeps the button out of the row entirely, so it
+       is not shown at any width. The bar is not a thing a visitor needs to
+       clear away. */
 
     /* ---- Header breathing room ----
        The mascot tile is 38px with an 11px gap, which pushed the wordmark close
