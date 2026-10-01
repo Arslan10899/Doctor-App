@@ -62,15 +62,17 @@
                 <div class="hero-head">
                     <div class="hero-head-text">
                         <h1>Need a <span class="hero-title-key">Doctor</span>? <span class="hero-title-accent">We Help You Find the Right One <span class="hero-title-tail">&mdash; anytime, anywhere.</span></span></h1>
+                        {# The city picker is rendered from one macro into two slots:
+                           the bar slot stays inside the search bar on desktop, and
+                           the pill slot sits beside the headline on phones. CSS shows
+                           exactly one at each width, so both can never appear
+                           together. The "id" argument keeps their element ids unique.
+                           The pill is outside the form, which is fine: it never
+                           submits, it only writes to the hidden city input below. #}
+                        {{ city_picker('pill', 'heroPill') }}
                         <p class="hero-sub"><span class="hero-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;<span class="hero-sub-tail">for Clinic visits & Online check-ups.</span></p>
                     </div>
                     <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
-                        {# The city picker is rendered from one macro into two slots:
-                           the bar slot stays inside the search bar on desktop, and
-                           the pill slot sits above it on phones. CSS shows exactly
-                           one at each width, so both can never appear together. The
-                           "id" argument keeps their element ids unique. #}
-                        {{ city_picker('pill', 'heroPill') }}
                         <div class="search-bar-wrap">
                             <div class="search-section">
                                 <input type="text" name="q" placeholder="Search by doctor, specialty, hospital or condition..." aria-label="Search">

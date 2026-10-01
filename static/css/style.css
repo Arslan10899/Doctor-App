@@ -1999,10 +1999,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-title-accent { display: none; }
     /* "Search . Connect . Book - for Clinic visits & Online check-ups." is
        desktop-only copy; on phones it pushed the search bar down for a line
-       nobody reads. The title now runs straight into the search bar, so pull
-       the 22px base margin back to keep the usual breathing room. */
+       nobody reads. The title row now carries the city pill beside the question,
+       so the search bar follows that row and keeps a little room under it. */
     .hero p.hero-sub { display: none; }
-    .hero-content .hero-search { margin-top: 4px; }
+    .hero-content .hero-search { margin-top: 12px; }
 
     /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
@@ -2116,28 +2116,60 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* ---- Mobile search bar + city pill ----
        Cramming the field, the city dropdown and the search button into one bar
        left the city part a ~100px tap target and clipped the placeholder. So on
-       phones the picker leaves the bar and becomes a pill above it, and the bar
-       is left as a plain full-width input plus the search button. */
+       phones the picker leaves the bar entirely and sits beside the headline
+       instead, and the bar is left as a plain full-width input plus the search
+       button.
+
+       The pill is a sibling of the h1 inside .hero-head-text, so that block
+       becomes a row on a phone: the question on the left, the city on the
+       right, the search bar on its own full-width line underneath. A long city
+       name truncates rather than shoving the question off the line, and if the
+       two genuinely cannot share a row the pill drops below the question. */
+    .hero-head-text {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 7px 10px;
+    }
+    .hero-head-text h1 { flex: 1 1 auto; min-width: 0; }
     .city-slot--bar { display: none; }
-    .city-slot--pill { display: block; }
+    .city-slot--pill { display: block; flex: 0 1 auto; max-width: 52%; }
     .city-slot--pill .city-drop {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 7px 14px 7px 11px;
+        gap: 5px;
+        padding: 6px 12px 6px 10px;
         border-radius: 9999px;
         background: #fff;
         border: 1px solid rgba(13, 148, 136, .22);
         box-shadow: 0 4px 14px -8px rgba(13, 94, 102, .30);
         color: #0f4a55;
+        font-size: 13px;
         font-weight: 600;
         width: auto;
+        max-width: 100%;
+    }
+    /* the city name is user data and can be long, so it gives way instead of
+       the layout giving way */
+    .city-slot--pill .city-drop-text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .city-slot--pill .city-drop .pin { display: block; color: #0d9488; }
     .city-slot--pill .city-drop .chevron { margin-left: 0; }
     .city-slot--pill .city-drop.open { background: rgba(13, 148, 136, .09); }
-    .city-slot--pill .city-menu { left: 0; right: auto; min-width: 100%; }
-    .search-bar-wrap { margin-top: 8px; }
+    /* the pill sits on the right of the row, so the list opens to the left from
+       its right edge and stays on screen, and it is allowed to be wider than the
+       pill because a city list crammed into 130px is not readable */
+    .city-slot--pill .city-menu {
+        left: auto;
+        right: 0;
+        min-width: 210px;
+        max-width: calc(100vw - 24px);
+    }
     .search-section input { font-size: 14px; }
     .search-section input::placeholder { font-size: 14px; }
     .city-drop,
@@ -2377,13 +2409,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .announce-tag-text { white-space: nowrap; }
 
     /* The announcements scroll here exactly as they do on a desktop: one line,
-       the whole list moving left on a loop, with the same fading ends. The
-       earlier phone version showed a single announcement and stepped through the
-       rest on a timer, which meant a phone never showed what a desktop showed.
-       There is deliberately no rule for .announcement-list, .announcement-item,
-       .announcement-title or .announcement-content in this block, so the desktop
-       rules above are what a phone gets. Overriding them here is how the two
-       drifted apart in the first place. */
+       the whole list moving left on a loop. The earlier phone version showed a
+       single announcement and stepped through the rest on a timer, which meant a
+       phone never showed what a desktop showed. There is deliberately no rule
+       here for .announcement-item, .announcement-title or .announcement-content,
+       so the desktop rules above are what a phone gets. Overriding them here is
+       how the two drifted apart in the first place.
+
+       The fading ends are the one exception. The desktop fade is 110px at the
+       left and 40px at the right, which on a 1280px screen is a soft edge. On a
+       390px phone that same fade is a third of the line, so the announcement read
+       as half transparent rather than as information. Twelve pixels keeps the
+       text fully opaque and still stops the loop being cut off square. */
+    .announcement-list {
+        -webkit-mask: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+        mask: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+    }
     /* A finger never produces :hover, so the desktop hover pause is unreachable
        on a phone and the loop could not be stopped at all. Pressing the strip
        stands in for it. This is the one rule here that a phone has and a
