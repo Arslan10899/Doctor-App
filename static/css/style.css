@@ -159,6 +159,13 @@ input, select, textarea { font-family: inherit; }
 .admin-entry:hover { background: var(--primary); color: #fff; border-style: solid; }
 .admin-entry svg { flex-shrink: 0; }
 
+/* The admin entry is rendered twice from one template macro: this is the copy
+   in the top bar. Above 1200px the dropdown copy is hidden and this one shows;
+   inside the 1200px block the two swap, so only one is ever visible. Without
+   this rule the dropdown copy would show in the desktop nav too, giving the
+   header two admin buttons. */
+.nav-admin-slot { display: none; }
+
 .nav-toggle {
     display: none;
     flex-direction: column;
@@ -1921,6 +1928,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .admin-entry { padding: 7px 10px; font-size: 13px; }
     .admin-entry span { display: none; }
     .admin-entry { padding: 7px 9px; }
+    /* On phones the admin entry moves into the dropdown so the top bar is just
+       the logo and the 3-dot. Exactly one of the two renders is ever shown. */
+    .hdr-admin-slot { display: none; }
+    .nav-admin-slot { display: block; margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .nav-admin-slot .admin-entry { display: flex; width: 100%; padding: 11px 14px; font-size: 14px; }
+    /* The rule above strips the label to leave room in the bar; inside the
+       menu it has to come back. */
+    .nav-admin-slot .admin-entry span { display: inline; }
 }
 
 @media (max-width: 768px) {

@@ -25,6 +25,21 @@
         {% endif %}
     {% endwith %}
 
+    {# The admin entry is rendered twice from this one macro: in the top bar on
+       desktop, inside the dropdown menu on phones. CSS decides which one shows,
+       so the two can never both appear in the same place. #}
+    {% macro admin_entry() -%}
+    <a href="{% if session.get('admin_logged_in') %}{{ url_for('admin_dashboard') }}{% else %}{{ url_for('admin_login') }}{% endif %}"
+       class="admin-entry" title="Admin panel">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M19 8v6M22 11h-6"/>
+        </svg>
+        <span>{% if session.get('admin_logged_in') %}Admin Panel{% else %}Admin{% endif %}</span>
+    </a>
+    {%- endmacro %}
+
     <header class="site-header">
         <div class="container header-inner">
             <a href="{{ url_for('index') }}" class="logo">
@@ -44,6 +59,7 @@
                 <a href="{{ url_for('hospitals') }}" class="nav-link{% if request.endpoint == 'hospitals' %} active{% endif %}">Hospitals</a>
                 <a href="{{ url_for('about') }}" class="nav-link{% if request.endpoint == 'about' %} active{% endif %}">About Us</a>
                 <a href="{{ url_for('contact') }}" class="nav-link{% if request.endpoint == 'contact' %} active{% endif %}">Contact</a>
+                <span class="nav-admin-slot">{{ admin_entry() }}</span>
             </nav>
 
             <div class="header-actions">
@@ -58,15 +74,7 @@
                     <a href="{{ url_for('auth') }}#signup" class="btn btn-primary btn-sm">Sign Up</a>
                 {% endif %}
 
-                <a href="{% if session.get('admin_logged_in') %}{{ url_for('admin_dashboard') }}{% else %}{{ url_for('admin_login') }}{% endif %}"
-                   class="admin-entry" title="Admin panel">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M19 8v6M22 11h-6"/>
-                    </svg>
-                    <span>{% if session.get('admin_logged_in') %}Admin Panel{% else %}Admin{% endif %}</span>
-                </a>
+                <span class="hdr-admin-slot">{{ admin_entry() }}</span>
             </div>
 
 
