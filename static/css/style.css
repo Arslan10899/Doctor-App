@@ -1984,26 +1984,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         white-space: normal;
         color: #0d3b44;
     }
-    /* #0d9488 is only 3.7:1 on white, which is fine for the big headline but
+    /*     #0d9488 is only 3.7:1 on white, which is fine for the big headline but
        not for the small accent words, so the teal is darkened to #0f766e
        (5.5:1) and used for both. */
     .hero-title-key { color: #0f766e; }
     .hero-steps { color: #0f766e; }
-    .hero-title-tail { color: #55737c; }
-    .hero-title-accent {
-        color: #0f4a55;
-        background: rgba(13, 148, 136, .07);
-        border-left-color: #0f766e;
-    }
     .hero p.hero-sub { color: #55737c; }
     .hero-sub-tail { color: #0d3b44; }
     .hero-stat span { color: #55737c; }
-    .hero-title-accent {
-        font-size: 13.5px;
-        line-height: 1.35;
-        margin-top: 10px;
-        padding: 8px 13px;
-    }
+    /* "We Help You Find the Right One" is desktop-only copy. On a phone it was a
+       tinted band under the headline, so the question the headline actually asks
+       was answered by a slogan a few words long, and the band pushed the search
+       field below the fold. Phones keep the question and the search. */
+    .hero-title-accent { display: none; }
     /* "Search . Connect . Book - for Clinic visits & Online check-ups." is
        desktop-only copy; on phones it pushed the search bar down for a line
        nobody reads. The title now runs straight into the search bar, so pull
@@ -2161,7 +2154,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 @media (max-width: 400px) {
     .hero h1 { font-size: 22px; }
-    .hero-title-accent { font-size: 12.5px; }
     .search-section input,
     .search-section input::placeholder { font-size: 13px; }
     .city-drop .city-drop-text { font-size: 12px; }
