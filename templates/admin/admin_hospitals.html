@@ -48,28 +48,30 @@
 <div class="card">
     <h2>All Hospitals &amp; Clinics ({{ hospitals|length }})</h2>
     {% if hospitals %}
-    <table class="table">
-        <thead>
-            <tr><th>Name</th><th>City</th><th>Phone</th><th>Rating</th><th>OPD Schedules</th><th></th></tr>
-        </thead>
-        <tbody>
-            {% for h in hospitals %}
-            <tr>
-                <td>{{ h['name'] }}</td>
-                <td>{{ h['city_name'] }}</td>
-                <td>{{ h['phone'] or '—' }}</td>
-                <td>{{ h['rating']|round(1) }}</td>
-                <td>{% if h['ot_schedules'] %}Yes{% else %}—{% endif %}</td>
-                <td>
-                    <a class="btn btn-sm" href="{{ url_for('admin_hospital_edit', hospital_id=h['id']) }}" style="background:#eef2f6;color:#0c3444;">Edit</a>
-                    <form class="inline" method="post" action="{{ url_for('admin_hospital_delete', hospital_id=h['id']) }}" onsubmit="return confirm('Delete {{ h['name'] }}?')">
-                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead>
+                <tr><th>Name</th><th>City</th><th>Phone</th><th>Rating</th><th>OPD Schedules</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for h in hospitals %}
+                <tr>
+                    <td>{{ h['name'] }}</td>
+                    <td>{{ h['city_name'] }}</td>
+                    <td>{{ h['phone'] or '—' }}</td>
+                    <td>{{ h['rating']|round(1) }}</td>
+                    <td>{% if h['ot_schedules'] %}Yes{% else %}—{% endif %}</td>
+                    <td>
+                        <a class="btn btn-sm" href="{{ url_for('admin_hospital_edit', hospital_id=h['id']) }}" style="background:#eef2f6;color:#0c3444;">Edit</a>
+                        <form class="inline" method="post" action="{{ url_for('admin_hospital_delete', hospital_id=h['id']) }}" onsubmit="return confirm('Delete {{ h['name'] }}?')">
+                            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <div class="empty">No hospitals or clinics yet.</div>
     {% endif %}

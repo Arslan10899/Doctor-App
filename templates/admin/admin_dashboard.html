@@ -41,24 +41,26 @@
 
 <div class="card">
     <h2>Recently Added Doctors</h2>
-    <table class="table">
-        <thead>
-            <tr><th>ID</th><th>Name</th><th>Specialty</th><th>City</th><th>Fee</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-            {% for d in recent %}
-            <tr>
-                <td>{{ d['id'] }}</td>
-                <td>{{ d['name'] }}</td>
-                <td>{{ d['specialty_name'] }}</td>
-                <td>{{ d['city_name'] }}</td>
-                <td>Rs. {{ '{:,}'.format(d['fee']) }}</td>
-                <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
-            </tr>
-            {% else %}
-            <tr><td colspan="6" class="empty">No doctors yet.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead>
+                <tr><th>ID</th><th>Name</th><th>Specialty</th><th>City</th><th>Fee</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for d in recent %}
+                <tr>
+                    <td>{{ d['id'] }}</td>
+                    <td>{{ d['name'] }}</td>
+                    <td>{{ d['specialty_name'] }}</td>
+                    <td>{{ d['city_name'] }}</td>
+                    <td>Rs. {{ '{:,}'.format(d['fee']) }}</td>
+                    <td><span class="tag {{ 'tag-on' if d['online'] else 'tag-off' }}">{{ 'Online' if d['online'] else 'In-Clinic' }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="empty">No doctors yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

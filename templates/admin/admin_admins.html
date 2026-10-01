@@ -31,27 +31,29 @@
 
 <div class="card">
     <h2>All Admins ({{ admins|length }})</h2>
-    <table class="table">
-        <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Email</th><th></th></tr></thead>
-        {% for a in admins %}
-        <tr>
-            <td>{{ a['id'] }}</td>
-            <td>{{ a['username'] }}</td>
-            <td>{{ a['name'] or '—' }}</td>
-            <td>{{ a['email'] or '—' }}</td>
-            <td>
-                <button class="btn btn-sm admin-edit" type="button"
-                        data-id="{{ a['id'] }}"
-                        data-username="{{ a['username'] }}"
-                        data-name="{{ a['name'] or '' }}"
-                        data-email="{{ a['email'] or '' }}">Edit</button>
-                <form class="inline" method="post" action="{{ url_for('admin_admin_delete', admin_id=a['id']) }}" onsubmit="return confirm('Delete admin {{ a['username'] }}?')">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Email</th><th></th></tr></thead>
+            {% for a in admins %}
+            <tr>
+                <td>{{ a['id'] }}</td>
+                <td>{{ a['username'] }}</td>
+                <td>{{ a['name'] or '—' }}</td>
+                <td>{{ a['email'] or '—' }}</td>
+                <td>
+                    <button class="btn btn-sm admin-edit" type="button"
+                            data-id="{{ a['id'] }}"
+                            data-username="{{ a['username'] }}"
+                            data-name="{{ a['name'] or '' }}"
+                            data-email="{{ a['email'] or '' }}">Edit</button>
+                    <form class="inline" method="post" action="{{ url_for('admin_admin_delete', admin_id=a['id']) }}" onsubmit="return confirm('Delete admin {{ a['username'] }}?')">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 <!-- Admin edit modal -->

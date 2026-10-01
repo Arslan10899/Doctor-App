@@ -810,7 +810,8 @@ animation: none;
     top: 50%;
     transform: translateY(-50%);
     z-index: 4;
-    width: 34px; height: 34px;
+    /* 34px was under a comfortable thumb target */
+    width: 40px; height: 40px;
     border: none;
     border-radius: 50%;
     background: rgba(255,255,255,.92);
@@ -1026,8 +1027,9 @@ animation: none;
     right: 22px;
     display: grid;
     place-items: center;
-    width: 34px;
-    height: 34px;
+    /* 34px was under a comfortable thumb target */
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: rgba(255, 255, 255, .78);
     color: var(--ac);
@@ -1093,7 +1095,7 @@ animation: none;
     .asym-title { gap: 10px; margin-bottom: 8px; }
     .asym-title-icon { flex-basis: 34px; width: 34px; height: 34px; }
     .asym-eyebrow { margin-bottom: 12px; font-size: 10.5px; }
-    .asym-arrow { top: 18px; right: 18px; width: 30px; height: 30px; }
+    .asym-arrow { top: 16px; right: 16px; width: 38px; height: 38px; }
     .asym-card-tall .asym-arrow { top: 20px; right: 20px; }
     .asym-card-tall .asym-media { height: 40%; }
 }
@@ -1255,7 +1257,7 @@ animation: none;
 }
 .social-links { display: flex; gap: 8px; margin-top: 16px; }
 .social-links a {
-    width: 36px; height: 36px; border-radius: 8px;
+    width: 40px; height: 40px; border-radius: 8px;
     border: 1px solid #2d4d5d;
     display: grid; place-items: center;
     color: #cbd5e1;
@@ -1724,6 +1726,14 @@ animation: none;
     background: radial-gradient(circle, rgba(76,175,80,.3), transparent 70%);
     bottom: -150px; left: 20%;
 }
+/* The two glows above deliberately hang outside the box (-100px on the right,
+   -150px at the bottom). On a phone that pushed the whole page out to a
+   sideways scroll, and the bottom one bled into the next section. Clip them to
+   the section; both are radial gradients already at zero by 70% of their
+   radius, so the cut edge is invisible. Deliberately NOT a global
+   overflow-x:hidden on html/body - that would turn the body into the scroll
+   container and break the sticky site header and the sticky admin topbar. */
+.app-section { overflow: hidden; }
 .app-phone { display: flex; justify-content: center; position: relative; z-index: 1; }
 .phone-frame {
     width: 230px;
@@ -1913,7 +1923,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .search-bar-wrap { border-radius: 18px; }
     .search-section, .dropdown-section { padding: 5px 10px; }
     .divider { display: none; }
-    .search-btn { width: 34px; height: 34px; }
+    .search-btn { width: 40px; height: 40px; }
     .hero-head { gap: 18px; }
 }
 
@@ -2097,6 +2107,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .admin-entry span { display: inline; }
     .hero-stats { flex-wrap: wrap; gap: 18px; }
     .app-section { grid-template-columns: 1fr; padding: 34px 22px; text-align: center; gap: 26px; }
+    /* Once the section is one column the glows are pure background. Pull them
+       in and shrink them so they read as a soft wash behind the phone instead
+       of two large discs fighting the copy. */
+    .app-section::before { width: 260px; height: 260px; top: -110px; right: -70px; }
+    .app-section::after { width: 220px; height: 220px; bottom: -90px; left: 12%; }
     .app-info h2 { font-size: 26px; }
     .app-info > p { margin-left: auto; margin-right: auto; }
     .app-features { align-items: center; }
@@ -2365,23 +2380,33 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     left: 0; right: 0;
     display: flex;
     justify-content: center;
-    gap: 7px;
+    gap: 2px;
     z-index: 6;
 }
+/* 8x8 was not a real target. The dot itself stays 8px (22px active) drawn by
+   ::before, and the button carries a 20x24 hit area around it. */
 .slide-dots button {
-    width: 8px; height: 8px;
-    border-radius: 50%;
+    width: 20px; height: 24px;
     border: none;
-    background: rgba(13, 148, 136, 0.3);
+    background: none;
     cursor: pointer;
     padding: 0;
-    transition: width .25s, background .25s;
+    display: grid;
+    place-items: center;
 }
-.slide-dots button.active { background: #0d9488; width: 22px; border-radius: 999px; }
+.slide-dots button::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(13, 148, 136, 0.3);
+    transition: width .25s, background .25s, border-radius .25s;
+}
+.slide-dots button.active { width: 34px; }
+.slide-dots button.active::before { background: #0d9488; width: 22px; border-radius: 999px; }
 @media (max-width: 768px) {
     .hero-slider { padding: 0 30px; }
     .hero-slider .slides-wrap { height: clamp(120px, 26vw, 190px); }
-    .car-nav { width: 32px; height: 32px; font-size: 16px; }
+    .car-nav { width: 38px; height: 38px; font-size: 17px; }
     .car-nav.prev { left: 0; }
     .car-nav.next { right: 0; }
     .slide-dots { bottom: -20px; }
@@ -2487,8 +2512,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
+    /* 30px was well under a comfortable thumb target */
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     background: rgba(255, 255, 255, .92);
@@ -2509,20 +2535,33 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .mcard-dots {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 2px;
     margin-top: 8px;
 }
+/* The visible dot stays 6px (18px active) but the button around it is a real
+   18x24 hit area instead of 6x6, which was close to untappable on a phone. The
+   active pill needs a wider button so the pill is not flush against its
+   neighbours. */
 .mcard-dots button {
-    width: 6px;
-    height: 6px;
+    width: 18px;
+    height: 24px;
     padding: 0;
     border: none;
+    background: none;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+.mcard-dots button::before {
+    content: "";
+    width: 6px;
+    height: 6px;
     border-radius: 999px;
     background: rgba(255, 255, 255, .45);
-    cursor: pointer;
     transition: width .2s, background .2s;
 }
-.mcard-dots button.active { background: #fff; width: 18px; }
+.mcard-dots button.active { width: 30px; }
+.mcard-dots button.active::before { background: #fff; width: 18px; }
 
 @media (max-width: 768px) {
     .mcard-strip { display: block; position: relative; }
@@ -2577,8 +2616,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     position: absolute;
     top: 14px;
     right: 14px;
-    width: 34px;
-    height: 34px;
+    /* 34px was under a comfortable thumb target */
+    width: 40px;
+    height: 40px;
     border: none;
     border-radius: 50%;
     background: var(--bg-light, #f0f5f7);

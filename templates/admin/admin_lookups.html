@@ -34,48 +34,52 @@
 
 <div class="card">
     <h2>Cities ({{ cities|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Name</th><th></th></tr></thead>
-        {% for c in cities %}
-        <tr id="city-{{ c['id'] }}">
-            <td id="city-name-{{ c['id'] }}">{{ c['name'] }}</td>
-            <td>
-                <button class="btn btn-sm" id="city-edit-btn-{{ c['id'] }}" type="button" onclick="startCityEdit({{ c['id'] }})">Edit</button>
-                <button class="btn btn-sm" id="city-save-btn-{{ c['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveCity({{ c['id'] }})">Save</button>
-                <button class="btn btn-sm" id="city-cancel-btn-{{ c['id'] }}" type="button" style="display:none;" onclick="cancelCityEdit({{ c['id'] }})">Cancel</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete city {{ c['name'] }}?')">
-                    <input type="hidden" name="action" value="city_delete">
-                    <input type="hidden" name="id" value="{{ c['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>Name</th><th></th></tr></thead>
+            {% for c in cities %}
+            <tr id="city-{{ c['id'] }}">
+                <td id="city-name-{{ c['id'] }}">{{ c['name'] }}</td>
+                <td>
+                    <button class="btn btn-sm" id="city-edit-btn-{{ c['id'] }}" type="button" onclick="startCityEdit({{ c['id'] }})">Edit</button>
+                    <button class="btn btn-sm" id="city-save-btn-{{ c['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveCity({{ c['id'] }})">Save</button>
+                    <button class="btn btn-sm" id="city-cancel-btn-{{ c['id'] }}" type="button" style="display:none;" onclick="cancelCityEdit({{ c['id'] }})">Cancel</button>
+                    <form class="inline" method="post" onsubmit="return confirm('Delete city {{ c['name'] }}?')">
+                        <input type="hidden" name="action" value="city_delete">
+                        <input type="hidden" name="id" value="{{ c['id'] }}">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 <div class="card">
     <h2>Specialties ({{ specialties|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Name</th><th>Urdu Name</th><th>Icon</th><th></th></tr></thead>
-        {% for s in specialties %}
-        <tr id="spec-{{ s['id'] }}">
-            <td id="spec-name-{{ s['id'] }}">{{ s['name'] }}</td>
-            <td id="spec-urdu-{{ s['id'] }}">{{ s['urdu_name'] or '—' }}</td>
-            <td id="spec-icon-{{ s['id'] }}">{% if s['icon'] %}<img src="{{ s['icon'] }}" style="width:26px;height:26px;object-fit:contain;">{% else %}—{% endif %}</td>
-            <td>
-                <button class="btn btn-sm" id="spec-edit-btn-{{ s['id'] }}" type="button" onclick="startSpecEdit({{ s['id'] }})">Edit</button>
-                <button class="btn btn-sm" id="spec-save-btn-{{ s['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveSpec({{ s['id'] }})">Save</button>
-                <button class="btn btn-sm" id="spec-cancel-btn-{{ s['id'] }}" type="button" style="display:none;" onclick="cancelSpecEdit({{ s['id'] }})">Cancel</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete specialty {{ s['name'] }}?')">
-                    <input type="hidden" name="action" value="specialty_delete">
-                    <input type="hidden" name="id" value="{{ s['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>Name</th><th>Urdu Name</th><th>Icon</th><th></th></tr></thead>
+            {% for s in specialties %}
+            <tr id="spec-{{ s['id'] }}">
+                <td id="spec-name-{{ s['id'] }}">{{ s['name'] }}</td>
+                <td id="spec-urdu-{{ s['id'] }}">{{ s['urdu_name'] or '—' }}</td>
+                <td id="spec-icon-{{ s['id'] }}">{% if s['icon'] %}<img src="{{ s['icon'] }}" style="width:26px;height:26px;object-fit:contain;">{% else %}—{% endif %}</td>
+                <td>
+                    <button class="btn btn-sm" id="spec-edit-btn-{{ s['id'] }}" type="button" onclick="startSpecEdit({{ s['id'] }})">Edit</button>
+                    <button class="btn btn-sm" id="spec-save-btn-{{ s['id'] }}" type="button" style="display:none;background:#0c3444;color:#fff;" onclick="saveSpec({{ s['id'] }})">Save</button>
+                    <button class="btn btn-sm" id="spec-cancel-btn-{{ s['id'] }}" type="button" style="display:none;" onclick="cancelSpecEdit({{ s['id'] }})">Cancel</button>
+                    <form class="inline" method="post" onsubmit="return confirm('Delete specialty {{ s['name'] }}?')">
+                        <input type="hidden" name="action" value="specialty_delete">
+                        <input type="hidden" name="id" value="{{ s['id'] }}">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 <script>

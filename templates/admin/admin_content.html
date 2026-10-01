@@ -63,68 +63,72 @@
 
 <div class="card">
     <h2>Announcements ({{ announcements|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Title</th><th>Content</th><th>Schedule</th><th>Status</th><th></th></tr></thead>
-        {% for a in announcements %}
-        <tr{% if not a['active'] %} style="opacity:.55;"{% endif %}>
-            <td>{{ a['title'] or '—' }}</td>
-            <td>{{ a['content'] }}</td>
-            <td>
-                {% if a['date_from'] or a['date_to'] %}
-                    {{ (a['date_from'] or 'Now')[:16] }} → {{ (a['date_to'] or 'Forever')[:16] }}
-                {% else %}
-                    <span class="tag tag-on">Always</span>
-                {% endif %}
-            </td>
-            <td>
-                <label class="toggle-switch" title="{{ 'Click to OFF' if a['active'] else 'Click to ON' }}">
-                    <input type="checkbox" class="ann-toggle" data-id="{{ a['id'] }}" {% if a['active'] %}checked{% endif %}>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span class="toggle-state">{{ 'ON' if a['active'] else 'OFF' }}</span>
-            </td>
-            <td>
-                <button class="btn btn-sm annn-edit" type="button"
-                        data-id="{{ a['id'] }}"
-                        data-title="{{ a['title'] or '' }}"
-                        data-content="{{ a['content'] }}"
-                        data-date-from="{{ a['date_from'] or '' }}"
-                        data-date-to="{{ a['date_to'] or '' }}">Edit</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
-                    <input type="hidden" name="section" value="delete">
-                    <input type="hidden" name="table" value="announcements">
-                    <input type="hidden" name="id" value="{{ a['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>Title</th><th>Content</th><th>Schedule</th><th>Status</th><th></th></tr></thead>
+            {% for a in announcements %}
+            <tr{% if not a['active'] %} style="opacity:.55;"{% endif %}>
+                <td>{{ a['title'] or '—' }}</td>
+                <td>{{ a['content'] }}</td>
+                <td>
+                    {% if a['date_from'] or a['date_to'] %}
+                        {{ (a['date_from'] or 'Now')[:16] }} → {{ (a['date_to'] or 'Forever')[:16] }}
+                    {% else %}
+                        <span class="tag tag-on">Always</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <label class="toggle-switch" title="{{ 'Click to OFF' if a['active'] else 'Click to ON' }}">
+                        <input type="checkbox" class="ann-toggle" data-id="{{ a['id'] }}" {% if a['active'] %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-state">{{ 'ON' if a['active'] else 'OFF' }}</span>
+                </td>
+                <td>
+                    <button class="btn btn-sm annn-edit" type="button"
+                            data-id="{{ a['id'] }}"
+                            data-title="{{ a['title'] or '' }}"
+                            data-content="{{ a['content'] }}"
+                            data-date-from="{{ a['date_from'] or '' }}"
+                            data-date-to="{{ a['date_to'] or '' }}">Edit</button>
+                    <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                        <input type="hidden" name="section" value="delete">
+                        <input type="hidden" name="table" value="announcements">
+                        <input type="hidden" name="id" value="{{ a['id'] }}">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 <div class="card">
     <h2>Carousel Slides ({{ carousel|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Title</th><th>Image</th><th></th></tr></thead>
-        {% for c in carousel %}
-        <tr>
-            <td>{{ c['title'] or '—' }}</td>
-            <td>{% if c['image_url'] %}<img src="{{ c['image_url'] }}" style="width:60px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
-            <td>
-                <button class="btn btn-sm car-edit" type="button"
-                        data-id="{{ c['id'] }}"
-                        data-title="{{ c['title'] or '' }}"
-                        data-image="{{ c['image_url'] }}">Edit</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
-                    <input type="hidden" name="section" value="delete">
-                    <input type="hidden" name="table" value="carousel_images">
-                    <input type="hidden" name="id" value="{{ c['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>Title</th><th>Image</th><th></th></tr></thead>
+            {% for c in carousel %}
+            <tr>
+                <td>{{ c['title'] or '—' }}</td>
+                <td>{% if c['image_url'] %}<img src="{{ c['image_url'] }}" style="width:60px;height:34px;object-fit:cover;border-radius:6px;">{% endif %}</td>
+                <td>
+                    <button class="btn btn-sm car-edit" type="button"
+                            data-id="{{ c['id'] }}"
+                            data-title="{{ c['title'] or '' }}"
+                            data-image="{{ c['image_url'] }}">Edit</button>
+                    <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                        <input type="hidden" name="section" value="delete">
+                        <input type="hidden" name="table" value="carousel_images">
+                        <input type="hidden" name="id" value="{{ c['id'] }}">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 <!-- Carousel edit modal -->
@@ -307,27 +311,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="card">
     <h2>Notifications ({{ notifications|length }})</h2>
-    <table class="table">
-        <thead><tr><th>Title</th><th>Description</th><th></th></tr></thead>
-        {% for n in notifications %}
-        <tr>
-            <td>{{ n['title'] }}</td>
-            <td>{{ n['description'] or '—' }}</td>
-            <td>
-                <button class="btn btn-sm notif-edit" type="button"
-                        data-id="{{ n['id'] }}"
-                        data-title="{{ n['title'] }}"
-                        data-desc="{{ n['description'] or '' }}"
-                        data-image="{{ n['image_url'] or '' }}">Edit</button>
-                <form class="inline" method="post" onsubmit="return confirm('Delete?')">
-                    <input type="hidden" name="section" value="delete">
-                    <input type="hidden" name="table" value="notifications">
-                    <input type="hidden" name="id" value="{{ n['id'] }}">
-                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="table-scroll">
+        <table class="table">
+            <thead><tr><th>Title</th><th>Description</th><th></th></tr></thead>
+            {% for n in notifications %}
+            <tr>
+                <td>{{ n['title'] }}</td>
+                <td>{{ n['description'] or '—' }}</td>
+                <td>
+                    <button class="btn btn-sm notif-edit" type="button"
+                            data-id="{{ n['id'] }}"
+                            data-title="{{ n['title'] }}"
+                            data-desc="{{ n['description'] or '' }}"
+                            data-image="{{ n['image_url'] or '' }}">Edit</button>
+                    <form class="inline" method="post" onsubmit="return confirm('Delete?')">
+                        <input type="hidden" name="section" value="delete">
+                        <input type="hidden" name="table" value="notifications">
+                        <input type="hidden" name="id" value="{{ n['id'] }}">
+                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 {% endblock %}
