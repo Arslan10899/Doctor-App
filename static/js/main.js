@@ -86,34 +86,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Mobile promo cards (mobile only). The frame picks its own layout from the
     // number of media inside (one / two / many, set server side). Only "many"
-    // is a carousel: the track is a CSS scroll-snap scroller, so touch already
-    // works there, and this adds arrows, dots and autoplay on top. With one or
-    // two media there is nothing to page through, so none of this runs.
+    // is a carousel: the track is a CSS scroll-snap scroller, so swipe already
+    // works there, and this adds dots and autoplay on top. There are no arrows:
+    // two tiles fill the frame, so there is nothing to step past - the strip
+    // advances itself and the dots are the only manual control.
     const mcardStrip = document.getElementById("mcardStrip");
     if (mcardStrip && mcardStrip.dataset.mode === "many") {
         const track = document.getElementById("mcardTrack");
         const cards = Array.prototype.slice.call(mcardStrip.querySelectorAll(".mcard"));
-        const prevBtn = mcardStrip.querySelector(".mcard-prev");
-        const nextBtn = mcardStrip.querySelector(".mcard-next");
         const dotsWrap = document.getElementById("mcardDots");
         let index = 0;
         let timer = null;
         const MCARD_INTERVAL = 4000;
 
+        function gap() {
+            return parseFloat(getComputedStyle(track).columnGap || "0") || 0;
+        }
         function cardStep() {
             if (!cards.length) return 0;
-            // one full card plus the gap, measured from the live layout
-            const gap = parseFloat(getComputedStyle(track).columnGap || "0") || 0;
-            return cards[0].getBoundingClientRect().width + gap;
+            // one full tile plus the gap, measured from the live layout
+            return cards[0].getBoundingClientRect().width + gap();
+        }
+        function perView() {
+            // how many tiles the frame actually shows at once
+            const step = cardStep();
+            if (!step || !track.clientWidth) return 1;
+            return Math.max(1, Math.min(cards.length, Math.round((track.clientWidth + gap()) / step)));
+        }
+        function lastIndex() {
+            // the furthest the strip can scroll while still filling the frame
+            return Math.max(0, cards.length - perView());
         }
         function nearestIndex() {
             const step = cardStep();
             if (!step) return 0;
-            return Math.max(0, Math.min(cards.length - 1, Math.round(track.scrollLeft / step)));
+            return Math.max(0, Math.min(lastIndex(), Math.round(track.scrollLeft / step)));
         }
         function paint() {
-            if (prevBtn) prevBtn.disabled = index <= 0;
-            if (nextBtn) nextBtn.disabled = index >= cards.length - 1;
             if (!dotsWrap) return;
             const dots = dotsWrap.querySelectorAll("button");
             for (let i = 0; i < dots.length; i++) {
@@ -121,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         function scrollToCard(i, smooth) {
-            index = Math.max(0, Math.min(cards.length - 1, i));
+            index = Math.max(0, Math.min(lastIndex(), i));
             const step = cardStep();
             if (step) {
                 track.scrollTo({ left: index * step, behavior: smooth ? "smooth" : "auto" });
@@ -133,36 +142,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         function play() {
             stop();
-            if (cards.length < 2) return;
+            if (lastIndex() < 1) return;   // everything already fits, nothing to advance
             timer = setInterval(function () {
-                // stop on the last card instead of wrapping into a dead end
                 if (document.hidden) return;
-                if (nearestIndex() >= cards.length - 1) { stop(); paint(); return; }
-                scrollToCard(nearestIndex() + 1, true);
+                const at = nearestIndex();
+                // stop on the last position instead of wrapping into a dead end
+                if (at >= lastIndex()) { stop(); paint(); return; }
+                scrollToCard(at + 1, true);
             }, MCARD_INTERVAL);
         }
         function buildDots() {
             if (!dotsWrap) return;
             dotsWrap.innerHTML = "";
-            cards.forEach(function (_, i) {
+            // one dot per reachable position, not per tile, so no two dots ever
+            // scroll the strip to the same place
+            for (let i = 0; i <= lastIndex(); i++) {
                 const d = document.createElement("button");
                 d.type = "button";
-                d.setAttribute("aria-label", "Go to card " + (i + 1));
+                d.setAttribute("aria-label", "Go to promo " + (i + 1) + " of " + (lastIndex() + 1));
                 d.addEventListener("click", function () {
                     stop();
                     scrollToCard(i, true);
                 });
                 dotsWrap.appendChild(d);
-            });
+            }
         }
         buildDots();
         paint();
-        if (prevBtn) {
-            prevBtn.addEventListener("click", function () { stop(); scrollToCard(index - 1, true); });
-        }
-        if (nextBtn) {
-            nextBtn.addEventListener("click", function () { stop(); scrollToCard(index + 1, true); });
-        }
         let rafPending = false;
         track.addEventListener("scroll", function () {
             // scroll fires a lot during momentum; only re-read the index once

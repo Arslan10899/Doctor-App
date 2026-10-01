@@ -2512,30 +2512,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     color: #fff;
     background: linear-gradient(135deg, var(--primary), #4db6ac);
 }
-.mcard-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    /* 30px was well under a comfortable thumb target */
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, .92);
-    color: var(--primary);
-    font-size: 19px;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 2;
-    box-shadow: 0 4px 12px rgba(3, 32, 38, .28);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0 2px;
-}
-.mcard-nav.mcard-prev { left: 6px; }
-.mcard-nav.mcard-next { right: 6px; }
-.mcard-nav:disabled { opacity: 0; pointer-events: none; }
+/* There are no arrows on the promo strip: two tiles fill the frame, so there
+   is nothing to step past. Swipe and the dots below are the whole interface. */
 .mcard-dots {
     display: flex;
     justify-content: center;
@@ -2592,6 +2570,16 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .mcard-strip--two .mcard { flex: none; min-width: 0; }
     .mcard-strip--two .mcard-media { object-fit: cover; }
+
+    /* many: the same pair-size tiles as the two-up layout, laid out in a strip
+       that auto-advances one tile at a time. Two tiles plus the gap fill the
+       frame exactly, so the pair always reads as centred. The snap is on the
+       tile edge rather than its centre precisely so a whole pair sits flush in
+       the frame instead of half a tile off. */
+    .mcard-strip--many .mcard {
+        flex: 0 0 calc(50% - 5px);
+        scroll-snap-align: start;
+    }
 }
 
 @media (max-width: 400px) {
