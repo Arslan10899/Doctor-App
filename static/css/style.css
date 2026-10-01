@@ -2659,7 +2659,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     color: #f8fafc;
     background: linear-gradient(135deg, #0c4a6e, #0f766e, #1e293b);
 }
-/* There are no arrows on the promo strip: two tiles fill the frame, so there
+/* There are no arrows on the promo strip: three tiles fill the frame, so there
    is nothing to step past. Swipe and the dots below are the whole interface. */
 .mcard-dots {
     display: flex;
@@ -2730,13 +2730,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .mcard-strip--two .mcard { flex: none; min-width: 0; background: #ffffff; }
     .mcard-strip--two .mcard-media { object-fit: cover; }
 
-    /* many: the same pair-size tiles as the two-up layout, laid out in a strip
-       that auto-advances one tile at a time. Two tiles plus the gap fill the
-       frame exactly, so the pair always reads as centred. The snap is on the
-       tile edge rather than its centre precisely so a whole pair sits flush in
-       the frame instead of half a tile off. */
+    /* many: the same tile size as the three-up layout, laid out in a strip
+       that auto-advances one tile at a time. Three tiles plus the gaps fill
+       the frame exactly, so the trio always reads as centred. The snap is on
+       the tile edge rather than its centre precisely so whole trios sit flush
+       in the frame instead of half a tile off. */
     .mcard-strip--many .mcard {
-        flex: 0 0 calc(50% - 5px);
+        flex: 0 0 calc(33.333% - 8px);
         scroll-snap-align: start;
         background: #ffffff;
     }

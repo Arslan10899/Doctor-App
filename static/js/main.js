@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // number of media inside (one / two / many, set server side). Only "many"
     // is a carousel: the track is a CSS scroll-snap scroller, so swipe already
     // works there, and this adds dots, autoplay and the loop on top. There are no
-    // arrows: two tiles fill the frame, so there is nothing to step past - the
+    // arrows: three tiles fill the frame, so there is nothing to step past - the
     // strip advances itself and the dots are the only manual control.
     const mcardStrip = document.getElementById("mcardStrip");
     if (mcardStrip && mcardStrip.dataset.mode === "many") {
@@ -228,9 +228,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // the end. Scrolling onto the copy is what makes the wrap seamless, and
         // the moment the copy is flush left the scroll is folded back to zero
         // without moving. This is only worth doing past two cards: with one or
-        // two the layout is a static grid rather than a strip, and with three or
-        // more the frame only ever shows a pair, so there is always another offer
-        // waiting and stopping used to leave a dead strip with a tile half off.
+        // two the layout is a static grid rather than a strip, and with four or
+        // more the frame only ever shows a trio, so there is always another
+        // offer waiting and stopping used to leave a dead strip with a tile
+        // half off. (With exactly three every tile already fits, so the strip
+        // stays static and the loop bails out below.)
         function clearLoop() {
             Array.prototype.slice.call(track.querySelectorAll(".mcard-clone"))
                 .forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
