@@ -2003,18 +2003,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        and .hero-content), so the 18px column gap from .hero-head was also
        landing between them. Drop it to 4px, matching the box's own margin. */
     .hero-head { gap: 4px; }
-    /* The booking box is the last thing in the hero, but the <=1024px rule
-       still adds 52px of bottom padding, so 52px of empty green hung below it
-       before the slider started. Drop it to 0 and the box finishes exactly
-       where the green does. */
-    .hero { padding-bottom: 0; }
+    /* The booking box is the last thing in the hero, and the <=1024px rule still
+       added 52px of empty green below it. Zero was too tight though: with the
+       banners gone from phones the box sits right on the edge of the green and
+       the next section, and the slider below has padding-top: 0, so the box read
+       as glued to both. 18px is enough to let it breathe without the 52px band
+       of dead green this rule originally replaced. */
+    .hero { padding-bottom: 18px; }
 
     .hero-book-box {
         display: block;
-        /* was -9px, which squeezed the box up against the search bar. It is 0
-           now: the hero-cta margin above plus the 4px .hero-head gap give the
-           8px of breathing room under the search bar. */
-        margin-top: 0;
+        /* was -9px, which squeezed the box up against the search bar. It was then
+           set to 0, back when the box sat directly under the search bar. Mobile
+           Promo Cards now sit between them, so 0 left only the 4px hero-cta
+           margin and the box read as stuck to the cards. 8px restores a clear
+           gap on its own side of the strip. */
+        margin-top: 8px;
         padding: 10px 12px;
         border-radius: 15px;
         /* transparent with a light border - the hero gradient shows through */
