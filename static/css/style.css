@@ -2420,8 +2420,18 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        left and 40px at the right, which on a 1280px screen is a soft edge. On a
        390px phone that same fade is a third of the line, so the announcement read
        as half transparent rather than as information. Twelve pixels keeps the
-       text fully opaque and still stops the loop being cut off square. */
+       text fully opaque and still stops the loop being cut off square.
+
+       And the line is anchored to the left, which is the other half of the same
+       complaint. The base rule carries padding-left:100%, a full container width
+       of empty space in front of the text, so the announcements come in from off
+       the right edge and only cross the middle of a phone screen. On a phone
+       that meant the strip was never really showing where the text began, and
+       the beginning of an announcement was the one part that scrolled past
+       unread. Zero puts the first announcement against the left of the bar, next
+       to the tag, where the text is actually read from. */
     .announcement-list {
+        padding-left: 0;
         -webkit-mask: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
         mask: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
     }
