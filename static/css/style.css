@@ -2739,7 +2739,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         flex: 0 0 calc(33.333% - 8px);
         scroll-snap-align: start;
         background: #ffffff;
+        /* center-focus: side tiles rest slightly smaller and dimmer so the
+           middle tile reads as the featured one. Transform never changes
+           layout, so the scroll math and snap points are untouched. */
+        transform: scale(.92);
+        opacity: .88;
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease, opacity .3s ease;
     }
+    .mcard-strip--many .mcard.is-center {
+        transform: scale(1);
+        opacity: 1;
+        z-index: 1;
+        border-color: rgba(13, 148, 136, .55);
+        box-shadow: 0 14px 30px -10px rgba(13, 148, 136, .45);
+    }
+    .mcard-strip--many .mcard:not(.is-center):hover { transform: scale(.92) translateY(-2px); }
+    .mcard-strip--many .mcard.is-center:hover { transform: scale(1) translateY(-2px); }
 }
 
 @media (max-width: 400px) {

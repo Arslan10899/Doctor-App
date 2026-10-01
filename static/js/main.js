@@ -135,12 +135,22 @@ document.addEventListener("DOMContentLoaded", function () {
             return Math.max(0, Math.min(virtualLast(), Math.round(track.scrollLeft / step)));
         }
         function paint() {
-            if (!dotsWrap) return;
-            const dots = dotsWrap.querySelectorAll("button");
-            for (let i = 0; i < dots.length; i++) {
-                // one dot per card, and it tracks the card on the left, so the
-                // dot never lies about which offer is being shown
-                dots[i].classList.toggle("active", i === wrapIndex(index));
+            if (dotsWrap) {
+                const dots = dotsWrap.querySelectorAll("button");
+                for (let i = 0; i < dots.length; i++) {
+                    // one dot per card, and it tracks the card on the left, so the
+                    // dot never lies about which offer is being shown
+                    dots[i].classList.toggle("active", i === wrapIndex(index));
+                }
+            }
+            // center-focus: the middle tile of the visible trio is the featured
+            // one. index is the leftmost position and perView() is 3 here, so the
+            // middle sits one step right of index. A plain class toggle; the zoom
+            // itself is pure CSS transform, so layout and scroll math are untouched.
+            const tiles = track.querySelectorAll(".mcard");
+            const middle = tiles[Math.min(tiles.length - 1, index + Math.floor(perView() / 2))] || null;
+            for (let t = 0; t < tiles.length; t++) {
+                tiles[t].classList.toggle("is-center", tiles[t] === middle);
             }
         }
         function syncMedia() {
