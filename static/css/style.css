@@ -1949,6 +1949,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* On phones swap the two big buttons for the "Book an Appointment" box */
     .hero-cta-actions.hero-cta-row { display: none; }
 
+    /* Hero Banner is the desktop promo system. Phones use Mobile Promo Cards
+       instead, so the banner is kept out of the mobile hero entirely - both
+       render paths have to go, the flowing .hero-banners row and the
+       absolutely positioned .hero-pinned-area. */
+    .hero-banners,
+    .hero-pinned-area { display: none; }
+
+    /* Pinned mode stamps a min-height inline on .hero-grid to make room for the
+       banners. Hiding the banners would leave that as a tall empty hole, so
+       cancel it. !important is required because an inline style outranks any
+       author rule otherwise. */
+    .hero-grid { min-height: 0 !important; }
+
     /* Centre the booking box on the hero-cta rule and pull it up close under
        the search bar so the CTA band stops costing dead space.
        Uses .hero-content prefix to outrank the base
