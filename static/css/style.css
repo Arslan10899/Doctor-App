@@ -2329,22 +2329,23 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .announcement-item::before { content: "\25CF"; color: #2dd4bf; font-size: 8px; }
-/* The dismiss button and the stepper dots are for phones only, so they are taken
-   out of the desktop row entirely rather than hidden and still taking up space.
-   This has to live outside the media query: the dots are built by script, and
-   unstyled they rendered as a row of default grey buttons in the desktop bar. */
+/* The dismiss button is for phones only, so it stays out of the desktop row
+   entirely instead of being hidden and still taking up space. This has to live
+   outside the media query. */
 .announce-close { display: none; }
-.announce-dots { display: none; }
 
 @media (max-width: 768px) {
     /* ---- Professional announcement bar ----
        The old phone ticker was a glowing teal wedge with a rainbow colour cycle
-       running behind a marquee that scrolled for 80 seconds and could only be
-       paused with a :hover that a finger cannot produce. It read as an ad banner
-       rather than as information. On a phone it is now a quiet strip of solid
-       dark teal: a small bell chip, one announcement on a fixed-height line, and
-       dots when there is more than one. Nothing blinks, nothing drifts, and the
-       bar never changes height as the text steps through. */
+       running behind the text, and it read as an ad banner rather than as
+       information. On a phone it is now a quiet strip of solid dark teal with a
+       small tag chip and no glow, no colour cycling and no motion of its own.
+
+       The announcements themselves are deliberately left to the desktop rules
+       below, so a phone scrolls the same single line on the same loop a desktop
+       does. An earlier version stepped through one announcement at a time on a
+       timer, which meant a phone and a desktop could be showing different
+       things at the same moment. */
     .announcement-bar {
         background: #0b2b36;
         padding: 0;
@@ -2375,91 +2376,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .announce-tag svg { display: block; width: 12px; height: 12px; color: #5eead4; }
     .announce-tag-text { white-space: nowrap; }
 
-    /* one announcement at a time, stacked in a fixed box so the bar cannot
-       change height when a longer one comes round */
-    .announcement-list {
-        position: relative;
-        flex: 1 1 auto;
-        display: block;
-        width: auto;
-        height: 42px;
-        padding: 0 6px 0 10px;
-        -webkit-mask: none;
-        mask: none;
-        animation: none;
-    }
-    .announcement-item {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0 6px;
-        border: 0;
-        overflow: hidden;
-        font-size: 12.5px;
-        line-height: 1.3;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(5px);
-        transition: opacity .3s ease, transform .3s ease, visibility .3s;
-    }
-    .announcement-item.is-active {
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-    }
-    /* the per-item bullet and the dividers belonged to the desktop marquee */
-    .announcement-item::before { display: none; }
-    /* the title was a gradient pill in caps, which fought the text next to it.
-       Real entries often carry a whole sentence as the title, so it is allowed
-       to shrink and truncate, but never past half the line: the message itself
-       always keeps room to be read. */
-    .announcement-title {
-        flex: 0 1 auto;
-        min-width: 0;
-        max-width: 50%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        background: none;
-        border: 0;
-        padding: 0;
-        color: #7fdbcd;
-        font-size: 12.5px;
-        font-weight: 700;
-        letter-spacing: 0;
-        text-transform: none;
-    }
-    .announcement-content {
-        min-width: 0;
-        color: #dcefee;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    .announce-dots {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        flex-shrink: 0;
-        margin-right: 4px;
-    }
-    .announce-dots button {
-        width: 6px;
-        height: 6px;
-        padding: 0;
-        border: 0;
-        border-radius: 999px;
-        /* .28 white on this bar lands at 2.4:1, under the 3:1 a control needs */
-        background: rgba(255, 255, 255, .45);
-        cursor: pointer;
-        transition: background .2s, width .2s;
-    }
-    .announce-dots button[aria-selected="true"] {
-        width: 14px;
-        background: #5eead4;
-    }
+    /* The announcements scroll here exactly as they do on a desktop: one line,
+       the whole list moving left on a loop, with the same fading ends. The
+       earlier phone version showed a single announcement and stepped through the
+       rest on a timer, which meant a phone never showed what a desktop showed.
+       There is deliberately no rule for .announcement-list, .announcement-item,
+       .announcement-title or .announcement-content in this block, so the desktop
+       rules above are what a phone gets. Overriding them here is how the two
+       drifted apart in the first place. */
+    /* A finger never produces :hover, so the desktop hover pause is unreachable
+       on a phone and the loop could not be stopped at all. Pressing the strip
+       stands in for it. This is the one rule here that a phone has and a
+       desktop does not need, because a desktop already has the hover. */
+    .announcement-bar:active .announcement-list { animation-play-state: paused; }
+
     .announce-close {
         display: grid;
         place-items: center;

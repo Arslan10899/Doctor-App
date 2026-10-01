@@ -28,26 +28,21 @@
 
 <!-- ================= ANNOUNCEMENT BAR (under header) ================= -->
 {% if announcements %}
-{% set acount = announcements|length %}
 <section class="announcement-bar" id="announceBar">
     <span class="announce-tag">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M3 10v4a1 1 0 0 0 1 1h2l3 4h2V6H6l-3 4H3zM14 8.1a4 4 0 0 1 0 7.8M16.2 5.5a8 8 0 0 1 0 13"/></svg>
         <span class="announce-tag-text">Announcement</span>
     </span>
-    {# Phones show one announcement at a time and step through them, because a
-       marquee that never stops is unreadable on a small screen and cannot be
-       paused by a finger the way :hover pauses it on a desktop. #}
-    <div class="announcement-list" id="announceList"{% if acount > 1 %} aria-live="polite"{% endif %}>
+    {# One line, the whole list scrolling, identical on a phone and a desktop, so
+       the two never disagree about what is being announced. #}
+    <div class="announcement-list" id="announceList">
         {% for a in announcements %}
-        <span class="announcement-item{% if loop.first %} is-active{% endif %}">
+        <span class="announcement-item">
             {%- if a['title'] %}<span class="announcement-title">{{ a['title'] }}</span>{% endif -%}
             <span class="announcement-content">{{ a['content'] }}</span>
         </span>
         {% endfor %}
     </div>
-    {% if acount > 1 %}
-    <div class="announce-dots" id="announceDots" role="tablist" aria-label="Choose announcement"></div>
-    {% endif %}
     <button type="button" class="announce-close" id="announceClose" aria-label="Dismiss announcements">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
@@ -1058,65 +1053,10 @@
         if (closed) bar.hidden = true;
     }
 
-    /* On a phone only one announcement is on screen at a time and the rest step
-       in on a timer. A finger has no :hover, so holding the bar pauses the
-       rotation the way hovering pauses the desktop marquee, and the dots jump
-       straight to one. The desktop keeps its own marquee, so nothing is built
-       or scheduled there and rotating an invisible strip is pure waste. */
-    var list = document.getElementById('announceList');
-    var dotsBox = document.getElementById('announceDots');
-    var items = list ? Array.prototype.slice.call(list.querySelectorAll('.announcement-item')) : [];
-    var phoneMQ = window.matchMedia ? window.matchMedia('(max-width: 768px)') : null;
-    var still = false;
-    try { still = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (err) { /* older browsers */ }
-    if (items.length > 1 && phoneMQ && phoneMQ.matches) {
-        var at = 0;
-        var timer = null;
-        var HOLD_MS = 6000;
-        var dots = items.map(function (_, i) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.setAttribute('role', 'tab');
-            b.setAttribute('aria-label', 'Announcement ' + (i + 1) + ' of ' + items.length);
-            b.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-            b.addEventListener('click', function () { show(i); restart(); });
-            dotsBox.appendChild(b);
-            return b;
-        });
-        function show(i) {
-            at = (i + items.length) % items.length;
-            items.forEach(function (it, n) { it.classList.toggle('is-active', n === at); });
-            dots.forEach(function (d, n) { d.setAttribute('aria-selected', n === at ? 'true' : 'false'); });
-        }
-        function stop() { if (timer) { clearInterval(timer); timer = null; } }
-        function start() {
-            if (still || timer) return;   // reduced motion opts out of stepping entirely
-            timer = setInterval(function () { show(at + 1); }, HOLD_MS);
-        }
-        function restart() { stop(); start(); }
-          /* The listener has to be attached whatever the page looked like at
-             load, otherwise the usual case, a visible page that later gets
-             backgrounded, is the one case that keeps stepping. */
-          document.addEventListener('visibilitychange', function () {
-              if (document.hidden) stop(); else start();
-          });
-          if (document.hidden) stop();   // loaded straight into a background tab
-
-        bar.addEventListener('pointerdown', stop);
-        ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
-            bar.addEventListener(ev, start);
-        });
-        /* crossing the breakpoint while the page is open turns the stepper on or
-           off, so a rotation or resize does not leave it stranded */
-        if (phoneMQ.addEventListener) {
-            phoneMQ.addEventListener('change', function (e) {
-                if (e.matches) { restart(); } else { stop(); }
-            });
-        } else if (phoneMQ.addListener) {
-            phoneMQ.addListener(function (e) { if (e.matches) { restart(); } else { stop(); } });
-        }
-        start();
-    }
+    /* The announcements scroll in a CSS marquee, the same loop a desktop runs.
+       There is no stepping, no timer and no dots here, so nothing to build and
+       nothing to keep in sync. The only script this bar still needs is the
+       dismiss button, so a phone can clear the strip for the session. */
 })();
 </script>
 
