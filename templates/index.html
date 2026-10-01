@@ -1094,11 +1094,14 @@
             timer = setInterval(function () { show(at + 1); }, HOLD_MS);
         }
         function restart() { stop(); start(); }
-        if (document.hidden) {           // do not burn a slot in a background tab
-            document.addEventListener('visibilitychange', function () {
-                if (document.hidden) stop(); else start();
-            });
-        }
+          /* The listener has to be attached whatever the page looked like at
+             load, otherwise the usual case, a visible page that later gets
+             backgrounded, is the one case that keeps stepping. */
+          document.addEventListener('visibilitychange', function () {
+              if (document.hidden) stop(); else start();
+          });
+          if (document.hidden) stop();   // loaded straight into a background tab
+
         bar.addEventListener('pointerdown', stop);
         ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
             bar.addEventListener(ev, start);
