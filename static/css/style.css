@@ -2337,9 +2337,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .announcement-item::before { content: "\25CF"; color: #2dd4bf; font-size: 8px; }
-/* The dismiss button is for phones only, so it stays out of the desktop row
-   entirely instead of being hidden and still taking up space. */
+/* The dismiss button and the stepper dots are for phones only, so they are taken
+   out of the desktop row entirely rather than hidden and still taking up space.
+   This has to live outside the media query: the dots are built by script, and
+   unstyled they rendered as a row of default grey buttons in the desktop bar. */
 .announce-close { display: none; }
+.announce-dots { display: none; }
 
 @media (max-width: 768px) {
     /* ---- Professional announcement bar ----
