@@ -1959,6 +1959,35 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 
 @media (max-width: 768px) {
+    /* ---- White hero with soft teal blobs + thin white wavy outlines ----
+       The solid green hero read as heavy on a phone, so on phones the hero is
+       now a clean white sheet and the colour moves into the background: a few
+       very soft teal organic blobs around the corners/edges, each with thin
+       white wavy outline strokes riding on top (they only show where they cross
+       a blob, which is exactly the reference look). Everything sits in
+       .hero::before, which paints under .hero-grid because ::before is the
+       first child, so no content ever sits on top of the decoration. */
+    .hero {
+        background: #fff;
+        color: #0f3b45;
+    }
+    .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 1;
+        pointer-events: none;
+        background-image:
+            /* a couple of extra soft radial washes for depth */
+            radial-gradient(58% 26% at 92% 12%, rgba(20, 184, 166, .10), rgba(20, 184, 166, 0) 72%),
+            radial-gradient(52% 24% at 4% 88%, rgba(13, 148, 136, .10), rgba(13, 148, 136, 0) 72%),
+            /* teal blobs + white wavy outline accents, drawn together so the
+               strokes always land on the shape they belong to */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='none'%3E%3Cpath d='M400 0C330 10 300 60 310 110C320 160 370 175 400 165Z' fill='%2314b8a6' fill-opacity='.22'/%3E%3Cpath d='M400 330C355 350 330 400 345 450C360 500 390 520 400 515Z' fill='%230d9488' fill-opacity='.15'/%3E%3Cpath d='M0 800C60 790 95 750 90 695C85 640 40 615 0 625Z' fill='%232dd4bf' fill-opacity='.20'/%3E%3Cpath d='M400 800C345 795 315 755 320 700C325 650 365 625 400 630Z' fill='%230d9488' fill-opacity='.14'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.6' vector-effect='non-scaling-stroke'%3E%3Cpath d='M400 24C346 32 324 70 332 110C340 150 376 156 400 150' stroke-opacity='.9'/%3E%3Cpath d='M400 50C358 56 342 86 348 114C354 144 382 150 400 144' stroke-opacity='.65'/%3E%3Cpath d='M400 356C362 374 344 412 356 452C368 490 392 500 400 496' stroke-opacity='.75'/%3E%3Cpath d='M0 780C46 774 74 742 70 700C66 658 34 640 0 648' stroke-opacity='.85'/%3E%3Cpath d='M0 752C38 746 60 720 57 690' stroke-opacity='.55'/%3E%3Cpath d='M400 776C358 772 336 744 340 704C344 664 372 648 400 652' stroke-opacity='.8'/%3E%3Cpath d='M-10 758C60 728 120 788 200 760C280 732 340 784 410 756' stroke-opacity='.6'/%3E%3Cpath d='M-10 702C60 672 130 732 210 704C290 676 340 718 410 692' stroke-opacity='.4'/%3E%3Cpath d='M410 44C300 20 250 42 200 24' stroke-opacity='.5'/%3E%3Cpath d='M410 562C350 582 300 558 250 576C200 594 150 572 110 588' stroke-opacity='.45'/%3E%3C/g%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: 100% 100%, 100% 100%, 100% 100%;
+    }
+
     /* ---- Mobile hero typography ----
        Desktop uses clamp(27px, 3vw, 34px) on .hero h1. The old 640px rule
        forced 30px, which was actually LARGER than the desktop clamp at this
@@ -1967,7 +1996,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         font-size: 25px;
         line-height: 1.2;
         white-space: normal;
+        color: #0d3b44;
     }
+    /* #0d9488 is only 3.7:1 on white, which is fine for the big headline but
+       not for the small accent words, so the teal is darkened to #0f766e
+       (5.5:1) and used for both. */
+    .hero-title-key { color: #0f766e; }
+    .hero-steps { color: #0f766e; }
+    .hero-title-tail { color: #55737c; }
+    .hero-title-accent {
+        color: #0f4a55;
+        background: rgba(13, 148, 136, .07);
+        border-left-color: #0f766e;
+    }
+    .hero p.hero-sub { color: #55737c; }
+    .hero-sub-tail { color: #0d3b44; }
+    .hero-stat span { color: #55737c; }
     .hero-title-accent {
         font-size: 13.5px;
         line-height: 1.35;
@@ -2031,30 +2075,34 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         margin-top: 8px;
         padding: 10px 12px;
         border-radius: 15px;
-        /* transparent with a light border - the hero gradient shows through */
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, .45);
-        box-shadow: 0 10px 26px -14px rgba(3, 32, 38, .55);
+        /* translucent white + a soft teal hairline: the blobs show faintly
+           through it, but the box still reads as a distinct surface now that
+           the hero behind it is white rather than solid green */
+        background: rgba(255, 255, 255, .72);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        border: 1px solid rgba(13, 148, 136, .22);
+        box-shadow: 0 10px 26px -16px rgba(13, 94, 102, .40);
     }
     .hero-book-label { padding: 0 2px 8px; font-size: 10.5px; letter-spacing: .6px; }
     .hero-book-label,
-    .hero-book-label svg { color: rgba(255, 255, 255, .92); }
+    .hero-book-label svg { color: #55737c; }
     .hero-book-actions { gap: 6px; }
     .hero-book-btn { min-height: 42px; padding: 9px 12px; font-size: 13.5px; border-radius: 12px; }
-    /* ghost button for clinic, solid white for the primary online action, so the
-       two still separate cleanly now that the container has no white fill */
+    /* ghost button for clinic, solid teal for the primary online action, so the
+       two still separate cleanly against the white hero */
     .hero-book-clinic {
-        background: rgba(255, 255, 255, .16);
-        color: #fff;
-        box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .50);
+        background: rgba(13, 148, 136, .07);
+        color: #0d5f66;
+        box-shadow: inset 0 0 0 1.5px rgba(13, 148, 136, .32);
     }
-    .hero-book-clinic:hover { background: rgba(255, 255, 255, .26); }
+    .hero-book-clinic:hover { background: rgba(13, 148, 136, .13); }
     .hero-book-online {
-        background: #fff;
-        color: var(--primary);
-        box-shadow: 0 8px 18px -8px rgba(3, 32, 38, .50);
+        background: linear-gradient(135deg, #0d9488, #0f766e);
+        color: #fff;
+        box-shadow: 0 8px 18px -8px rgba(13, 94, 102, .50);
     }
-    .hero-book-online:hover { background: #e9f5f6; }
+    .hero-book-online:hover { background: linear-gradient(135deg, #0f766e, #115e59); }
 
     /* ---- Mobile booking modal trimming ----
        The "Book an Appointment" title and the "Choose how you would like to
@@ -2082,6 +2130,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .dropdown-section { max-width: 116px; }
     .city-menu-head,
     .city-menu li { font-size: 12.5px; }
+    /* the search bar is a white pill, so on the white hero it needs a teal edge
+       to stay a surface rather than disappear into the page */
+    .search-bar-wrap {
+        border-color: rgba(13, 148, 136, .20);
+        box-shadow: 0 6px 20px -8px rgba(13, 94, 102, .28);
+    }
 }
 
 @media (max-width: 400px) {
@@ -2559,6 +2613,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         height: 100%;
     }
     .mcard-strip--one .mcard-placeholder { border-radius: 16px; }
+    /* the dots were translucent white, which vanished the moment the hero went
+       white, so on phones they are teal instead */
+    .mcard-dots button::before { background: rgba(13, 148, 136, .34); }
+    .mcard-dots button.active::before { background: #0d9488; }
 
     /* two: a static split preview. Both tiles are on screen at once, the track
        stops being a scroller, and each tile takes half the width. */
