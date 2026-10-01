@@ -2612,12 +2612,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .mcard-strip { display: none; }
 .mcard-track {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    border-radius: 16px;
 }
 .mcard-track::-webkit-scrollbar { display: none; }
 .mcard {
@@ -2625,19 +2624,27 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     flex: 0 0 100%;
     scroll-snap-align: center;
     display: block;
-    height: 124px;
-    border-radius: 16px;
+    height: 140px;
+    border-radius: 18px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 10px 24px -14px rgba(3, 32, 38, .55);
+    box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-decoration: none;
 }
+.mcard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.4);
+    border-color: rgba(255, 255, 255, 0.9);
+}
+.mcard.is-paused { opacity: 0.95; }
 .mcard-media {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 16px;
+    border-radius: 18px;
 }
 .mcard-placeholder {
     width: 100%;
@@ -2645,12 +2652,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
+    padding: 14px;
     text-align: center;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, var(--primary), #4db6ac);
+    font-size: 14px;
+    font-weight: 600;
+    color: #f8fafc;
+    background: linear-gradient(135deg, #0c4a6e, #0f766e, #1e293b);
 }
 /* There are no arrows on the promo strip: two tiles fill the frame, so there
    is nothing to step past. Swipe and the dots below are the whole interface. */
@@ -2665,8 +2672,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    active pill needs a wider button so the pill is not flush against its
    neighbours. */
 .mcard-dots button {
-    width: 18px;
-    height: 24px;
+    width: 22px;
+    height: 28px;
     padding: 0;
     border: none;
     background: none;
@@ -2676,23 +2683,23 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .mcard-dots button::before {
     content: "";
-    width: 6px;
+    width: 8px;
     height: 6px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, .45);
+    background: #cbd5e1;
     transition: width .2s, background .2s;
 }
-.mcard-dots button.active { width: 30px; }
-.mcard-dots button.active::before { background: #fff; width: 18px; }
+.mcard-dots button.active { width: 32px; }
+.mcard-dots button.active::before { background: #0f766e; width: 20px; }
 
 @media (max-width: 768px) {
     .mcard-strip { display: block; position: relative; }
-    .mcard { height: 118px; }
+    .mcard { height: 140px; background: #ffffff; }
 
     /* one: the media is shown whole and centred, so nothing is cropped out of
        a banner just because the frame is a different shape to the artwork */
     .mcard-strip--one .mcard-track { overflow: hidden; }
-    .mcard-strip--one .mcard { display: grid; place-items: center; background: #eef3f5; }
+    .mcard-strip--one .mcard { display: grid; place-items: center; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); }
     .mcard-strip--one .mcard-media {
         object-fit: contain;
         width: 100%;
@@ -2706,7 +2713,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         height: auto;
         max-height: 100%;
     }
-    .mcard-strip--one .mcard-placeholder { border-radius: 16px; }
+    .mcard-strip--one .mcard-placeholder { border-radius: 18px; }
     /* the dots were translucent white, which vanished the moment the hero went
        white, so on phones they are teal instead */
     .mcard-dots button::before { background: rgba(13, 148, 136, .34); }
@@ -2717,10 +2724,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .mcard-strip--two .mcard-track {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        gap: 10px;
         overflow: hidden;
     }
-    .mcard-strip--two .mcard { flex: none; min-width: 0; }
+    .mcard-strip--two .mcard { flex: none; min-width: 0; background: #ffffff; }
     .mcard-strip--two .mcard-media { object-fit: cover; }
 
     /* many: the same pair-size tiles as the two-up layout, laid out in a strip
@@ -2731,6 +2738,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .mcard-strip--many .mcard {
         flex: 0 0 calc(50% - 5px);
         scroll-snap-align: start;
+        background: #ffffff;
     }
 }
 
