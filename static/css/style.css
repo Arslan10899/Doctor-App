@@ -2342,43 +2342,143 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .announce-close { display: none; }
 
 @media (max-width: 768px) {
-    /* ---- Slimmer announcement ticker with a dismiss button ----
-       9px of vertical padding plus the 15px tag chip made the ticker eat a
-       surprising amount of a short phone screen. Trimmed to 4px, with a 32px
-       close target so the list stops short of it. The tag also stops being an
-       absolutely positioned skewed wedge pinned to the left edge and becomes an
-       ordinary inline chip, so it cannot cover the first announcement. */
-    .announcement-bar { padding: 4px 0; font-size: 12px; }
+    /* ---- Professional announcement bar ----
+       The old phone ticker was a glowing teal wedge with a rainbow colour cycle
+       running behind a marquee that scrolled for 80 seconds and could only be
+       paused with a :hover that a finger cannot produce. It read as an ad banner
+       rather than as information. On a phone it is now a quiet strip of solid
+       dark teal: a small bell chip, one announcement on a fixed-height line, and
+       dots when there is more than one. Nothing blinks, nothing drifts, and the
+       bar never changes height as the text steps through. */
+    .announcement-bar {
+        background: #0b2b36;
+        padding: 0;
+        min-height: 42px;
+        font-size: 12.5px;
+        font-weight: 500;
+        box-shadow: none;
+        border-bottom: 1px solid rgba(45, 212, 191, .14);
+    }
     .announce-tag {
         position: static;
         flex-shrink: 0;
-        padding: 0 12px;
-        font-size: 10.5px;
+        gap: 5px;
+        margin: 0 0 0 14px;
+        padding: 3px 8px;
+        border-radius: 7px;
+        background: rgba(45, 212, 191, .13);
+        border: 1px solid rgba(45, 212, 191, .26);
+        color: #7fdbcd;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .05em;
         clip-path: none;
         box-shadow: none;
-        border-radius: 999px;
-        margin-left: 12px;
+        animation: none;
+        text-shadow: none;
+    }
+    .announce-tag svg { display: block; width: 12px; height: 12px; color: #5eead4; }
+    .announce-tag-text { white-space: nowrap; }
+
+    /* one announcement at a time, stacked in a fixed box so the bar cannot
+       change height when a longer one comes round */
+    .announcement-list {
+        position: relative;
+        flex: 1 1 auto;
+        display: block;
+        width: auto;
+        height: 42px;
+        padding: 0 6px 0 10px;
+        -webkit-mask: none;
+        mask: none;
         animation: none;
     }
-    .announce-tag svg { display: none; }
-    .announcement-list { padding-right: 4px; }
-    .announcement-item { font-size: 12px; }
-    .announcement-title { font-size: 12px; }
+    .announcement-item {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 6px;
+        border: 0;
+        overflow: hidden;
+        font-size: 12.5px;
+        line-height: 1.3;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(5px);
+        transition: opacity .3s ease, transform .3s ease, visibility .3s;
+    }
+    .announcement-item.is-active {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+    }
+    /* the per-item bullet and the dividers belonged to the desktop marquee */
+    .announcement-item::before { display: none; }
+    /* the title was a gradient pill in caps, which fought the text next to it.
+       Real entries often carry a whole sentence as the title, so it is allowed
+       to shrink and truncate, but never past half the line: the message itself
+       always keeps room to be read. */
+    .announcement-title {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 50%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        background: none;
+        border: 0;
+        padding: 0;
+        color: #7fdbcd;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+    .announcement-content {
+        min-width: 0;
+        color: #dcefee;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .announce-dots {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+        margin-right: 4px;
+    }
+    .announce-dots button {
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        /* .28 white on this bar lands at 2.4:1, under the 3:1 a control needs */
+        background: rgba(255, 255, 255, .45);
+        cursor: pointer;
+        transition: background .2s, width .2s;
+    }
+    .announce-dots button[aria-selected="true"] {
+        width: 14px;
+        background: #5eead4;
+    }
     .announce-close {
         display: grid;
         place-items: center;
         flex-shrink: 0;
-        width: 32px;
-        height: 32px;
-        margin-right: 8px;
-        margin-left: 6px;
+        width: 34px;
+        height: 34px;
+        margin: 0 8px 0 4px;
         border: 0;
         border-radius: 999px;
-        background: rgba(255, 255, 255, .12);
-        color: #d7f3ef;
+        background: rgba(255, 255, 255, .07);
+        color: #9fc4c6;
         cursor: pointer;
     }
-    .announce-close:hover { background: rgba(255, 255, 255, .22); }
+    .announce-close:hover { background: rgba(255, 255, 255, .16); color: #fff; }
     .announce-close:active { transform: scale(.94); }
 
     /* ---- Header breathing room ----
