@@ -2423,12 +2423,29 @@ def admin_mobile_cards_action():
 @app.route("/admin/mobile-cards")
 @admin_required
 def admin_mobile_cards():
-    cards = query("SELECT * FROM mobile_cards ORDER BY sort_order ASC, id ASC")
+    # dict() first: sqlite3.Row has no .get() and is immutable, and both are
+    # needed to normalise the values below.
+    cards = [dict(r) for r in query("SELECT * FROM mobile_cards ORDER BY sort_order ASC, id ASC")]
     active_count = sum(1 for c in cards if c["active"])
+    # Mark and normalise the rows the homepage will not render. This has to use
+    # the same .strip() test as the index query, otherwise a row holding only
+    # spaces looks healthy here ("   " is truthy) while the homepage silently
+    # drops it. Normalising the values too means every truthiness check in the
+    # template - thumbnail branch, badge, repair form - agrees, instead of each
+    # one silently disagreeing about what "missing" means.
+    for c in cards:
+        img = (c.get("image_url") or "").strip() or None
+        vid = (c.get("video_url") or "").strip() or None
+        c["image_url"] = img
+        c["video_url"] = vid
+        c["link_url"] = (c.get("link_url") or "").strip() or None
+        c["broken"] = not (img or vid)
+    broken_count = sum(1 for c in cards if c["broken"])
     return render_template(
         "admin/admin_mobile_cards.html",
         mobile_cards=cards,
         active_count=active_count,
+        broken_count=broken_count,
     )
 
 

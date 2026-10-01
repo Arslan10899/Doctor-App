@@ -6,6 +6,7 @@
     .mc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
     .mc-card { border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; background: #fff; }
     .mc-card.is-off { opacity: .58; }
+    .mc-card.is-broken { border-color: #fca5a5; box-shadow: 0 0 0 1px #fecaca; }
     .mc-thumb { position: relative; aspect-ratio: 16 / 7; background: #f3f4f6; }
     .mc-thumb img, .mc-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
     .mc-badge {
@@ -133,7 +134,7 @@
 
 <!-- ============ EXISTING CARDS ============ -->
 {% if mobile_cards %}
-{% set broken = mobile_cards | rejectattr('image_url') | rejectattr('video_url') | list %}
+{% set broken = mobile_cards | selectattr('broken') | list %}
 {% if broken %}
 <div style="border:1px solid #fca5a5;background:#fef2f2;color:#991b1b;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13.5px;">
     <strong>{{ broken | length }} card(s) ka media missing hai</strong> — inki image/video URL khaali hai, isliye ye
@@ -143,7 +144,7 @@
 {% endif %}
 <div class="mc-grid">
     {% for c in mobile_cards %}
-    <div class="mc-card{% if not c['active'] %} is-off{% endif %}" data-mc-item="{{ c['id'] }}">
+    <div class="mc-card{% if not c['active'] %} is-off{% endif %}{% if c['broken'] %} is-broken{% endif %}" data-mc-item="{{ c['id'] }}">
         <div class="mc-thumb">
             {% if c['media_type'] == 'video' and c['video_url'] %}
                 <video src="{{ c['video_url'] }}" muted playsinline preload="metadata"></video>
@@ -157,7 +158,7 @@
             {% endif %}
             <span class="mc-badge">{{ c['media_type'] }}</span>
             <span class="mc-state {{ 'on' if c['active'] else 'off' }}">{{ 'Active' if c['active'] else 'Inactive' }}</span>
-            {% if not c['image_url'] and not c['video_url'] %}
+            {% if c['broken'] %}
             <span class="mc-state" style="background:#b91c1c;">Media missing</span>
             {% endif %}
         </div>
@@ -188,7 +189,7 @@
                 </form>
             </div>
 
-            {% if not c['image_url'] and not c['video_url'] %}
+            {% if c['broken'] %}
             <form method="post" action="{{ url_for('admin_mobile_cards_action') }}"
                   style="border:1px solid #fca5a5;background:#fff1f2;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px;">
                 <input type="hidden" name="section" value="repair">
