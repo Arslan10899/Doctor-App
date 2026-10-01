@@ -87,9 +87,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mobile promo cards (mobile only). The frame picks its own layout from the
     // number of media inside (one / two / many, set server side). Only "many"
     // is a carousel: the track is a CSS scroll-snap scroller, so swipe already
-    // works there, and this adds dots and autoplay on top. There are no arrows:
-    // two tiles fill the frame, so there is nothing to step past - the strip
-    // advances itself and the dots are the only manual control.
+    // works there, and this adds dots, autoplay and the loop on top. There are no
+    // arrows: two tiles fill the frame, so there is nothing to step past - the
+    // strip advances itself and the dots are the only manual control.
     const mcardStrip = document.getElementById("mcardStrip");
     if (mcardStrip && mcardStrip.dataset.mode === "many") {
         const track = document.getElementById("mcardTrack");
@@ -97,7 +97,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const dotsWrap = document.getElementById("mcardDots");
         let index = 0;
         let timer = null;
+        let resumeTimer = null;
+        let loopSpan = 0;          // cloned tiles sitting at the end, 0 when not looping
+        let firstClone = null;    // the copy that marks the wrap point
         const MCARD_INTERVAL = 4000;
+        const RESUME_AFTER = 6000;
 
         function gap() {
             return parseFloat(getComputedStyle(track).columnGap || "0") || 0;
@@ -114,61 +118,176 @@ document.addEventListener("DOMContentLoaded", function () {
             return Math.max(1, Math.min(cards.length, Math.round((track.clientWidth + gap()) / step)));
         }
         function lastIndex() {
-            // the furthest the strip can scroll while still filling the frame
+            // the furthest position that still shows only real cards
             return Math.max(0, cards.length - perView());
+        }
+        function virtualLast() {
+            // the furthest the strip can actually sit, cloned tiles included
+            return lastIndex() + loopSpan;
+        }
+        function wrapIndex(i) {
+            const n = cards.length;
+            return n ? ((i % n) + n) % n : 0;
         }
         function nearestIndex() {
             const step = cardStep();
             if (!step) return 0;
-            return Math.max(0, Math.min(lastIndex(), Math.round(track.scrollLeft / step)));
+            return Math.max(0, Math.min(virtualLast(), Math.round(track.scrollLeft / step)));
         }
         function paint() {
             if (!dotsWrap) return;
             const dots = dotsWrap.querySelectorAll("button");
             for (let i = 0; i < dots.length; i++) {
-                dots[i].classList.toggle("active", i === index);
+                // one dot per card, and it tracks the card on the left, so the
+                // dot never lies about which offer is being shown
+                dots[i].classList.toggle("active", i === wrapIndex(index));
             }
         }
-        function scrollToCard(i, smooth) {
-            index = Math.max(0, Math.min(lastIndex(), i));
+        function syncMedia() {
+            // a cloned tile is never allowed to autoplay, so the video that is
+            // actually on screen is the one real card that belongs there
+            const shown = cards[wrapIndex(index)];
+            cards.forEach(function (card) {
+                const v = card.querySelector("video");
+                if (!v) return;
+                if (card === shown && v.hasAttribute("autoplay")) {
+                    if (v.paused) { const p = v.play(); if (p && p.catch) p.catch(function () { }); }
+                } else if (!v.paused) {
+                    v.pause();
+                }
+            });
+        }
+        function settle() {
             const step = cardStep();
-            if (step) {
-                track.scrollTo({ left: index * step, behavior: smooth ? "smooth" : "auto" });
+            if (!step) return;
+            if (firstClone) {
+                // Measured off the copy's own edge rather than off scrollLeft.
+                // scrollLeft lands on fractional values on a scaled screen, and
+                // comparing that to a computed target is how a loop ends up
+                // parked on the last card waiting for a pixel it cannot reach.
+                // Asking the layout where the copy actually is cannot drift.
+                //
+                // drift is how far the copy sits to the right of the track's left
+                // edge, so it starts large and falls to zero as the copy comes up
+                // flush, then goes negative once the copy is past. The wrap is
+                // therefore drift at or below a pixel, not at or above one: the
+                // other way round folds the strip back to the start on every
+                // scroll and the loop never leaves the first card.
+                const drift = firstClone.getBoundingClientRect().left
+                    - track.getBoundingClientRect().left;
+                if (drift <= 1) {
+                    // the copy is exactly where card one was, so putting the scroll
+                    // back to zero moves nothing the eye can catch. The strip has
+                    // come all the way round without the jump a wrap would show.
+                    index = 0;
+                    track.scrollTo({ left: 0, behavior: "auto" });
+                    paint();
+                    syncMedia();
+                    return;
+                }
             }
+            index = nearestIndex();
             paint();
+            syncMedia();
+        }
+        function scrollToCard(i, smooth) {
+            const step = cardStep();
+            if (!step) return;
+            index = Math.max(0, Math.min(virtualLast(), i));
+            track.scrollTo({ left: index * step, behavior: smooth ? "smooth" : "auto" });
+            paint();
+            syncMedia();
         }
         function stop() {
             if (timer) { clearInterval(timer); timer = null; }
         }
         function play() {
             stop();
-            if (lastIndex() < 1) return;   // everything already fits, nothing to advance
+            if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+            if (virtualLast() < 1) return;   // everything already fits, nothing to advance
             timer = setInterval(function () {
                 if (document.hidden) return;
-                const at = nearestIndex();
-                // stop on the last position instead of wrapping into a dead end
-                if (at >= lastIndex()) { stop(); paint(); return; }
-                scrollToCard(at + 1, true);
+                // wrap round rather than stopping: past the last real position the
+                // strip is sitting on the copies, which settle() folds back to zero
+                scrollToCard(index + 1, true);
             }, MCARD_INTERVAL);
+        }
+        function scheduleResume() {
+            // a swipe stops the loop, but a loop that never starts again is not a
+            // loop, so it picks itself back up once the finger has been still
+            if (resumeTimer) clearTimeout(resumeTimer);
+            resumeTimer = setTimeout(function () {
+                resumeTimer = null;
+                play();
+            }, RESUME_AFTER);
+        }
+
+        // ---- the loop -------------------------------------------------------
+        // A native scroll-snap scroller stops dead at the end of its own content
+        // and cannot go past it, so looping means repeating the leading tiles at
+        // the end. Scrolling onto the copy is what makes the wrap seamless, and
+        // the moment the copy is flush left the scroll is folded back to zero
+        // without moving. This is only worth doing past two cards: with one or
+        // two the layout is a static grid rather than a strip, and with three or
+        // more the frame only ever shows a pair, so there is always another offer
+        // waiting and stopping used to leave a dead strip with a tile half off.
+        function clearLoop() {
+            Array.prototype.slice.call(track.querySelectorAll(".mcard-clone"))
+                .forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+            loopSpan = 0;
+            firstClone = null;
+        }
+        function buildLoop() {
+            clearLoop();
+            if (cards.length < 3) return;   // one or two: a grid, not a strip
+            if (lastIndex() < 1) return;    // the last pair is already in frame
+            // One tile more than the frame shows, and the spare is the point.
+            // Repeating exactly perView() copies puts the wrap position at the
+            // very last pixel the scroller can reach, so a rounding difference in
+            // the 50% tile widths leaves the target one pixel out of bounds and the
+            // loop silently stalls on the final card. One extra copy leaves about
+            // half a frame of slack past the wrap, which is comfortably enough.
+            cards.slice(0, perView() + 1).forEach(function (card) {
+                const copy = card.cloneNode(true);
+                copy.classList.add("mcard-clone");
+                // a copy is scenery for the loop and never a second way to the
+                // same offer: out of the tab order and away from a screen reader
+                copy.setAttribute("aria-hidden", "true");
+                copy.setAttribute("tabindex", "-1");
+                copy.removeAttribute("href");
+                copy.removeAttribute("target");
+                Array.prototype.slice.call(copy.querySelectorAll("a[href], button, video, [tabindex]"))
+                    .forEach(function (el) {
+                        el.setAttribute("tabindex", "-1");
+                        // two copies of one autoplaying video is double audio
+                        el.removeAttribute("autoplay");
+                        el.removeAttribute("loop");
+                    });
+                track.appendChild(copy);
+                if (!firstClone) firstClone = copy;
+                loopSpan++;
+            });
         }
         function buildDots() {
             if (!dotsWrap) return;
             dotsWrap.innerHTML = "";
-            // one dot per reachable position, not per tile, so no two dots ever
-            // scroll the strip to the same place
-            for (let i = 0; i <= lastIndex(); i++) {
+            // one dot per card, so a dot is a card and not an ambiguous offset
+            for (let i = 0; i < cards.length; i++) {
                 const d = document.createElement("button");
                 d.type = "button";
-                d.setAttribute("aria-label", "Go to promo " + (i + 1) + " of " + (lastIndex() + 1));
+                d.setAttribute("aria-label", "Go to promo " + (i + 1) + " of " + cards.length);
                 d.addEventListener("click", function () {
                     stop();
                     scrollToCard(i, true);
+                    scheduleResume();
                 });
                 dotsWrap.appendChild(d);
             }
         }
+        buildLoop();
         buildDots();
         paint();
+        syncMedia();
         let rafPending = false;
         track.addEventListener("scroll", function () {
             // scroll fires a lot during momentum; only re-read the index once
@@ -177,16 +296,27 @@ document.addEventListener("DOMContentLoaded", function () {
             rafPending = true;
             requestAnimationFrame(function () {
                 rafPending = false;
-                index = nearestIndex();
-                paint();
+                settle();
             });
         });
         ["touchstart", "pointerdown", "wheel"].forEach(function (ev) {
-            track.addEventListener(ev, stop, { passive: true });
+            track.addEventListener(ev, function () { stop(); scheduleResume(); }, { passive: true });
         });
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) stop();
             else if (!timer) play();
+        });
+        // a rotate or a window resize can change how many tiles fit, which changes
+        // both the step and how many copies the loop needs
+        let resizeTimer = null;
+        window.addEventListener("resize", function () {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                resizeTimer = null;
+                buildLoop();
+                buildDots();
+                settle();
+            }, 200);
         });
         // only autoplay once the strip is actually on screen
         if ("IntersectionObserver" in window) {

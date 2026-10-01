@@ -2601,9 +2601,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    the layout, set on the frame as mcard-strip--one / --two / --many:
      one   the single media is contained and centred in the frame
      two   both sit side by side as two half-width tiles, the frame does not grow
-     many  a scroll-snap carousel with arrows, dots and autoplay
+     many  a scroll-snap carousel with dots and autoplay
+   Past two cards the strip loops, which the script does by repeating the leading
+   tiles at the end of the track and folding the scroll back to the start the
+   moment a copy is flush left. The copies are ordinary .mcard tiles, so they
+   need no styling of their own and nothing here has to know they exist.
+
    The track is a native scroll-snap scroller so touch momentum works without
-   any JS transform maths; arrows and dots are progressive enhancement. */
+   any JS transform maths; dots and autoplay are progressive enhancement. */
 .mcard-strip { display: none; }
 .mcard-track {
     display: flex;
