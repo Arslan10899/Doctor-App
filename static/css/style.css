@@ -159,12 +159,19 @@ input, select, textarea { font-family: inherit; }
 .admin-entry:hover { background: var(--primary); color: #fff; border-style: solid; }
 .admin-entry svg { flex-shrink: 0; }
 
-/* The admin entry is rendered twice from one template macro: this is the copy
-   in the top bar. Above 1200px the dropdown copy is hidden and this one shows;
-   inside the 1200px block the two swap, so only one is ever visible. Without
-   this rule the dropdown copy would show in the desktop nav too, giving the
-   header two admin buttons. */
+/* The admin entry and the account buttons are each rendered twice from one
+   template macro: the bar copies sit in the top bar, the nav copies sit in the
+   3-dot dropdown. Above 1200px the nav copies are display:none and the bar
+   copies show where they always were; inside the 1200px block the two swap, so a
+   phone header is just the logo and the 3-dot and Login/Sign Up, My
+   Account/Logout and Admin all move into the menu. Without the unconditional
+   display:none the nav copies would render in the desktop nav too, giving the
+   header duplicate buttons. */
+.nav-menu-slot { display: none; }
 .nav-admin-slot { display: none; }
+/* the bar copy is one flex item now, so it has to supply the gap that
+   .header-actions used to give the two buttons between them */
+.hdr-acct-slot { display: inline-flex; align-items: center; gap: 10px; }
 
 .nav-toggle {
     display: none;
@@ -1928,10 +1935,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .admin-entry { padding: 7px 10px; font-size: 13px; }
     .admin-entry span { display: none; }
     .admin-entry { padding: 7px 9px; }
-    /* On phones the admin entry moves into the dropdown so the top bar is just
-       the logo and the 3-dot. Exactly one of the two renders is ever shown. */
-    .hdr-admin-slot { display: none; }
-    .nav-admin-slot { display: block; margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border); }
+    /* On phones the admin entry and the account buttons move into the dropdown
+       so the top bar is just the logo and the 3-dot. Exactly one copy of each is
+       ever shown. */
+    .hdr-admin-slot, .hdr-acct-slot { display: none; }
+    .nav-menu-slot { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .nav-menu-slot .nav-acct { display: flex; width: 100%; justify-content: center; padding: 11px 14px; }
+    .nav-admin-slot { display: block; margin-top: 4px; }
     .nav-admin-slot .admin-entry { display: flex; width: 100%; padding: 11px 14px; font-size: 14px; }
     /* The rule above strips the label to leave room in the bar; inside the
        menu it has to come back. */
@@ -2074,9 +2084,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 
 @media (max-width: 640px) {
-    /* Keep the admin shortcut in the bar on phones; patient login lives in the menu. */
-    .header-actions { display: flex; }
-    .header-actions > .btn { display: none; }
+    /* Login/Sign Up and My Account/Logout moved into the dropdown at 1200px, so
+       they must not be hidden here as well or a phone visitor could not sign in
+       or out. The old .header-actions > .btn { display: none } is gone: the
+       buttons are no longer direct children, and it is what used to strand a
+       logged-in phone user with no way to log out. */
     .admin-entry { padding: 6px 10px; font-size: 12.5px; }
     .admin-entry span { display: inline; }
     .hero-stats { flex-wrap: wrap; gap: 18px; }
