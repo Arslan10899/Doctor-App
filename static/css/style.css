@@ -2408,48 +2408,41 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .announce-tag svg { display: block; width: 12px; height: 12px; color: #5eead4; }
     .announce-tag-text { white-space: nowrap; }
 
-    /* ---- The line is anchored to the left and nothing is see-through ----
-       A phone gets a strip that stays put. The text begins against the left of
-       the bar, next to the tag, and does not travel across the screen, so what
-       is written is where it can be read instead of sliding past. That is the
-       opposite of the desktop marquee and it is deliberate: the desktop rule
-       animates the whole list left on an 80s loop, which on a 390px screen only
-       ever showed the middle of whatever was passing by.
+    /* ---- The line runs left across the bar, and nothing on it is see-through --
+       A phone gets the same travelling line a desktop gets. The desktop rule
+       animates the whole list leftwards on an 80s loop behind a one-screen
+       lead-in, so every announcement gets its turn rather than one of them
+       holding the bar while the rest go unread. There is deliberately no rule
+       here for the motion, the width, the lead-in or the items, so the desktop
+       values above are what a phone gets. Overriding them here is how the two
+       drifted apart in the first place.
 
-       The first announcement takes the full width and ellipsizes, so the rest
-       sit past the right edge and are clipped rather than crowding in beside it.
+       The one thing a phone does not get is the fading ends. The desktop mask
+       runs 110px in from the left and 40px from the right, which on a 1280px
+       screen is a soft edge. On a 390px phone that same fade is a quarter of
+       the line, and on a 524px screen it is still a fifth, so the announcement
+       read as half transparent rather than as information. Turning the mask off
+       is what makes the line fully opaque.
 
-       Every surface here is a solid colour. The desktop uses rgba() for the tag
-       chip, the title pill and the dividers, and that reads as a wash against
-       the dark bar on a phone, so each one is written out as the flat colour it
-       blended to. The line also drops the fading mask entirely, since there is
-       nothing scrolling in from off screen to soften. */
+       Every surface is written out as a flat colour for the same reason. The
+       desktop builds the tag chip, the title pill and the dividers out of
+       rgba(), and over the dark bar on a phone those read as a wash instead of
+       a surface, so each is the solid colour it was blending to. */
     .announcement-list {
-        width: auto;
-        flex: 1 1 auto;
-        min-width: 0;
-        padding-left: 0;
-        overflow: hidden;
-        animation: none;
         -webkit-mask: none;
         mask: none;
     }
-    .announcement-item { flex: 0 0 auto; border-right: 1px solid #11494f; }
-    /* only the first one may shrink, and it always fills the row, so the second
-       starts beyond the clip and never shows as a sliver beside it */
-    .announcement-item:first-child { flex: 1 1 auto; min-width: 0; border-left: 0; }
-    .announcement-title,
-    .announcement-content {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+    .announcement-item { border-right: 1px solid #11494f; }
+    .announcement-item:first-child { border-left: 1px solid #11494f; }
     .announcement-title {
-        flex: 0 1 auto;
+        flex: 0 0 auto;
         background: #134b57;
         border: 1px solid #2a6b78;
     }
+    /* A finger never produces :hover, so the desktop hover pause is unreachable
+       on a phone and the loop could not be stopped at all. Pressing the strip
+       stands in for it. */
+    .announcement-bar:active .announcement-list { animation-play-state: paused; }
     .announce-close {
         display: grid;
         place-items: center;
