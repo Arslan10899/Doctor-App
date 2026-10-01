@@ -61,7 +61,9 @@
                         </div>
                     </form>
                     {% if mobile_cards %}
-                    <div class="mcard-strip" id="mcardStrip" aria-label="Featured offers">
+                    {% set mn = mobile_cards|length %}
+                    {% set mmode = 'one' if mn == 1 else ('two' if mn == 2 else 'many') %}
+                    <div class="mcard-strip mcard-strip--{{ mmode }}" id="mcardStrip" data-mode="{{ mmode }}" data-count="{{ mn }}" aria-label="Featured offers">
                         <div class="mcard-track" id="mcardTrack" tabindex="0">
                             {% for c in mobile_cards %}
                             {% set href = c['link_url'] or '' %}
@@ -84,7 +86,7 @@
                             {% endif %}
                             {% endfor %}
                         </div>
-                        {% if mobile_cards|length > 1 %}
+                        {% if mmode == 'many' %}
                         <button class="mcard-nav mcard-prev" type="button" aria-label="Previous card">&#8249;</button>
                         <button class="mcard-nav mcard-next" type="button" aria-label="Next card">&#8250;</button>
                         <div class="mcard-dots" id="mcardDots"></div>

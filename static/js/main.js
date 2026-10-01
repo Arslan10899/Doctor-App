@@ -84,11 +84,13 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Mobile promo cards (mobile only). The track is a CSS scroll-snap
-    // scroller, so touch already works; this only adds arrows, dots and
-    // autoplay, and pauses autoplay whenever the user takes over.
+    // Mobile promo cards (mobile only). The frame picks its own layout from the
+    // number of media inside (one / two / many, set server side). Only "many"
+    // is a carousel: the track is a CSS scroll-snap scroller, so touch already
+    // works there, and this adds arrows, dots and autoplay on top. With one or
+    // two media there is nothing to page through, so none of this runs.
     const mcardStrip = document.getElementById("mcardStrip");
-    if (mcardStrip) {
+    if (mcardStrip && mcardStrip.dataset.mode === "many") {
         const track = document.getElementById("mcardTrack");
         const cards = Array.prototype.slice.call(mcardStrip.querySelectorAll(".mcard"));
         const prevBtn = mcardStrip.querySelector(".mcard-prev");

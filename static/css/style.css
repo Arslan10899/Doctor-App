@@ -2462,9 +2462,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .doctor-avatar.no-img img, .avatar-lg.no-img img { border-radius: 12px; }
 
 /* -------------------- Mobile promo cards (mobile only) --------------------
-   Lives between the hero search bar and the "Book an Appointment" box. The
-   track is a native scroll-snap scroller so touch momentum works without any
-   JS transform maths; the arrows and dots below are progressive enhancement. */
+   The frame (.mcard-strip) is a fixed box. The number of media inside decides
+   the layout, set on the frame as mcard-strip--one / --two / --many:
+     one   the single media is contained and centred in the frame
+     two   both sit side by side as two half-width tiles, the frame does not grow
+     many  a scroll-snap carousel with arrows, dots and autoplay
+   The track is a native scroll-snap scroller so touch momentum works without
+   any JS transform maths; arrows and dots are progressive enhancement. */
 .mcard-strip { display: none; }
 .mcard-track {
     display: flex;
@@ -2566,12 +2570,36 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 768px) {
     .mcard-strip { display: block; position: relative; }
     .mcard { height: 118px; }
+
+    /* one: the media is shown whole and centred, so nothing is cropped out of
+       a banner just because the frame is a different shape to the artwork */
+    .mcard-strip--one .mcard-track { overflow: hidden; }
+    .mcard-strip--one .mcard { display: grid; place-items: center; background: #eef3f5; }
+    .mcard-strip--one .mcard-media {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+    }
+    .mcard-strip--one .mcard-placeholder { border-radius: 16px; }
+
+    /* two: a static split preview. Both tiles are on screen at once, the track
+       stops being a scroller, and each tile takes half the width. */
+    .mcard-strip--two .mcard-track {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        overflow: hidden;
+    }
+    .mcard-strip--two .mcard { flex: none; min-width: 0; }
+    .mcard-strip--two .mcard-media { object-fit: cover; }
 }
 
 @media (max-width: 400px) {
     .mcard { height: 108px; border-radius: 14px; }
     .mcard-media { border-radius: 14px; }
     .mcard-track, .mcard-media { border-radius: 14px; }
+    /* two tiles are half as wide, so they are also a little shorter */
+    .mcard-strip--two .mcard { height: 96px; }
 }
 
 /* -------------------- Booking modal -------------------- */
