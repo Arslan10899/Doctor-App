@@ -3,9 +3,32 @@
 
 {% block content %}
 
+{# One definition of the city picker, used in two places. On desktop it sits
+   inside the search bar; on phones it becomes a pill above the bar so the
+   search field gets the full width and a usable tap target. "slot" adds a
+   class for CSS, "uid" keeps the element ids unique per copy. #}
+{% macro city_picker(slot, uid) -%}
+<div class="city-slot city-slot--{{ slot }}">
+    <button type="button" class="city-drop" id="{{ uid }}Drop" aria-label="Select City" aria-haspopup="listbox">
+        <svg class="pin" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="city-drop-text" id="{{ uid }}Label">Select City</span>
+        <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="city-menu" id="{{ uid }}Menu" hidden>
+        <div class="city-menu-head">Choose your city</div>
+        <ul role="listbox">
+            <li data-city="" class="selected">All Cities</li>
+            {% for c in cities %}
+            <li data-city="{{ c }}" role="option">{{ c }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{%- endmacro %}
+
 <!-- ================= ANNOUNCEMENT BAR (under header) ================= -->
 {% if announcements %}
-<section class="announcement-bar">
+<section class="announcement-bar" id="announceBar">
     <span class="announce-tag">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M3 10v4a1 1 0 0 0 1 1h2l3 4h2V6H6l-3 4H3zM14 8.1a4 4 0 0 1 0 7.8M16.2 5.5a8 8 0 0 1 0 13"/></svg>
         Announcement
@@ -15,6 +38,10 @@
             <span class="announcement-item">{% if a['title'] %}<span class="announcement-title">{{ a['title'] }}</span>{% endif %}<span class="announcement-content">{{ a['content'] }}</span></span>
         {% endfor %}
     </div>
+    {# Phones only: lets a visitor give the space back. Hidden on desktop by CSS. #}
+    <button type="button" class="announce-close" id="announceClose" aria-label="Dismiss announcement">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
 </section>
 {% endif %}
 
@@ -34,31 +61,22 @@
                         <p class="hero-sub"><span class="hero-steps">Search&nbsp;.&nbsp;Connect&nbsp;.&nbsp;Book</span>&nbsp;&mdash;&nbsp;<span class="hero-sub-tail">for Clinic visits & Online check-ups.</span></p>
                     </div>
                     <form class="hero-search" action="{{ url_for('doctors') }}" method="get">
+                        {# The city picker is rendered from one macro into two slots:
+                           the bar slot stays inside the search bar on desktop, and
+                           the pill slot sits above it on phones. CSS shows exactly
+                           one at each width, so both can never appear together. The
+                           "id" argument keeps their element ids unique. #}
+                        {{ city_picker('pill', 'heroPill') }}
                         <div class="search-bar-wrap">
                             <div class="search-section">
                                 <input type="text" name="q" placeholder="Search by doctor, specialty, hospital or condition..." aria-label="Search">
                             </div>
-                            <div class="divider"></div>
-                            <div class="dropdown-section">
-                                <button type="button" class="city-drop" id="cityDrop" aria-label="Select City">
-                                    <span id="cityLabel">Select City</span>
-                                    <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                                </button>
-                                <input type="hidden" name="city" id="cityInput" value="">
-                                <div class="city-menu" id="cityMenu" hidden>
-                                    <div class="city-menu-head">Choose your city</div>
-                                    <ul>
-                                        <li data-city="">All Cities</li>
-                                        {% for c in cities %}
-                                        <li data-city="{{ c }}">{{ c }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
+                            {{ city_picker('bar', 'heroBar') }}
                             <button class="search-btn" type="submit" aria-label="Search">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                             </button>
                         </div>
+                        <input type="hidden" name="city" id="cityInput" value="">
                     </form>
                     {% if mobile_cards %}
                     {% set mn = mobile_cards|length %}
@@ -75,7 +93,7 @@
                                 {% if c['media_type'] == 'video' and c['video_url'] %}
                                 <video class="mcard-media" src="{{ c['video_url'] }}"{% if c['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"></video>
                                 {% elif c['image_url'] %}
-                                <img class="mcard-media" src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy">
+                                <img class="mcard-media" src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy"{% if mmode == 'one' %} data-contain="1"{% endif %}>
                                 {% else %}
                                 <div class="mcard-placeholder">{{ c['name'] or 'Coming soon' }}</div>
                                 {% endif %}
@@ -948,33 +966,88 @@
 })();
 </script>
 <script>
+/* A promo image whose source is smaller than the frame gets stretched to fill it
+   and turns soft and blocky. Where that happens the tile is marked so the
+   browser can paint it at its own size and centre it, which keeps small banner
+   artwork crisp instead of upscaled. */
 (function () {
-    var drop = document.getElementById('cityDrop');
-    var menu = document.getElementById('cityMenu');
-    var label = document.getElementById('cityLabel');
-    var input = document.getElementById('cityInput');
-    if (!drop || !menu || !label || !input) return;
-    function closeMenu() { menu.hidden = true; drop.classList.remove('open'); }
-    drop.addEventListener('click', function (e) {
-        e.preventDefault(); e.stopPropagation();
-        if (menu.hidden) {
-            menu.hidden = false; drop.classList.add('open');
-            var sel = menu.querySelector('li.selected');
-            if (sel) sel.scrollIntoView({ block: 'nearest' });
-        } else { closeMenu(); }
+    var imgs = document.querySelectorAll('.mcard-strip--one .mcard-media[data-contain]');
+    function mark(img) {
+        if (!img.naturalWidth) return;
+        var box = img.getBoundingClientRect();
+        if (box.width > 0 && img.naturalWidth < box.width) img.classList.add('is-undersized');
+    }
+    Array.prototype.forEach.call(imgs, function (img) {
+        if (img.complete) mark(img); else img.addEventListener('load', mark);
     });
-    Array.prototype.forEach.call(menu.querySelectorAll('li'), function (li) {
-        li.addEventListener('click', function (e) {
-            e.stopPropagation();
-            input.value = li.getAttribute('data-city');
-            label.textContent = li.textContent;
-            Array.prototype.forEach.call(menu.querySelectorAll('li'), function (x) { x.classList.remove('selected'); });
-            li.classList.add('selected');
-            closeMenu();
+    window.addEventListener('resize', function () {
+        Array.prototype.forEach.call(imgs, function (img) {
+            img.classList.remove('is-undersized');
+            mark(img);
         });
     });
-    document.addEventListener('click', function (e) { if (!menu.hidden) closeMenu(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) closeMenu(); });
+})();
+</script>
+<script>
+(function () {
+    var input = document.getElementById('cityInput');
+    var slots = Array.prototype.slice.call(document.querySelectorAll('.city-slot'));
+    if (!input || !slots.length) return;
+
+    /* Both copies of the picker stay in sync: only one is on screen at a given
+       width, but they share one hidden input, so a pick made in either has to be
+       reflected in the other. */
+    function closeAll(except) {
+        slots.forEach(function (s) {
+            if (s === except) return;
+            s.querySelector('.city-menu').hidden = true;
+            s.querySelector('.city-drop').classList.remove('open');
+        });
+    }
+    function setCity(value, text) {
+        input.value = value;
+        slots.forEach(function (s) {
+            s.querySelector('.city-drop-text').textContent = text;
+            Array.prototype.forEach.call(s.querySelectorAll('.city-menu li'), function (x) {
+                x.classList.toggle('selected', x.getAttribute('data-city') === value);
+            });
+        });
+    }
+    slots.forEach(function (slot) {
+        var drop = slot.querySelector('.city-drop');
+        var menu = slot.querySelector('.city-menu');
+        function close() { menu.hidden = true; drop.classList.remove('open'); }
+        drop.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            if (menu.hidden) {
+                closeAll(slot);
+                menu.hidden = false; drop.classList.add('open');
+                var sel = menu.querySelector('li.selected');
+                if (sel) sel.scrollIntoView({ block: 'nearest' });
+            } else { close(); }
+        });
+        Array.prototype.forEach.call(menu.querySelectorAll('li'), function (li) {
+            li.addEventListener('click', function (e) {
+                e.stopPropagation();
+                setCity(li.getAttribute('data-city'), li.textContent);
+                close();
+            });
+        });
+    });
+    document.addEventListener('click', function () { closeAll(null); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(null); });
+
+    var bar = document.getElementById('announceBar');
+    var closeBtn = document.getElementById('announceClose');
+    if (bar && closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            bar.hidden = true;
+            try { sessionStorage.setItem('announceClosed', '1'); } catch (err) { /* private mode */ }
+        });
+        var closed = false;
+        try { closed = sessionStorage.getItem('announceClosed') === '1'; } catch (err) { /* private mode */ }
+        if (closed) bar.hidden = true;
+    }
 })();
 </script>
 

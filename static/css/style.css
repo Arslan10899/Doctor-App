@@ -625,28 +625,7 @@ input, select, textarea { font-family: inherit; }
     color: #334155;
 }
 .search-section input::placeholder { color: #94a3b8; }
-.divider {
-    width: 1px;
-    height: 22px;
-    background-color: #e2e8f0;
-    flex-shrink: 0;
-}
-.dropdown-section {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 0 1 auto;
-    min-width: 0;
-    max-width: 130px;
-    padding: 6px 4px;
-    cursor: pointer;
-    user-select: none;
-    color: #334155;
-    font-size: 14px;
-    font-weight: 500;
-    white-space: nowrap;
-}.city-drop {
+.city-drop {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -703,6 +682,14 @@ input, select, textarea { font-family: inherit; }
 .city-menu li.selected { background: #eff6ff; color: #0284c7; font-weight: 600; }
 .city-drop .chevron { margin-left: auto; }
 .search-section .icon { width: 0; height: 0; flex-shrink: 0; }
+.city-slot { position: relative; }
+/* The in-bar copy has to be a real flex item, and it also has to be the
+   containing block for its absolutely positioned .city-menu. display:contents
+   would drop the box and hand the menu's positioning to some ancestor further
+   up, which put the desktop dropdown in the wrong place. */
+.city-slot--bar { display: flex; align-items: center; min-width: 0; }
+.city-slot--pill { display: none; }
+.city-drop .pin { display: none; flex-shrink: 0; }
 .search-btn {
     background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 100%);
     color: white;
@@ -1921,8 +1908,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 @media (max-width: 640px) {
     .search-bar-wrap { border-radius: 18px; }
-    .search-section, .dropdown-section { padding: 5px 10px; }
-    .divider { display: none; }
+    .search-section { padding: 5px 10px; }
     .search-btn { width: 40px; height: 40px; }
     .hero-head { gap: 18px; }
 }
@@ -2088,21 +2074,36 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-book-label,
     .hero-book-label svg { color: #55737c; }
     .hero-book-actions { gap: 6px; }
-    .hero-book-btn { min-height: 42px; padding: 9px 12px; font-size: 13.5px; border-radius: 12px; }
-    /* ghost button for clinic, solid teal for the primary online action, so the
-       two still separate cleanly against the white hero */
+    /* Both CTAs were previously a faint outline next to a solid fill, which read
+       as "the other one is disabled" rather than as two equal choices. They are
+       now equal-weight cards: same size, same corner radius, same white label,
+       each with its own icon. They differ in tint only, so the tint can never be
+       mistaken for a state. */
+    .hero-book-btn {
+        min-height: 56px;
+        padding: 10px 8px;
+        font-size: 13px;
+        border-radius: 14px;
+        flex-direction: column;
+        gap: 4px;
+        line-height: 1.15;
+        box-shadow: 0 6px 16px -10px rgba(13, 94, 102, .55);
+    }
+    .hero-book-btn svg { width: 19px; height: 19px; }
     .hero-book-clinic {
-        background: rgba(13, 148, 136, .07);
-        color: #0d5f66;
-        box-shadow: inset 0 0 0 1.5px rgba(13, 148, 136, .32);
-    }
-    .hero-book-clinic:hover { background: rgba(13, 148, 136, .13); }
-    .hero-book-online {
-        background: linear-gradient(135deg, #0d9488, #0f766e);
+        background: linear-gradient(135deg, #0f766e, #115e59);
         color: #fff;
-        box-shadow: 0 8px 18px -8px rgba(13, 94, 102, .50);
+        /* clears the base rule's inset outline, which was what made this one
+           read as the weaker of the pair */
+        box-shadow: 0 6px 16px -10px rgba(13, 94, 102, .55);
     }
-    .hero-book-online:hover { background: linear-gradient(135deg, #0f766e, #115e59); }
+    .hero-book-clinic:hover { background: linear-gradient(135deg, #115e59, #134e4a); }
+    .hero-book-online {
+        background: linear-gradient(135deg, #134e4a, #0f3b38);
+        color: #fff;
+        box-shadow: 0 6px 16px -10px rgba(15, 59, 56, .55);
+    }
+    .hero-book-online:hover { background: linear-gradient(135deg, #0f3b38, #0b2f2c); }
 
     /* ---- Mobile booking modal trimming ----
        The "Book an Appointment" title and the "Choose how you would like to
@@ -2119,15 +2120,35 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .book-field-time { display: none; }
     .book-modal[data-step="form"] .book-modal-close { display: none; }
 
-    /* ---- Mobile search bar + city dropdown ----
-       14px placeholder text was too wide next to the Select City button, so
-       the placeholder got clipped. Trim both by ~1.5px. */
-    .search-section input { font-size: 12.5px; }
-    .search-section input::placeholder { font-size: 12.5px; }
+    /* ---- Mobile search bar + city pill ----
+       Cramming the field, the city dropdown and the search button into one bar
+       left the city part a ~100px tap target and clipped the placeholder. So on
+       phones the picker leaves the bar and becomes a pill above it, and the bar
+       is left as a plain full-width input plus the search button. */
+    .city-slot--bar { display: none; }
+    .city-slot--pill { display: block; }
+    .city-slot--pill .city-drop {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px 7px 11px;
+        border-radius: 9999px;
+        background: #fff;
+        border: 1px solid rgba(13, 148, 136, .22);
+        box-shadow: 0 4px 14px -8px rgba(13, 94, 102, .30);
+        color: #0f4a55;
+        font-weight: 600;
+        width: auto;
+    }
+    .city-slot--pill .city-drop .pin { display: block; color: #0d9488; }
+    .city-slot--pill .city-drop .chevron { margin-left: 0; }
+    .city-slot--pill .city-drop.open { background: rgba(13, 148, 136, .09); }
+    .city-slot--pill .city-menu { left: 0; right: auto; min-width: 100%; }
+    .search-bar-wrap { margin-top: 8px; }
+    .search-section input { font-size: 14px; }
+    .search-section input::placeholder { font-size: 14px; }
     .city-drop,
-    .city-drop span,
-    .dropdown-section { font-size: 12.5px; }
-    .dropdown-section { max-width: 116px; }
+    .city-drop .city-drop-text { font-size: 12.5px; }
     .city-menu-head,
     .city-menu li { font-size: 12.5px; }
     /* the search bar is a white pill, so on the white hero it needs a teal edge
@@ -2142,13 +2163,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero h1 { font-size: 22px; }
     .hero-title-accent { font-size: 12.5px; }
     .search-section input,
-    .search-section input::placeholder,
-    .city-drop { font-size: 11.5px; }
-    .dropdown-section { max-width: 104px; }
+    .search-section input::placeholder { font-size: 13px; }
+    .city-drop .city-drop-text { font-size: 12px; }
     .hero-book-box { padding: 9px 10px; border-radius: 14px; }
     .hero-book-label { font-size: 10px; padding-bottom: 7px; }
     .hero-book-actions { gap: 5px; }
-    .hero-book-btn { font-size: 12.5px; min-height: 40px; gap: 6px; padding: 8px 8px; }
+    .hero-book-btn { font-size: 12px; min-height: 54px; gap: 3px; padding: 9px 5px; }
+    .hero-book-btn svg { width: 18px; height: 18px; }
 }
 
 @media (max-width: 640px) {
@@ -2316,6 +2337,60 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .announcement-item::before { content: "\25CF"; color: #2dd4bf; font-size: 8px; }
+/* The dismiss button is for phones only, so it stays out of the desktop row
+   entirely instead of being hidden and still taking up space. */
+.announce-close { display: none; }
+
+@media (max-width: 768px) {
+    /* ---- Slimmer announcement ticker with a dismiss button ----
+       9px of vertical padding plus the 15px tag chip made the ticker eat a
+       surprising amount of a short phone screen. Trimmed to 4px, with a 32px
+       close target so the list stops short of it. The tag also stops being an
+       absolutely positioned skewed wedge pinned to the left edge and becomes an
+       ordinary inline chip, so it cannot cover the first announcement. */
+    .announcement-bar { padding: 4px 0; font-size: 12px; }
+    .announce-tag {
+        position: static;
+        flex-shrink: 0;
+        padding: 0 12px;
+        font-size: 10.5px;
+        clip-path: none;
+        box-shadow: none;
+        border-radius: 999px;
+        margin-left: 12px;
+        animation: none;
+    }
+    .announce-tag svg { display: none; }
+    .announcement-list { padding-right: 4px; }
+    .announcement-item { font-size: 12px; }
+    .announcement-title { font-size: 12px; }
+    .announce-close {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+        margin-left: 6px;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .12);
+        color: #d7f3ef;
+        cursor: pointer;
+    }
+    .announce-close:hover { background: rgba(255, 255, 255, .22); }
+    .announce-close:active { transform: scale(.94); }
+
+    /* ---- Header breathing room ----
+       The mascot tile is 38px with an 11px gap, which pushed the wordmark close
+       to the hamburger. Shrink the tile a little and give the actions more air so
+       the row stops reading as crowded. */
+    .site-header .logo { gap: 8px; }
+    .site-header .logo-icon img { width: 34px; height: 34px; }
+    .site-header .logo-text { font-size: 19px; }
+    .site-header .logo-tagline { font-size: 9px; letter-spacing: .5px; }
+    .header-actions { gap: 8px; }
+}
 
 /* ===== Hero announcements (under heading) ===== */
 .hero-announce-item {
@@ -2611,6 +2686,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         object-fit: contain;
         width: 100%;
         height: 100%;
+    }
+    /* a source narrower than the frame would otherwise be stretched up and go
+       soft, so it is painted at its own size and centred instead */
+    .mcard-strip--one .mcard-media.is-undersized {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 100%;
     }
     .mcard-strip--one .mcard-placeholder { border-radius: 16px; }
     /* the dots were translucent white, which vanished the moment the hero went
