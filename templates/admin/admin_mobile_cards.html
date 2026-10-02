@@ -287,7 +287,12 @@
     function visibleInput() {
         var form = addForm();
         if (!form) return null;
-        return form.querySelector('input[type="text"][name$="_url"][data-mc-field]');
+        // The form holds BOTH url boxes; a plain querySelector would always
+        // grab the image one (first in DOM) even on the Video tab, which
+        // blocked every video-URL submit. Follow the selected radio instead.
+        var mt = form.querySelector('input[name="media_type"]:checked');
+        var kind = mt && mt.value === 'video' ? 'video_url' : 'image_url';
+        return form.querySelector('input[type="text"][name="' + kind + '"]');
     }
 
     function renderQueue() {
