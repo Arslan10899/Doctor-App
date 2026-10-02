@@ -952,20 +952,19 @@ def index():
     )]
     for _c in mobile_cards:
         # A YouTube page/shorts/share link is neither a renderable <img> src
-        # nor a playable <video> src, so without this the card comes out
-        # broken. Swap in the video's real thumbnail (a proper jpg) and, when
-        # the card has no link yet, point the tap at the YouTube video itself.
+        # nor a playable <video> src. It stays a video card and plays inline
+        # in the card frame via the embed (the template gets the video id).
+        # Image field is for image links/uploads; a YouTube link pasted there
+        # is treated the same way so the card never comes out broken.
         _img_src = (_c.get("image_url") or "").strip()
         _vid_src = (_c.get("video_url") or "").strip()
-        if _vid_src and yt_thumb(_vid_src):
-            if not (_c.get("link_url") or "").strip():
-                _c["link_url"] = _vid_src
-            _c["image_url"] = yt_thumb(_vid_src)
-            _c["video_url"] = None
-        if _img_src and yt_thumb(_img_src):
-            if not (_c.get("link_url") or "").strip():
-                _c["link_url"] = _img_src
-            _c["image_url"] = yt_thumb(_img_src)
+        _vid_yt = yt_video_id(_vid_src) if _vid_src else None
+        _img_yt = yt_video_id(_img_src) if _img_src else None
+        if _vid_yt or _img_yt:
+            _c["media_type"] = "video"
+            _c["video_url"] = _vid_src or _img_src
+            _c["image_url"] = None
+            _c["yt_id"] = _vid_yt or _img_yt
         # Decide the type from the data that actually exists, so the template
         # can never render an <img> with an empty or whitespace src. When both
         # columns are filled, media_type is the admin's stated intent, so it

@@ -44,17 +44,68 @@
             if (v !== except && !v.paused) { try { v.pause(); } catch (e) { /* no video, no problem */ } }
         });
     }
+    // YouTube cards play inline in the frame, never as a link out. Poster is
+    // the video thumbnail; tap swaps in the embed, leaving the slide destroys
+    // it again so no two videos (and no background audio) ever overlap.
+    function ytCards() {
+        return Array.prototype.slice.call(strip.querySelectorAll(".mcard--yt"));
+    }
+    function ytFrame(card) { return card.querySelector("iframe.mcard-frame"); }
+    function ytPoster(card) { return card.querySelector(".mcard-poster"); }
+    function ytPlay(card, muted) {
+        var id = card.getAttribute("data-yt");
+        if (!id) return null;
+        var f = ytFrame(card);
+        if (!f) {
+            f = document.createElement("iframe");
+            f.className = "mcard-frame";
+            f.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0&enablejsapi=1&playsinline=1"
+                + (muted ? "&mute=1&loop=1&playlist=" + id : "");
+            f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            f.setAttribute("frameborder", "0");
+            f.setAttribute("allowfullscreen", "");
+            f.setAttribute("title", card.getAttribute("data-name") || "Video");
+            card.insertBefore(f, card.firstChild);
+        } else if (!muted) {
+            try {
+                f.contentWindow.postMessage(JSON.stringify({ event: "command", func: "unMute", args: "" }), "*");
+                f.contentWindow.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
+            } catch (e) { /* player not ready yet */ }
+        }
+        var poster = ytPoster(card);
+        if (poster) poster.style.display = "none";
+        card.classList.add("is-playing");
+        return f;
+    }
+    function ytStop(card) {
+        var f = ytFrame(card);
+        if (f && f.parentNode) f.parentNode.removeChild(f);
+        var poster = ytPoster(card);
+        if (poster) poster.style.display = "";
+        card.classList.remove("is-playing");
+        if (card._ytSound) card._ytSound = false;
+    }
     // While a video plays WITH sound the slider holds still, so the slide is
     // never yanked away mid-watch. Muted autoplay does not hold the slider.
     function soundCheck() {
         if (!swiper || !swiper.autoplay) return;
-        var sounding = videos().some(function (v) { return !v.paused && !v.muted; });
+        var sounding = videos().some(function (v) { return !v.paused && !v.muted; })
+            || ytCards().some(function (card) { return !!card._ytSound && !!ytFrame(card); });
         if (sounding) swiper.autoplay.stop();
         else swiper.autoplay.start();
     }
     function settleVideos() {
         if (!swiper) return;
         var active = swiper.slides[swiper.activeIndex];
+        ytCards().forEach(function (card) {
+            if (!active || !active.contains(card)) {
+                if (ytFrame(card)) ytStop(card);
+                return;
+            }
+            if (card.getAttribute("data-autoplay") === "1" && !card._manual && !ytFrame(card)) {
+                ytPlay(card, true);
+            }
+        });
         videos().forEach(function (v) {
             var card = v.closest(".mcard--video");
             if (!active || !active.contains(v)) {
@@ -73,8 +124,20 @@
     }
 
     // Tap a video card (or its glass play button): inline playback with sound.
-    // From here the card is manual, so the muted autoplay above leaves it alone.
+    // YouTube first: it has no <video> element, only the embed. From here a
+    // card is manual, so the muted autoplay above leaves it alone.
     strip.addEventListener("click", function (e) {
+        var ycard = e.target.closest(".mcard--yt");
+        if (ycard) {
+            ycard._manual = true;
+            ycard._ytSound = true;
+            pauseAll(null);
+            ytCards().forEach(function (o) { if (o !== ycard && ytFrame(o)) ytStop(o); });
+            if (ytFrame(ycard)) ytStop(ycard); // drop a muted autoplay frame, replay with sound
+            ytPlay(ycard, false);
+            soundCheck();
+            return;
+        }
         var card = e.target.closest(".mcard--video");
         if (!card) return;
         var v = card.querySelector("video");

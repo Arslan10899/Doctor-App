@@ -68,6 +68,14 @@
                             {% for c in mobile_cards %}
                             <div class="swiper-slide">
                                 {% if c['media_type'] == 'video' and c['video_url'] %}
+                                {% if c.get('yt_id') %}
+                                <div class="mcard mcard--video mcard--yt" data-yt="{{ c['yt_id'] }}" data-autoplay="{{ 1 if c['autoplay'] else 0 }}" data-name="{{ c['name'] or 'Offer' }}">
+                                    <img class="mcard-video mcard-poster" src="{{ yt_thumb(c['video_url']) }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy">
+                                    <button type="button" class="mcard-play" aria-label="Play video">
+                                        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                                    </button>
+                                </div>
+                                {% else %}
                                 <div class="mcard mcard--video" data-autoplay="{{ 1 if c['autoplay'] else 0 }}" data-name="{{ c['name'] or 'Offer' }}">
                                     <video class="mcard-video" src="{{ c['video_url'] }}" preload="metadata" muted loop playsinline></video>
                                     <button type="button" class="mcard-play" aria-label="Play video">
@@ -76,6 +84,7 @@
                                     <span class="mcard-duration" hidden>--:--</span>
                                     <span class="mcard-progress" aria-hidden="true"><i></i></span>
                                 </div>
+                                {% endif %}
                                 {% elif c['image_url'] %}
                                 {% set href = c['link_url'] or '' %}
                                 {% if href %}

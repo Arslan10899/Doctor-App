@@ -108,6 +108,7 @@
         </div>
         <input type="file" data-mc-file="video" data-mc-scope="add" accept="video/*" multiple style="display:none;">
         <p class="mc-preview" data-mc-preview="video"></p>
+        <p class="mc-muted" style="margin:4px 0 0;">MP4 upload karein ya <strong>YouTube link</strong> paste karein &mdash; YouTube video usi card mein inline play hogi, bahar nahi jayegi.</p>
         <label class="mc-toggle" style="margin-top:10px;">
             <input type="checkbox" name="autoplay" value="1" checked> Video khud chalay (muted loop)
         </label>
@@ -147,7 +148,11 @@
     <div class="mc-card{% if not c['active'] %} is-off{% endif %}{% if c['broken'] %} is-broken{% endif %}" data-mc-item="{{ c['id'] }}">
         <div class="mc-thumb">
             {% if c['media_type'] == 'video' and c['video_url'] %}
+                {% if yt_thumb(c['video_url']) %}
+                <img src="{{ yt_thumb(c['video_url']) }}" alt="YouTube video" loading="lazy">
+                {% else %}
                 <video src="{{ c['video_url'] }}" muted playsinline preload="metadata"></video>
+                {% endif %}
             {% elif c['image_url'] %}
                 <img src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Card' }}" loading="lazy">
             {% else %}
