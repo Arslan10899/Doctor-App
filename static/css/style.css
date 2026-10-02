@@ -2863,6 +2863,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     transition: width .2s, background .2s;
 }
 .promo-pagination .swiper-pagination-bullet-active { width: 22px; background: #0d9488; }
+/* softened coverflow side shading so angled slides read as one cylinder */
+.promo-swiper .swiper-slide-shadow-left, .promo-swiper .swiper-slide-shadow-right { border-radius: 16px; }
+.promo-swiper .swiper-slide-shadow-left { background-image: linear-gradient(to left, rgba(15, 23, 42, .32), transparent 70%); }
+.promo-swiper .swiper-slide-shadow-right { background-image: linear-gradient(to right, rgba(15, 23, 42, .32), transparent 70%); }
 
 /* -------------------- Booking modal -------------------- */
 .book-modal {

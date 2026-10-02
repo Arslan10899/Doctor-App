@@ -102,13 +102,13 @@
             slidesPerView: "auto",
             loop: loop,
             loopedSlides: total,
-            speed: 450,
+            speed: 550,
             coverflowEffect: {
-                rotate: 38,
+                rotate: 45,
                 stretch: 0,
-                depth: 150,
+                depth: 200,
                 modifier: 1,
-                slideShadows: false
+                slideShadows: true
             },
             // auto-slide loop: keeps going after a swipe (disableOnInteraction
             // false), single-card strips have nothing to advance to
