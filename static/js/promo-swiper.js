@@ -35,13 +35,21 @@
         v.addEventListener("timeupdate", function () {
             if (bar && v.duration) bar.style.width = (100 * v.currentTime / v.duration) + "%";
         });
-        v.addEventListener("play", function () { if (card) card.classList.add("is-playing"); });
-        v.addEventListener("pause", function () { if (card) card.classList.remove("is-playing"); });
+        v.addEventListener("play", function () { if (card) card.classList.add("is-playing"); soundCheck(); });
+        v.addEventListener("pause", function () { if (card) card.classList.remove("is-playing"); soundCheck(); });
     }
     function pauseAll(except) {
         videos().forEach(function (v) {
             if (v !== except && !v.paused) { try { v.pause(); } catch (e) { /* no video, no problem */ } }
         });
+    }
+    // While a video plays WITH sound the slider holds still, so the slide is
+    // never yanked away mid-watch. Muted autoplay does not hold the slider.
+    function soundCheck() {
+        if (!swiper || !swiper.autoplay) return;
+        var sounding = videos().some(function (v) { return !v.paused && !v.muted; });
+        if (sounding) swiper.autoplay.stop();
+        else swiper.autoplay.start();
     }
     function settleVideos() {
         if (!swiper) return;
@@ -101,10 +109,18 @@
                 modifier: 1,
                 slideShadows: false
             },
+            // auto-slide loop: keeps going after a swipe (disableOnInteraction
+            // false), single-card strips have nothing to advance to
+            autoplay: total > 1 ? { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true } : false,
             pagination: pagEl ? { el: pagEl, clickable: true } : undefined
         });
         swiper.on("slideChange", settleVideos);
         settleVideos();
+        document.addEventListener("visibilitychange", function () {
+            if (!swiper || !swiper.autoplay) return;
+            if (document.hidden) swiper.autoplay.stop();
+            else soundCheck();
+        });
     }
     function destroy() {
         if (!swiper) return;
