@@ -11,9 +11,7 @@
     var mq = window.matchMedia("(max-width: 768px)");
     var swiper = null;
     var loop = strip.dataset.loop === "1";
-    var userPaused = false; // the ring button: manual pause wins over everything
     var visWired = false;
-    var autoBtn = document.getElementById("promoAutoplay");
 
     function pad(n) { return (n < 10 ? "0" : "") + n; }
     function fmt(sec) {
@@ -52,7 +50,7 @@
         if (!swiper || !swiper.autoplay) return;
         var sounding = videos().some(function (v) { return !v.paused && !v.muted; });
         if (sounding) swiper.autoplay.stop();
-        else if (!userPaused) swiper.autoplay.start();
+        else swiper.autoplay.start();
     }
     function settleVideos() {
         if (!swiper) return;
@@ -106,9 +104,9 @@
             loopedSlides: total,
             speed: 450,
             coverflowEffect: {
-                rotate: 30,
+                rotate: 38,
                 stretch: 0,
-                depth: 120,
+                depth: 150,
                 modifier: 1,
                 slideShadows: false
             },
@@ -120,34 +118,19 @@
         swiper.on("slideChange", settleVideos);
         settleVideos();
         // circular autoplay progress: the ring drains as the next slide
-        // approaches, and the button toggles the loop on tap
-        if (autoBtn && !autoBtn._promoWired) {
-            autoBtn._promoWired = true;
-            autoBtn.addEventListener("click", function () {
-                if (!swiper || !swiper.autoplay) return;
-                userPaused = !userPaused;
-                if (userPaused) swiper.autoplay.stop();
-                else soundCheck();
-                var ic = autoBtn.querySelector(".promo-auto-ic");
-                if (ic) ic.textContent = userPaused ? "\u25B6" : "\u275A\u275A";
-                autoBtn.setAttribute("aria-label", userPaused ? "Resume auto-slide" : "Pause auto-slide");
+        // approaches. Display only, it is not clickable.
+        var fg = strip.querySelector(".promo-auto-fg");
+        if (fg) {
+            swiper.on("autoplayTimeLeft", function (s, time, progress) {
+                fg.style.strokeDashoffset = String(56.5 * progress);
             });
-        }
-        if (autoBtn) {
-            var fg = autoBtn.querySelector(".promo-auto-fg");
-            if (fg) {
-                swiper.on("autoplayTimeLeft", function (s, time, progress) {
-                    fg.style.strokeDashoffset = String(56.5 * progress);
-                });
-            }
-            if (userPaused && swiper.autoplay) swiper.autoplay.stop();
         }
         if (!visWired) {
             visWired = true;
             document.addEventListener("visibilitychange", function () {
                 if (!swiper || !swiper.autoplay) return;
                 if (document.hidden) swiper.autoplay.stop();
-                else if (!userPaused) soundCheck();
+                else soundCheck();
             });
         }
     }
