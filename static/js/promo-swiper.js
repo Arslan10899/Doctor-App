@@ -12,6 +12,7 @@
     var swiper = null;
     var loop = strip.dataset.loop === "1";
     var visWired = false;
+    var hoverPaused = false; // mouse over the strip holds the auto-slide
 
     function pad(n) { return (n < 10 ? "0" : "") + n; }
     function fmt(sec) {
@@ -92,7 +93,7 @@
         var sounding = videos().some(function (v) { return !v.paused && !v.muted; })
             || ytCards().some(function (card) { return !!card._ytSound && !!ytFrame(card); });
         if (sounding) swiper.autoplay.stop();
-        else swiper.autoplay.start();
+        else if (!hoverPaused) swiper.autoplay.start();
     }
     function settleVideos() {
         if (!swiper) return;
@@ -174,12 +175,27 @@
                 slideShadows: true
             },
             // auto-slide loop: keeps going after a swipe (disableOnInteraction
-            // false), single-card strips have nothing to advance to
-            autoplay: total > 1 ? { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true } : false,
+            // false), single-card strips have nothing to advance to. Hover
+            // pause is manual below so it respects the sound hold above.
+            autoplay: total > 1 ? { delay: 4000, disableOnInteraction: false } : false,
             pagination: pagEl ? { el: pagEl, clickable: true } : undefined
         });
         swiper.on("slideChange", settleVideos);
         settleVideos();
+        // Mouse over the cards holds the slide; moving away resumes normally
+        // (unless a video is playing with sound, which keeps holding).
+        if (box && !box._promoHover) {
+            box._promoHover = true;
+            box.addEventListener("mouseenter", function () {
+                if (!swiper || !swiper.autoplay) return;
+                hoverPaused = true;
+                swiper.autoplay.stop();
+            });
+            box.addEventListener("mouseleave", function () {
+                hoverPaused = false;
+                soundCheck();
+            });
+        }
         if (!visWired) {
             visWired = true;
             document.addEventListener("visibilitychange", function () {
