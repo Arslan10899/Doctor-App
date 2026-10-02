@@ -1,0 +1,2 @@
+cd ~/Doctor-App
+git pull origin main
