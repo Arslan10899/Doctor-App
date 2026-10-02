@@ -2771,7 +2771,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    any card count: a single card simply centres itself, many become a loop. */
 .mcard-strip--coverflow .promo-swiper { padding: 6px 0 24px; }
 .mcard-strip--coverflow .swiper-slide {
-    width: min(80vw, 480px);
+    width: min(40vw, 240px);
     height: auto;
     -webkit-box-reflect: below 2px linear-gradient(transparent 70%, rgba(255, 255, 255, .25));
 }
@@ -2799,8 +2799,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 58px;
-    height: 58px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: grid;
     place-items: center;
