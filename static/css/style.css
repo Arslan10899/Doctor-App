@@ -2850,7 +2850,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
     z-index: 2;
 }
-.mcard-progress i { display: block; height: 100%; width: 0; background: #ef4444; }
+.mcard-progress i { display: block; height: 100%; width: 0; background: var(--accent); }
 /* swiper dots in the house teal */
 .promo-pagination { position: static; margin-top: 12px; display: flex; justify-content: center; }
 .promo-pagination .swiper-pagination-bullet {
