@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Doctor App - Find and Book the Best Doctors in Pakistan{% endblock %}
+{% block head %}{% if mobile_cards %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}">{% endif %}{% endblock %}
 
 {% block content %}
 
@@ -61,33 +62,45 @@
             <div class="hero-content">
                 {% if mobile_cards %}
                 {% set mn = mobile_cards|length %}
-                {% set mmode = 'one' if mn == 1 else ('two' if mn == 2 else 'many') %}
-                <div class="mcard-strip mcard-strip--{{ mmode }}" id="mcardStrip" data-mode="{{ mmode }}" data-count="{{ mn }}" aria-label="Featured offers">
-                    <div class="mcard-track" id="mcardTrack" tabindex="0">
-                        {% for c in mobile_cards %}
-                        {% set href = c['link_url'] or '' %}
-                        {% if href %}
-                        <a class="mcard" href="{{ href }}">
-                        {% else %}
-                        <div class="mcard">
-                        {% endif %}
-                            {% if c['media_type'] == 'video' and c['video_url'] %}
-                            <video class="mcard-media" src="{{ c['video_url'] }}"{% if c['autoplay'] %} autoplay muted loop playsinline{% endif %} preload="metadata"></video>
-                            {% elif c['image_url'] %}
-                            <img class="mcard-media" src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy"{% if mmode == 'one' %} data-contain="1"{% endif %}>
-                            {% else %}
-                            <div class="mcard-placeholder">{{ c['name'] or 'Coming soon' }}</div>
-                            {% endif %}
-                        {% if href %}
-                        </a>
-                        {% else %}
+                <div class="mcard-strip mcard-strip--coverflow" id="mcardStrip" data-mode="coverflow" data-count="{{ mn }}" data-loop="{{ '1' if mn > 1 else '0' }}" aria-label="Featured offers">
+                    <div class="promo-swiper swiper" id="promoSwiper">
+                        <div class="swiper-wrapper">
+                            {% for c in mobile_cards %}
+                            <div class="swiper-slide">
+                                {% if c['media_type'] == 'video' and c['video_url'] %}
+                                <div class="mcard mcard--video" data-autoplay="{{ 1 if c['autoplay'] else 0 }}" data-name="{{ c['name'] or 'Offer' }}">
+                                    <video class="mcard-video" src="{{ c['video_url'] }}" preload="metadata" muted loop playsinline></video>
+                                    <button type="button" class="mcard-play" aria-label="Play video">
+                                        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                                    </button>
+                                    <span class="mcard-duration" hidden>--:--</span>
+                                    <span class="mcard-progress" aria-hidden="true"><i></i></span>
+                                </div>
+                                {% elif c['image_url'] %}
+                                {% set href = c['link_url'] or '' %}
+                                {% if href %}
+                                <a class="mcard mcard--image" href="{{ href }}">
+                                {% else %}
+                                <div class="mcard mcard--image">
+                                {% endif %}
+                                    <img class="mcard-media" src="{{ c['image_url'] }}" alt="{{ c['name'] or 'Offer' }}" loading="lazy">
+                                {% if href %}
+                                </a>
+                                {% else %}
+                                </div>
+                                {% endif %}
+                                {% else %}
+                                <div class="mcard">
+                                    <div class="mcard-placeholder">{{ c['name'] or 'Coming soon' }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
                         </div>
+                        {% if mn > 1 %}
+                        <div class="swiper-pagination promo-pagination"></div>
                         {% endif %}
-                        {% endfor %}
                     </div>
-                    {% if mmode == 'many' %}
-                    <div class="mcard-dots" id="mcardDots"></div>
-                    {% endif %}
                 </div>
                 {% endif %}
                 <div class="hero-head">
@@ -1062,4 +1075,10 @@
 })();
 </script>
 
+{% endblock %}
+{% block scripts %}
+{% if mobile_cards %}
+<script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/promo-swiper.js') }}"></script>
+{% endif %}
 {% endblock %}

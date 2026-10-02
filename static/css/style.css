@@ -2765,6 +2765,97 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .mcard-strip--two .mcard { height: 96px; }
 }
 
+/* -------------------- Mobile promo coverflow (Swiper, mobile only) --------------------
+   16:9 widescreen cards in a 3D coverflow: the centre slide faces forward while
+   the neighbours tilt away (rotateY) and sink back (depth). One code path for
+   any card count: a single card simply centres itself, many become a loop. */
+.mcard-strip--coverflow .promo-swiper { padding: 6px 0 24px; }
+.mcard-strip--coverflow .swiper-slide {
+    width: min(80vw, 480px);
+    height: auto;
+    -webkit-box-reflect: below 2px linear-gradient(transparent 70%, rgba(255, 255, 255, .25));
+}
+.mcard-strip--coverflow .mcard {
+    flex: none;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+}
+.mcard-strip--coverflow .mcard-media { border-radius: 16px; }
+.mcard-strip--coverflow .mcard-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 16px;
+    background: #0f172a;
+}
+/* floating glass play button over the video poster */
+.mcard-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    cursor: pointer;
+    background: rgba(255, 255, 255, .18);
+    border: 1.5px solid rgba(255, 255, 255, .65);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 28px -8px rgba(3, 32, 38, .6), inset 0 1px 0 rgba(255, 255, 255, .35);
+    transition: transform .25s ease, opacity .25s ease, background .25s ease;
+    z-index: 2;
+}
+.mcard-play:hover { transform: translate(-50%, -50%) scale(1.08); background: rgba(255, 255, 255, .28); }
+.mcard--video.is-playing .mcard-play { opacity: 0; pointer-events: none; }
+/* duration tag, bottom-right */
+.mcard-duration {
+    position: absolute;
+    right: 10px;
+    bottom: 12px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, .72);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    z-index: 2;
+}
+/* red playback progress line along the bottom edge */
+.mcard-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, .35);
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+    z-index: 2;
+}
+.mcard-progress i { display: block; height: 100%; width: 0; background: #ef4444; }
+/* swiper dots in the house teal */
+.promo-pagination { position: static; margin-top: 12px; display: flex; justify-content: center; }
+.promo-pagination .swiper-pagination-bullet {
+    width: 8px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(13, 148, 136, .34);
+    opacity: 1;
+    margin: 0 5px !important;
+    transition: width .2s, background .2s;
+}
+.promo-pagination .swiper-pagination-bullet-active { width: 22px; background: #0d9488; }
+
 /* -------------------- Booking modal -------------------- */
 .book-modal {
     position: fixed;
