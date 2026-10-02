@@ -2783,6 +2783,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border-radius: 16px;
 }
 .mcard-strip--coverflow .mcard-media { border-radius: 16px; }
+/* centre card reads slightly bigger; Swiper owns the slide transform, so the
+   zoom lives on the inner card and never fights the coverflow maths */
+.mcard-strip--coverflow .swiper-slide-active .mcard {
+    transform: scale(1.08);
+    z-index: 2;
+    box-shadow: 0 16px 34px -12px rgba(13, 148, 136, .5);
+}
+.mcard-strip--coverflow .swiper-slide-active .mcard:hover { transform: scale(1.08) translateY(-2px); }
 .mcard-strip--coverflow .mcard-video {
     position: absolute;
     inset: 0;
