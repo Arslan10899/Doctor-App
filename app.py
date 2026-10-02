@@ -951,6 +951,21 @@ def index():
         "ORDER BY sort_order ASC, id ASC"
     )]
     for _c in mobile_cards:
+        # A YouTube page/shorts/share link is neither a renderable <img> src
+        # nor a playable <video> src, so without this the card comes out
+        # broken. Swap in the video's real thumbnail (a proper jpg) and, when
+        # the card has no link yet, point the tap at the YouTube video itself.
+        _img_src = (_c.get("image_url") or "").strip()
+        _vid_src = (_c.get("video_url") or "").strip()
+        if _vid_src and yt_thumb(_vid_src):
+            if not (_c.get("link_url") or "").strip():
+                _c["link_url"] = _vid_src
+            _c["image_url"] = yt_thumb(_vid_src)
+            _c["video_url"] = None
+        if _img_src and yt_thumb(_img_src):
+            if not (_c.get("link_url") or "").strip():
+                _c["link_url"] = _img_src
+            _c["image_url"] = yt_thumb(_img_src)
         # Decide the type from the data that actually exists, so the template
         # can never render an <img> with an empty or whitespace src. When both
         # columns are filled, media_type is the admin's stated intent, so it
@@ -967,10 +982,10 @@ def index():
         # right branch, and blank out whitespace-only values.
         if _c["media_type"] == "image":
             _c["video_url"] = None
-            _c["image_url"] = _c["image_url"].strip()
+            _c["image_url"] = (_c["image_url"] or "").strip()
         else:
             _c["image_url"] = None
-            _c["video_url"] = _c["video_url"].strip()
+            _c["video_url"] = (_c["video_url"] or "").strip()
         # Re-validate on read too, so a bad value that reached the table by any
         # other route (direct SQL, a future importer) still cannot become an href.
         _c["link_url"] = safe_link(_c.get("link_url"))
