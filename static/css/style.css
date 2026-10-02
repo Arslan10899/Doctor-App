@@ -2863,33 +2863,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     transition: width .2s, background .2s;
 }
 .promo-pagination .swiper-pagination-bullet-active { width: 22px; background: #0d9488; }
-/* circular autoplay progress + pause/play toggle, top-right of the strip */
-.promo-autoplay {
-    position: absolute;
-    top: 0;
-    right: 2px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: rgba(255, 255, 255, .88);
-    border: 1px solid rgba(13, 148, 136, .35);
-    box-shadow: 0 4px 12px -4px rgba(3, 32, 38, .4);
-    padding: 0;
-    z-index: 5;
-    pointer-events: none;
-}
-.promo-autoplay .ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.promo-auto-bg { fill: none; stroke: rgba(13, 148, 136, .18); stroke-width: 2.5; }
-.promo-auto-fg {
-    fill: none;
-    stroke: #0d9488;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-dasharray: 56.5;
-    stroke-dashoffset: 0;
-}
 
 /* -------------------- Booking modal -------------------- */
 .book-modal {

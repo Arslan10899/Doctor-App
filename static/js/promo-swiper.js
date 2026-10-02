@@ -117,14 +117,6 @@
         });
         swiper.on("slideChange", settleVideos);
         settleVideos();
-        // circular autoplay progress: the ring drains as the next slide
-        // approaches. Display only, it is not clickable.
-        var fg = strip.querySelector(".promo-auto-fg");
-        if (fg) {
-            swiper.on("autoplayTimeLeft", function (s, time, progress) {
-                fg.style.strokeDashoffset = String(56.5 * progress);
-            });
-        }
         if (!visWired) {
             visWired = true;
             document.addEventListener("visibilitychange", function () {
