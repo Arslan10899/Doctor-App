@@ -209,6 +209,39 @@
         </div>
     </footer>
 
+    {# Mobile-only bottom navigation: Home, Doctors, Book (center FAB),
+       Hospitals, Account. Desktop never renders it (CSS), admin has its own
+       base template so it never appears there either. #}
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+        <a href="{{ url_for('index') }}" class="bottom-nav-item{% if request.endpoint == 'index' %} active{% endif %}">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('doctors') }}" class="bottom-nav-item{% if request.endpoint == 'doctors' %} active{% endif %}">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 3.3A1 1 0 0 1 6 2h12a1 1 0 0 1 1 1v5a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6V3.3z"/><path d="M4 9H2v2a4 4 0 0 0 4 4V9zM20 9h2v2a4 4 0 0 1-4 4V9z"/><path d="M12 14v7"/></svg>
+            <span>Doctors</span>
+        </a>
+        <button type="button" class="bottom-nav-fab js-book-now" aria-label="Book an appointment">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+            <span>Book</span>
+        </button>
+        <a href="{{ url_for('hospitals') }}" class="bottom-nav-item{% if request.endpoint == 'hospitals' %} active{% endif %}">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M12 9v4M10 11h4"/></svg>
+            <span>Hospitals</span>
+        </a>
+        {% if session.get('patient_id') %}
+        <a href="{{ url_for('dashboard') }}" class="bottom-nav-item{% if request.endpoint == 'dashboard' %} active{% endif %}">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Account</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth') }}" class="bottom-nav-item{% if request.endpoint == 'auth' %} active{% endif %}">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Login</span>
+        </a>
+        {% endif %}
+    </nav>
+
     <div class="book-modal" id="bookingModal" hidden>
         <div class="book-modal-backdrop" data-book-close></div>
         <div class="book-modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
