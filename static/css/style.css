@@ -179,7 +179,7 @@ input, select, textarea { font-family: inherit; }
     gap: 5px;
     background: none;
     border: none;
-    padding: 8px;
+    padding: 13px 10px;
     margin-left: auto;
 }
 .nav-toggle span {
@@ -1910,7 +1910,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 640px) {
     .search-bar-wrap { border-radius: 18px; }
     .search-section { padding: 5px 10px; }
-    .search-btn { width: 40px; height: 40px; }
+    .search-btn { width: 44px; height: 44px; }
     .hero-head { gap: 18px; }
 }
 
@@ -2140,7 +2140,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: 6px 12px 6px 10px;
+        padding: 10px 14px 10px 12px;
         border-radius: 9999px;
         background: #fff;
         border: 1px solid rgba(13, 148, 136, .22);
@@ -2187,6 +2187,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 @media (max-width: 400px) {
     .hero h1 { font-size: 22px; }
+    /* narrowest phones: the headline takes its own full row and the city
+       pill drops underneath at full tap width instead of squeezing the h1 */
+    .hero-head-text h1 { flex: 1 1 100%; }
+    .city-slot--pill { max-width: none; }
     .search-section input,
     .search-section input::placeholder { font-size: 13px; }
     .city-drop .city-drop-text { font-size: 12px; }
@@ -2221,6 +2225,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .doctor-grid { grid-template-columns: 1fr; }
     .chip-grid, .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .hospital-grid, .reviews-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 26px; }
     .search-row { flex-direction: column; }
     .contact-grid { grid-template-columns: 1fr; }
     .stat-band { grid-template-columns: 1fr 1fr; }
@@ -2542,7 +2547,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 768px) {
     .hero-slider { padding: 0 30px; }
     .hero-slider .slides-wrap { height: clamp(120px, 26vw, 190px); }
-    .car-nav { width: 38px; height: 38px; font-size: 17px; }
+    .car-nav { width: 44px; height: 44px; font-size: 17px; }
     .car-nav.prev { left: 0; }
     .car-nav.next { right: 0; }
     .slide-dots { bottom: -20px; }
@@ -3267,6 +3272,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 @media (max-width: 480px) {
     .book-slots { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
     .book-slot { padding: 8px 2px; font-size: 12px; }
+    /* single column: two squeezed cards with oversized images help nobody */
+    .services-grid { grid-template-columns: 1fr; }
 }
 .book-error {
     background: #fff0f0;

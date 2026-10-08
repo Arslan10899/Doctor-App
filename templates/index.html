@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Doctor App - Find and Book the Best Doctors in Pakistan{% endblock %}
-{% block head %}{% if mobile_cards %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}">{% endif %}{% endblock %}
+{% block head %}{% if mobile_cards %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" media="(max-width: 768px)">{% endif %}{% endblock %}
 
 {% block content %}
 
@@ -56,7 +56,7 @@
         <div class="hero-grid"{% if hero_banners and banner_pinned %} style="min-height:{{ pinned_height }}px;"{% endif %}>
             <div class="hero-visual">
                 <div class="hero-doctor-card">
-                    <img src="{{ url_for('static', filename='img/hero-doctor.png') }}" alt="Pakistani doctor">
+                    <img src="{{ url_for('static', filename='img/hero-doctor.png') }}" alt="Pakistani doctor" loading="lazy" decoding="async">
                 </div>
             </div>
             <div class="hero-content">
@@ -1087,7 +1087,38 @@
 {% endblock %}
 {% block scripts %}
 {% if mobile_cards %}
-<script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/promo-swiper.js') }}"></script>
+<script>
+/* Swiper (~155KB) is mobile-only: desktops never download it. Phones load it
+   on demand; if a desktop window shrinks to phone size it loads on entry. */
+(function () {
+    function loadSwiper() {
+        function load(src, done) {
+            var s = document.createElement("script");
+            s.src = src;
+            if (done) s.onload = done;
+            document.body.appendChild(s);
+        }
+        load("{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}", function () {
+            load("{{ url_for('static', filename='js/promo-swiper.js') }}");
+        });
+    }
+    if (window.matchMedia && matchMedia("(max-width: 768px)").matches) {
+        loadSwiper();
+    } else if (window.matchMedia) {
+        var mq = matchMedia("(max-width: 768px)");
+        var onChange = function (e) {
+            if (e.matches) {
+                loadSwiper();
+                if (mq.removeEventListener) mq.removeEventListener("change", onChange);
+                else if (mq.removeListener) mq.removeListener(onChange);
+            }
+        };
+        if (mq.addEventListener) mq.addEventListener("change", onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    } else {
+        loadSwiper();
+    }
+})();
+</script>
 {% endif %}
 {% endblock %}
