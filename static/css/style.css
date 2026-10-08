@@ -2777,7 +2777,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    16:9 widescreen cards in a 3D coverflow: the centre slide faces forward while
    the neighbours tilt away (rotateY) and sink back (depth). One code path for
    any card count: a single card simply centres itself, many become a loop. */
-.mcard-strip--coverflow .promo-swiper { padding: 6px 0 24px; }
+.mcard-strip--coverflow .promo-swiper { padding: 6px 0 10px; }
 .mcard-strip--coverflow .swiper-slide {
     width: min(55vw, 320px);
     height: auto;
@@ -2869,18 +2869,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     z-index: 2;
 }
 .mcard-progress i { display: block; height: 100%; width: 0; background: var(--accent); }
-/* swiper dots in the house teal */
-.promo-pagination { position: static; margin-top: 12px; display: flex; justify-content: center; }
-.promo-pagination .swiper-pagination-bullet {
-    width: 8px;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(13, 148, 136, .34);
-    opacity: 1;
-    margin: 0 5px !important;
-    transition: width .2s, background .2s;
-}
-.promo-pagination .swiper-pagination-bullet-active { width: 22px; background: #0d9488; }
 /* softened coverflow side shading so angled slides read as one cylinder */
 .promo-swiper .swiper-slide-shadow-left, .promo-swiper .swiper-slide-shadow-right { border-radius: 16px; }
 .promo-swiper .swiper-slide-shadow-left { background-image: linear-gradient(to left, rgba(15, 23, 42, .32), transparent 70%); }

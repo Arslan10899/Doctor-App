@@ -157,7 +157,6 @@
         var box = document.getElementById("promoSwiper");
         if (!box) return;
         videos().forEach(wireVideo);
-        var pagEl = strip.querySelector(".promo-pagination");
         var total = strip.querySelectorAll(".swiper-slide").length;
         swiper = new Swiper(box, {
             effect: "coverflow",
@@ -177,8 +176,7 @@
             // auto-slide loop: keeps going after a swipe (disableOnInteraction
             // false), single-card strips have nothing to advance to. Hover
             // pause is manual below so it respects the sound hold above.
-            autoplay: total > 1 ? { delay: 4000, disableOnInteraction: false } : false,
-            pagination: pagEl ? { el: pagEl, clickable: true } : undefined
+            autoplay: total > 1 ? { delay: 4000, disableOnInteraction: false } : false
         });
         swiper.on("slideChange", settleVideos);
         settleVideos();
