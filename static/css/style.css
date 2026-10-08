@@ -2073,31 +2073,47 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        now equal-weight cards: same size, same corner radius, same white label,
        each with its own icon. They differ in tint only, so the tint can never be
        mistaken for a state. */
+    /* Modern visit picker: horizontal cards with a gradient icon tile and a
+       two-line label. Clinic is a bright card, Online is the vivid gradient
+       action — no more murky dark pair. */
     .hero-book-btn {
-        min-height: 56px;
-        padding: 10px 8px;
-        font-size: 13px;
-        border-radius: 14px;
-        flex-direction: column;
-        gap: 4px;
-        line-height: 1.15;
-        box-shadow: 0 6px 16px -10px rgba(13, 94, 102, .55);
+        min-height: 66px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        line-height: 1.2;
+        text-align: left;
     }
-    .hero-book-btn svg { width: 19px; height: 19px; }
+    .hero-book-btn svg { width: 22px; height: 22px; }
+    .hero-book-ic {
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 4px 10px -4px rgba(3, 32, 38, .35);
+    }
+    .hero-book-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .hero-book-tx small { font-size: 11px; font-weight: 600; opacity: .7; }
     .hero-book-clinic {
-        background: linear-gradient(135deg, #0f766e, #115e59);
-        color: #fff;
-        /* clears the base rule's inset outline, which was what made this one
-           read as the weaker of the pair */
-        box-shadow: 0 6px 16px -10px rgba(13, 94, 102, .55);
+        background: rgba(255, 255, 255, .92);
+        color: #0f3b45;
+        border: 1px solid rgba(13, 148, 136, .25);
+        box-shadow: 0 8px 18px -12px rgba(13, 94, 102, .5);
     }
-    .hero-book-clinic:hover { background: linear-gradient(135deg, #115e59, #134e4a); }
+    .hero-book-clinic .hero-book-ic { background: linear-gradient(135deg, #38bdf8, #14b8a6); color: #fff; }
+    .hero-book-clinic:hover { background: #fff; }
     .hero-book-online {
-        background: linear-gradient(135deg, #134e4a, #0f3b38);
+        background: linear-gradient(135deg, #14b8a6, #0d9488 60%, #0f766e);
         color: #fff;
-        box-shadow: 0 6px 16px -10px rgba(15, 59, 56, .55);
+        box-shadow: 0 10px 22px -8px rgba(13, 148, 136, .65);
     }
-    .hero-book-online:hover { background: linear-gradient(135deg, #0f3b38, #0b2f2c); }
+    .hero-book-online .hero-book-ic { background: rgba(255, 255, 255, .22); }
+    .hero-book-online:hover { background: linear-gradient(135deg, #0d9488, #0f766e 60%, #115e59); }
+    .hero-book-online .hero-book-tx small { opacity: .85; }
 
     /* ---- Mobile booking modal trimming ----
        The "Book an Appointment" title and the "Choose how you would like to
