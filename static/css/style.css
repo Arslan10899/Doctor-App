@@ -624,7 +624,8 @@ input, select, textarea { font-family: inherit; }
     font-size: 14px;
     color: #334155;
 }
-.search-section input::placeholder { color: #94a3b8; }
+.search-section input::placeholder { color: #94a3b8; transition: opacity .3s ease; }
+.search-section input.ph-fade::placeholder { opacity: 0; }
 .city-drop {
     display: inline-flex;
     align-items: center;

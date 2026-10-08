@@ -817,4 +817,52 @@ document.addEventListener("DOMContentLoaded", function () {
             errorBox.hidden = false;
         }
     }
+
+    // Hero search: rotating placeholder hints on phones. One hint at a time
+    // (doctor, specialty, hospital, condition) so the short mobile bar never
+    // truncates into "condi...xyz". Pauses while the user types or focuses,
+    // desktop keeps the full static text.
+    const heroQ = document.querySelector('.hero-search input[name="q"]');
+    if (heroQ) {
+        const PH_FULL = "Search by doctor, specialty, hospital or condition...";
+        const PH_HINTS = [
+            "Search by doctor...",
+            "Search by specialty...",
+            "Search by hospital...",
+            "Search by condition..."
+        ];
+        const phMq = window.matchMedia("(max-width: 768px)");
+        let phIdx = 0;
+        let phTimer = null;
+        function phStop() {
+            if (phTimer) { clearInterval(phTimer); phTimer = null; }
+            heroQ.classList.remove("ph-fade");
+        }
+        function phTick() {
+            if (document.activeElement === heroQ || heroQ.value) return;
+            heroQ.classList.add("ph-fade");
+            setTimeout(function () {
+                if (document.activeElement === heroQ || heroQ.value) {
+                    heroQ.classList.remove("ph-fade");
+                    return;
+                }
+                phIdx = (phIdx + 1) % PH_HINTS.length;
+                heroQ.setAttribute("placeholder", PH_HINTS[phIdx]);
+                heroQ.classList.remove("ph-fade");
+            }, 300);
+        }
+        function phSync() {
+            phStop();
+            if (!phMq.matches) {
+                heroQ.setAttribute("placeholder", PH_FULL);
+                return;
+            }
+            phIdx = 0;
+            heroQ.setAttribute("placeholder", PH_HINTS[0]);
+            phTimer = setInterval(phTick, 3000);
+        }
+        if (phMq.addEventListener) phMq.addEventListener("change", phSync);
+        else if (phMq.addListener) phMq.addListener(phSync);
+        phSync();
+    }
 });
