@@ -344,24 +344,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Hero image slider (3 per view, auto-play)
+    // Hero image slider (3 per view on desktop, 2 on phones, auto-play).
+    // Phones hide the arrow buttons and swipe instead (touch handlers below).
     const heroSlider = document.getElementById("heroSlider");
     if (heroSlider) {
         const slides = heroSlider.querySelectorAll(".slide");
         const slidesWrap = heroSlider.querySelector(".slides-wrap");
+        const viewport = heroSlider.querySelector(".slider-viewport");
         const dotsWrap = heroSlider.querySelector(".slide-dots");
         const prevBtn = heroSlider.querySelector(".car-nav.prev");
         const nextBtn = heroSlider.querySelector(".car-nav.next");
         const total = slides.length;
-        const STEP = total >= 3 ? 100 / 3 : 100;
-        const maxIndex = total >= 3 ? total - 3 : 0;
-        if (total < 3) heroSlider.classList.add("single-view");
+        const isPhone = function () { return window.matchMedia("(max-width: 768px)").matches; };
+        function perView() {
+            if (total <= 1) return 1;
+            if (isPhone()) return 2;
+            return total >= 3 ? 3 : 2;
+        }
+        function stepPct() { return 100 / perView(); }
+        function maxIdx() { return Math.max(0, total - perView()); }
+        function paintClasses() {
+            heroSlider.classList.toggle("single-view", !isPhone() && total < 3);
+            heroSlider.classList.toggle("solo-view", total === 1);
+        }
         let current = 0;
         let timer = null;
         const INTERVAL = 3500;
 
         function buildDots() {
-            const dotCount = maxIndex + 1;
+            const dotCount = maxIdx() + 1;
             dotsWrap.innerHTML = "";
             for (let i = 0; i < dotCount; i++) {
                 const dot = document.createElement("button");
@@ -374,8 +385,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         function go(i) {
-            current = Math.max(0, Math.min(i, maxIndex));
-            slidesWrap.style.transform = "translateX(" + (-current * STEP) + "%)";
+            current = Math.max(0, Math.min(i, maxIdx()));
+            slidesWrap.style.transform = "translateX(" + (-current * stepPct()) + "%)";
             const dots = dotsWrap.querySelectorAll("button");
             dots.forEach(function (d, idx) {
                 d.classList.toggle("active", idx === current);
@@ -384,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function restart() {
             clearInterval(timer);
             timer = setInterval(function () {
-                go(current >= maxIndex ? 0 : current + 1);
+                go(current >= maxIdx() ? 0 : current + 1);
             }, INTERVAL);
         }
         function start() {
@@ -400,6 +411,34 @@ document.addEventListener("DOMContentLoaded", function () {
             heroSlider._paused = false;
             restart();
         });
+        // touch swipe (phones have no arrows): a mostly-horizontal swipe
+        // steps one slide, vertical movement stays with the page scroll
+        if (viewport) {
+            let tx = 0, ty = 0, tracking = false;
+            viewport.addEventListener("touchstart", function (e) {
+                if (!e.touches.length) return;
+                tracking = true;
+                tx = e.touches[0].clientX;
+                ty = e.touches[0].clientY;
+            }, { passive: true });
+            viewport.addEventListener("touchend", function (e) {
+                if (!tracking) return;
+                tracking = false;
+                if (!e.changedTouches.length) return;
+                const dx = e.changedTouches[0].clientX - tx;
+                const dy = e.changedTouches[0].clientY - ty;
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                    go(dx < 0 ? current + 1 : current - 1);
+                    restart();
+                }
+            });
+        }
+        // crossing the phone/desktop breakpoint re-lays the track
+        const slideMq = window.matchMedia("(max-width: 768px)");
+        const resync = function () { paintClasses(); buildDots(); go(current); };
+        if (slideMq.addEventListener) slideMq.addEventListener("change", resync);
+        else if (slideMq.addListener) slideMq.addListener(resync);
+        paintClasses();
         buildDots();
         if (prevBtn) prevBtn.addEventListener("click", function () { go(current - 1); restart(); });
         if (nextBtn) nextBtn.addEventListener("click", function () { go(current + 1); restart(); });
