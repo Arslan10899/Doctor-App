@@ -2096,8 +2096,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         place-items: center;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 4px 10px -4px rgba(3, 32, 38, .35);
     }
-    .hero-book-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .hero-book-tx small { font-size: 11px; font-weight: 600; opacity: .7; }
+    .hero-book-tx { display: flex; flex-direction: column; justify-content: center; min-width: 0; font-size: 16px; font-weight: 800; letter-spacing: -.1px; }
+    /* action cue: tinted arrow chip pinned right so the cards read tappable */
+    .hero-book-btn::after {
+        content: "\2192";
+        flex: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        font-weight: 800;
+        margin-left: auto;
+    }
+    .hero-book-clinic::after { background: rgba(234, 88, 12, .12); color: #ea580c; }
+    .hero-book-online::after { background: rgba(37, 99, 235, .12); color: #2563eb; }
     /* help-grid tile colours: Clinic matches the peach Clinic Appointment
        tile, Online matches the blue Video Consultation tile (pastel card,
        white icon tile, accent icon). */
