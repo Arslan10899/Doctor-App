@@ -2098,22 +2098,25 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .hero-book-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .hero-book-tx small { font-size: 11px; font-weight: 600; opacity: .7; }
+    /* help-grid tile colours: Clinic matches the peach Clinic Appointment
+       tile, Online matches the blue Video Consultation tile (pastel card,
+       white icon tile, accent icon). */
     .hero-book-clinic {
-        background: rgba(255, 255, 255, .92);
-        color: #0f3b45;
-        border: 1px solid rgba(13, 148, 136, .25);
-        box-shadow: 0 8px 18px -12px rgba(13, 94, 102, .5);
+        background: linear-gradient(145deg, #fff3e9, #ffe1cd);
+        color: #7c2d12;
+        border: 1px solid rgba(234, 88, 12, .20);
+        box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45);
     }
-    .hero-book-clinic .hero-book-ic { background: linear-gradient(135deg, #38bdf8, #14b8a6); color: #fff; }
-    .hero-book-clinic:hover { background: #fff; }
+    .hero-book-clinic .hero-book-ic { background: rgba(255, 255, 255, .92); color: #ea580c; }
+    .hero-book-clinic:hover { background: linear-gradient(145deg, #fff6ef, #ffe7d6); }
     .hero-book-online {
-        background: linear-gradient(135deg, #14b8a6, #0d9488 60%, #0f766e);
-        color: #fff;
-        box-shadow: 0 10px 22px -8px rgba(13, 148, 136, .65);
+        background: linear-gradient(145deg, #eaf3ff, #d6e7ff);
+        color: #1e3a8a;
+        border: 1px solid rgba(37, 99, 235, .20);
+        box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45);
     }
-    .hero-book-online .hero-book-ic { background: rgba(255, 255, 255, .22); }
-    .hero-book-online:hover { background: linear-gradient(135deg, #0d9488, #0f766e 60%, #115e59); }
-    .hero-book-online .hero-book-tx small { opacity: .85; }
+    .hero-book-online .hero-book-ic { background: rgba(255, 255, 255, .92); color: #2563eb; }
+    .hero-book-online:hover { background: linear-gradient(145deg, #f0f6ff, #dce9ff); }
 
     /* ---- Mobile booking modal trimming ----
        The "Book an Appointment" title and the "Choose how you would like to
