@@ -2247,6 +2247,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .services-grid { grid-template-columns: 1fr 1fr; }
     .doctor-grid { grid-template-columns: 1fr; }
     .chip-grid, .chip-grid.cols-5, .chip-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* specialties: one full-width tile per row so English + Urdu names
+       never truncate, with roomier icon and text */
+    .top-specialties .chip-grid.cols-5 { grid-template-columns: 1fr; gap: 10px; }
+    .top-specialties .chip { padding: 16px 18px; font-size: 16px; gap: 14px; border-radius: 14px; }
+    .top-specialties .chip-icon { width: 52px; height: 52px; border-radius: 14px; }
+    .top-specialties .chip-icon img { width: 34px !important; height: 34px !important; }
+    .top-specialties .chip-icon svg { width: 28px; height: 28px; }
+    .top-specialties .chip small { font-size: 12.5px !important; }
     .hospital-grid, .reviews-grid { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; gap: 26px; }
     .search-row { flex-direction: column; }
