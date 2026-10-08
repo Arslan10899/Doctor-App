@@ -2087,15 +2087,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         text-align: left;
     }
     .hero-book-btn svg { width: 26px; height: 26px; }
-    .hero-book-ic {
-        flex: none;
-        width: 52px;
-        height: 52px;
-        border-radius: 15px;
-        display: grid;
-        place-items: center;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 4px 10px -4px rgba(3, 32, 38, .35);
-    }
     .hero-book-tx { display: flex; flex-direction: column; justify-content: center; min-width: 0; font-size: 16px; font-weight: 800; letter-spacing: -.1px; }
     /* action cue: tinted arrow chip pinned right so the cards read tappable */
     .hero-book-btn::after {
@@ -2113,15 +2104,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-book-clinic::after { background: rgba(234, 88, 12, .12); color: #ea580c; }
     .hero-book-online::after { background: rgba(37, 99, 235, .12); color: #2563eb; }
     /* help-grid tile colours: Clinic matches the peach Clinic Appointment
-       tile, Online matches the blue Video Consultation tile (pastel card,
-       white icon tile, accent icon). */
+       tile, Online matches the blue Video Consultation tile. */
     .hero-book-clinic {
         background: linear-gradient(145deg, #fff3e9, #ffe1cd);
         color: #7c2d12;
         border: 1px solid rgba(234, 88, 12, .20);
         box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45);
     }
-    .hero-book-clinic .hero-book-ic { background: rgba(255, 255, 255, .92); color: #ea580c; }
     .hero-book-clinic:hover { background: linear-gradient(145deg, #fff6ef, #ffe7d6); }
     .hero-book-online {
         background: linear-gradient(145deg, #eaf3ff, #d6e7ff);
@@ -2129,7 +2118,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         border: 1px solid rgba(37, 99, 235, .20);
         box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45);
     }
-    .hero-book-online .hero-book-ic { background: rgba(255, 255, 255, .92); color: #2563eb; }
     .hero-book-online:hover { background: linear-gradient(145deg, #f0f6ff, #dce9ff); }
 
     /* ---- Mobile booking modal trimming ----
