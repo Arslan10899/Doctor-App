@@ -2095,7 +2095,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         color: #7c2d12;
         border: 1px solid rgba(234, 88, 12, .20);
         box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45);
-        animation: bookGlowPeach 2.6s ease-in-out infinite;
+        animation: bookGlowPeach 5.2s ease-in-out infinite;
     }
     .hero-book-clinic:hover { background: linear-gradient(145deg, #fff6ef, #ffe7d6); }
     .hero-book-online {
@@ -2103,18 +2103,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         color: #1e3a8a;
         border: 1px solid rgba(37, 99, 235, .20);
         box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45);
-        animation: bookGlowBlue 2.6s ease-in-out infinite 1.3s;
+        animation: bookGlowBlue 5.2s ease-in-out infinite;
     }
     .hero-book-online:hover { background: linear-gradient(145deg, #f0f6ff, #dce9ff); }
-    /* breathing glow like the bottom-nav Book button, staggered so the pair
-       alternates. Shadow-only, never fights the press scale. */
+    /* sequential glow: Clinic breathes first, Online answers after. Each has
+       a rest window while the other peaks, so both never glow together. */
     @keyframes bookGlowPeach {
-        0%, 100% { box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45), 0 0 0 0 rgba(234, 88, 12, .35); }
-        50% { box-shadow: 0 8px 22px -8px rgba(234, 88, 12, .55), 0 0 0 8px rgba(234, 88, 12, 0); }
+        0% { box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45), 0 0 0 0 rgba(234, 88, 12, .35); }
+        20% { box-shadow: 0 8px 22px -8px rgba(234, 88, 12, .55), 0 0 0 8px rgba(234, 88, 12, 0); }
+        40%, 100% { box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45), 0 0 0 0 rgba(234, 88, 12, 0); }
     }
     @keyframes bookGlowBlue {
-        0%, 100% { box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45), 0 0 0 0 rgba(37, 99, 235, .35); }
-        50% { box-shadow: 0 8px 22px -8px rgba(37, 99, 235, .55), 0 0 0 8px rgba(37, 99, 235, 0); }
+        0%, 50% { box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45), 0 0 0 0 rgba(37, 99, 235, 0); }
+        70% { box-shadow: 0 8px 22px -8px rgba(37, 99, 235, .55), 0 0 0 8px rgba(37, 99, 235, 0); }
+        90%, 100% { box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45), 0 0 0 0 rgba(37, 99, 235, 0); }
     }
     @media (prefers-reduced-motion: reduce) {
         .hero-book-clinic, .hero-book-online { animation: none; }
