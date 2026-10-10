@@ -2473,8 +2473,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .header-actions { gap: 8px; }
     /* The bar sticks just under the header. The header is trimmed to 54px on
        phones, so the bar has to follow it, otherwise it parked at the desktop
-       offset and left a white strip between the wordmark and the announcements. */
-    .announcement-bar { top: 54px; }
+       offset and left a white strip between the wordmark and the announcements.
+       Its vertical padding is also trimmed so the strip sits only a touch taller
+       than the text, instead of looming over it. */
+    .announcement-bar { top: 54px; padding: 3px 0; }
 }
 
 /* ===== Hero announcements (under heading) ===== */
