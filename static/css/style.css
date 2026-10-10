@@ -2146,6 +2146,28 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        records against a real time. */
     .book-field-time { display: none; }
     .book-modal[data-step="form"] .book-modal-close { display: none; }
+    /* Form step on phones: the Back pill and the chosen visit type share one
+       row, so the visit is visible right beside the back control. The form is
+       unwrapped with display:contents so its fields can join the card's flex
+       row, then every field claims a full-width row again. */
+    .book-modal[data-step="form"] .book-modal-card {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 11px 10px;
+    }
+    .book-modal[data-step="form"] .book-form:not([hidden]) { display: contents; }
+    .book-modal[data-step="form"] .book-modal-back { margin: 0; flex: 0 0 auto; }
+    .book-modal[data-step="form"] .book-visitsummary {
+        margin: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .book-modal[data-step="form"] .book-form:not([hidden]) > *:not(.book-visitsummary),
+    .book-modal[data-step="form"] .book-success {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
 
     /* ---- Mobile search bar + city pill ----
        Cramming the field, the city dropdown and the search button into one bar
