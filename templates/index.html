@@ -4,6 +4,36 @@
 
 {% block content %}
 
+{# Condition icons. Each condition gets a recognisable glyph for the mobile
+   "Search Condition..." section; desktop keeps the original generic mark and
+   the tailored icon is swapped in with CSS. #}
+{% macro cond_icon(name) -%}
+{%- set n = name|lower -%}
+{%- if 'fever' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0z"/><circle cx="12" cy="17" r="1.4" fill="currentColor" stroke="none"/></svg>
+{%- elif 'piles' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>
+{%- elif 'acne' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9.2" cy="10.2" r=".9" fill="currentColor" stroke="none"/><circle cx="14.6" cy="9.6" r=".9" fill="currentColor" stroke="none"/><circle cx="12.4" cy="14.4" r=".9" fill="currentColor" stroke="none"/><path d="M9.5 16.2c.9.8 4.1.8 5 0"/></svg>
+{%- elif 'migraine' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M13 6.5L9.5 12h4L10.5 17.5"/></svg>
+{%- elif 'stomach' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v4.5a4.5 4.5 0 0 0 4.5 4.5H15a4 4 0 0 1 4 4v.5a3.5 3.5 0 0 1-3.5 3.5H11a5 5 0 0 1-5-5V7a4 4 0 0 1 4-4z"/></svg>
+{%- elif 'pressure' in n or 'blood' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5C7.5 16.9 3.5 13.7 3.5 9.9A4.4 4.4 0 0 1 12 6.9a4.4 4.4 0 0 1 8.5 3c0 .5-.1 1-.3 1.5"/><path d="M13.5 14.5h2l1.3-2.6 1.8 4.6 1.2-2h1.7"/></svg>
+{%- elif 'diabetes' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2s6 6.4 6 10.3a6 6 0 0 1-12 0C6 9.6 12 3.2 12 3.2z"/></svg>
+{%- elif 'erectile' in n or 'dysfunction' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="4.5"/><path d="M13.2 10.8L20 4m0 0h-5.2M20 4v5.2"/></svg>
+{%- elif 'asthma' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v9"/><path d="M12 9.5c0-1.6-.9-2.7-2.4-3C8 6.2 6.6 7 6.2 9c-.3 1.7-1.3 3.4-.9 5.8.35 2.2 2.1 3.6 4 3.2 1.4-.3 2.3-1.5 2.3-3V9.5"/><path d="M12 9.5c0-1.6.9-2.7 2.4-3C16 6.2 17.4 7 17.8 9c.3 1.7 1.3 3.4.9 5.8-.35 2.2-2.1 3.6-4 3.2-1.4-.3-2.3-1.5-2.3-3V9.5"/></svg>
+{%- elif 'pregnan' in n -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 16.7 3.5 13.6 3.5 10A4.4 4.4 0 0 1 12 7.4 4.4 4.4 0 0 1 20.5 10c0 3.6-3.5 6.7-8.5 11z"/><circle cx="12" cy="11" r="2.2"/></svg>
+{%- else -%}
+<svg class="cond-icon-mob" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+{%- endif -%}
+{%- endmacro %}
+
 {# One definition of the city picker, used in two places. On desktop it sits
    inside the search bar; on phones it becomes a pill above the bar so the
    search field gets the full width and a usable tap target. "slot" adds a
@@ -442,7 +472,8 @@
             {% for cond in conditions[:8] %}
                 <a class="chip" href="{{ url_for('doctors', q=cond) }}">
                     <span class="chip-icon">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+                        <svg class="cond-icon-desk" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5c0 1.37.42 2.63 1.17 3.67L2.5 16l3.29-1.07C6.9 15.58 8.5 16.5 11.5 16.5c4.69 0 8.5-3.81 8.5-8.5S16.19 2 11.5 2zM8 9.5h2V8h1v1.5h2V11h-2V12.5H10V11H8z"/></svg>
+                        {{ cond_icon(cond) }}
                     </span>
                     {{ cond }}
                 </a>

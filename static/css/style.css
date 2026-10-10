@@ -1129,6 +1129,9 @@ animation: none;
 .chip:nth-child(12n+11) .chip-icon { background: #dbeafe; color: #2563eb; }
 .chip:nth-child(12n+12) .chip-icon { background: #fef9c3; color: #a16207; }
 .chip:hover .chip-icon { transform: scale(1.1) rotate(-3deg); transition: transform .2s; }
+/* Condition chips carry two marks: the generic one for desktop, a tailored
+   glyph for the mobile "Search Condition..." list. */
+.cond-icon-mob { display: none; }
 
 /* Gradient headline text */
 .gradient-text {
@@ -4144,6 +4147,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* Phones surface only the five headline specialties; the full list stays a
        tap away behind "View All Specialties". */
     .top-specialties .chip:nth-child(n+6) { display: none; }
+
+    /* Condition chips: swap the generic mark for the tailored glyph. */
+    .cond-section .chip-icon .cond-icon-desk { display: none; }
+    .cond-section .chip-icon .cond-icon-mob { display: block; }
 }
 
 /* Mobile-only headings for the specialty / condition sections: "Search
