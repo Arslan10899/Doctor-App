@@ -2444,7 +2444,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        the row stops reading as crowded. */
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
-    .site-header .logo-text { font-size: 19px; }
+    /* Wordmark gets a bigger, punchier treatment on phones: the tagline is
+       gone here, so the name carries the brand on its own. Size up and add
+       weight plus tight tracking so it reads as a proper logotype. */
+    .site-header .logo-text {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.7px;
+    }
     .site-header .logo-tagline { font-size: 9px; letter-spacing: .5px; }
     .header-actions { gap: 8px; }
 }
