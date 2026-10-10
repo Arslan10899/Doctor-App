@@ -3227,6 +3227,37 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .book-visitsummary-change:hover { background: var(--vs-c, var(--primary)); color: #fff; }
 
+/* Quick contact shortcuts under the doctor field: call, WhatsApp and profile.
+   They point at the picked doctor when one is chosen, or the site's own line
+   otherwise (main.js rewires the hrefs). */
+.book-contact-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+.book-contact-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 6px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+    transition: transform .15s ease, filter .18s ease;
+}
+.book-contact-btn svg { width: 20px; height: 20px; }
+.book-contact-btn:active { transform: scale(.96); }
+.book-contact-btn:hover { filter: brightness(.97); }
+.book-contact-call { background: #e8f6f7; color: #0f766e; border-color: rgba(13, 148, 136, .22); }
+.book-contact-wa { background: #e6f9ee; color: #12876f; border-color: rgba(18, 135, 111, .24); }
+.book-contact-profile { background: #eef1fb; color: #3b4b8a; border-color: rgba(59, 75, 138, .22); }
+
 .book-form { display: flex; flex-direction: column; gap: 11px; }
 .book-form[hidden] { display: none; }
 .book-step[hidden] { display: none; }

@@ -488,6 +488,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const modalBackBtn = document.getElementById("bkModalBack");
         const stepDots = document.getElementById("bkStepDots");
         const modalSub = document.getElementById("bkModalSub");
+        const callBtn = document.getElementById("bkCallBtn");
+        const waBtn = document.getElementById("bkWaBtn");
+        const profileBtn = document.getElementById("bkProfileBtn");
+        // Server-rendered fallbacks (site phone / WhatsApp / browse-all) kept so
+        // the shortcuts still do something before a doctor is picked.
+        const SITE_CALL = callBtn ? callBtn.getAttribute("href") : "";
+        const SITE_WA = waBtn ? waBtn.getAttribute("href") : "";
+        const SITE_PROFILE = profileBtn ? profileBtn.getAttribute("href") : "";
         const SUB_FORM = "Fill in your details and our team will confirm your booking.";
         const ICONS = {
             "Clinic Visit": '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 8h-2V5a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3H5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zm-8-3h2v3h-2V5zm6 14H7v-3h4v1h2v-1h4v3zm-4-5H7v-2h2v-2h2v2h2v2h-2z"/></svg>',
@@ -553,6 +561,24 @@ document.addEventListener("DOMContentLoaded", function () {
             setStep("form");
         }
 
+        function waDigits(raw) {
+            // WhatsApp needs a full international number; local Pakistani
+            // numbers written as 0300... are upgraded to 92300...
+            var d = String(raw || "").replace(/[^0-9]/g, "");
+            if (!d) return "";
+            if (d.charAt(0) === "0") d = "92" + d.slice(1);
+            return d;
+        }
+        function updateContact(doc) {
+            if (!callBtn || !waBtn || !profileBtn) return;
+            var dial = doc ? (doc.phone || doc.whatsapp_number || "") : "";
+            var waNum = doc ? (doc.whatsapp_number || doc.phone || "") : "";
+            callBtn.href = dial ? ("tel:" + String(dial).replace(/[^0-9+]/g, "")) : SITE_CALL;
+            var wa = waDigits(waNum);
+            waBtn.href = wa ? ("https://wa.me/" + wa) : SITE_WA;
+            profileBtn.href = (doc && doc.id) ? ("/doctor/" + doc.id) : SITE_PROFILE;
+        }
+
         function openModal() {
             bookingModal.hidden = false;
             document.body.style.overflow = "hidden";
@@ -562,6 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
             visitSummary.style.removeProperty("--vs-bg");
             visitSummary.style.removeProperty("--vs-bd");
             setStep("type", { reset: true });
+            updateContact(null);
             if (doctorCache.length === 0) {
                 fetch("/api/doctors-list")
                     .then(function (r) { return r.json(); })
@@ -622,6 +649,10 @@ document.addEventListener("DOMContentLoaded", function () {
         doctorInput.addEventListener("input", function () {
             const q = doctorInput.value.trim();
             clearTimeout(debounceTimer);
+            // Any edit invalidates the current pick, so shortcuts fall back to
+            // the site line until a suggestion is chosen again.
+            if (doctorIdInput.value) updateContact(null);
+            doctorIdInput.value = "";
             if (q.length < 1) {
                 suggestBox.classList.remove("open");
                 doctorIdInput.value = "";
@@ -682,6 +713,7 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorInput.value = d.doctor_name;
             doctorIdInput.value = d.id;
             suggestBox.classList.remove("open");
+            updateContact(d);
             loadSlots();
         }
         doctorInput.addEventListener("focus", function () {

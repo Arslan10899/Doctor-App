@@ -1079,7 +1079,7 @@ def api_doctors_list():
     q = request.args.get("q", "").strip()
     cols = (
         "d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name, "
-        "d.fee, d.online, d.rating, d.experience"
+        "d.fee, d.online, d.rating, d.experience, d.phone, d.whatsapp_number"
     )
     if q:
         like = f"%{q}%"
