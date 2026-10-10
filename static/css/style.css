@@ -2343,42 +2343,17 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border-right: 1px solid rgba(45, 212, 191, .18);
 }
 .announcement-item:first-child { border-left: 1px solid rgba(45, 212, 191, .18); }
-/* Staged ticker (JS-driven, left to right): each announcement shows its
-   title first, then its content. Slides enter from the left, hold readable,
-   exit right. The marquee above stays as the no-JS fallback. */
-.announce-stage {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    align-self: stretch;
-    min-height: 22px;
-    overflow: hidden;
-    -webkit-mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
-    mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
+/* Seamless left-to-right loop for phones (the strip content is doubled by
+   script, so -50% lands exactly on the copy). Desktops keep announce-scroll. */
+@keyframes announce-scroll-ltr {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
 }
-.announce-slide {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translate(-115%, -50%);
-    white-space: nowrap;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #d7f3ef;
-    opacity: 0;
-    transition: left .7s cubic-bezier(.22, .8, .3, 1), transform .7s cubic-bezier(.22, .8, .3, 1), opacity .45s ease;
-}
-.announce-slide.in { left: 24px; transform: translate(0, -50%); opacity: 1; }
-.announce-slide.out { left: 100%; transform: translate(0, -50%); opacity: 0; }
-.announce-slide.is-title {
-    color: #5eead4;
-    font-weight: 800;
-    font-size: 12.5px;
-    letter-spacing: .05em;
-    text-transform: uppercase;
+@media (max-width: 768px) {
+    /* phones: marquee runs left to right; the title reads emphasized ahead
+       of its content as each pair flows past */
+    .announcement-list { animation-name: announce-scroll-ltr; padding-left: 0; }
+    .announcement-title { color: #5eead4; font-weight: 800; }
 }
 
 /* ===== Live search autocomplete ===== */
@@ -2629,7 +2604,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 @media (max-width: 640px) {
     .announcement-list { font-size: 12.5px; }
-    .announce-slide { font-size: 12.5px; }
     /* phones: speaker icon stays, the "Announcement" word is dropped */
     .announce-tag-text { display: none; }
 }
