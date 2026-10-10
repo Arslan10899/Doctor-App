@@ -2159,11 +2159,23 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .book-modal[data-step="form"] .book-form:not([hidden]) { display: contents; }
     .book-modal[data-step="form"] .book-modal-back { margin: 0; flex: 0 0 auto; }
+    /* flex-basis:0 keeps the chip on the Back pill's row regardless of how long
+       the visit name is (Online Check-up is wider than Clinic Visit, which is
+       why it used to drop to its own line). */
     .book-modal[data-step="form"] .book-visitsummary {
         margin: 0;
-        flex: 1 1 auto;
+        flex: 1 1 0;
         min-width: 0;
+        padding: 7px 9px;
+        gap: 7px;
     }
+    .book-modal[data-step="form"] .book-visitsummary-ic { width: 28px; height: 28px; border-radius: 8px; }
+    .book-modal[data-step="form"] .book-visitsummary-txt small { font-size: 10.5px; }
+    .book-modal[data-step="form"] .book-visitsummary-txt strong {
+        font-size: 12px;
+        line-height: 1.2;
+    }
+    .book-modal[data-step="form"] .book-visitsummary-change { padding: 6px 9px; font-size: 11.5px; }
     .book-modal[data-step="form"] .book-form:not([hidden]) > *:not(.book-visitsummary),
     .book-modal[data-step="form"] .book-success {
         flex: 1 1 100%;
