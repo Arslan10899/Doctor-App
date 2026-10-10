@@ -2592,6 +2592,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 @media (max-width: 640px) {
     .announcement-list { font-size: 12.5px; }
+    /* phones: speaker icon stays, the "Announcement" word is dropped */
+    .announce-tag-text { display: none; }
 }
 
 /* ===== Announcement ON/OFF toggle switch ===== */
