@@ -2459,6 +2459,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         line-height: 1.08;
         letter-spacing: -0.5px;
         color: var(--text);
+        transform: rotate(-8deg);
+        transform-origin: left center;
         text-shadow:
             0 2px 2px rgba(15, 40, 60, .10),
             0 6px 12px rgba(15, 40, 60, .10);
