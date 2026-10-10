@@ -4018,6 +4018,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         color: #9cc3c8;
     }
     .top-specialties .chip small { color: #6b8a8f !important; opacity: .9; }
+    /* Phones surface only the five headline specialties; the full list stays a
+       tap away behind "View All Specialties". */
+    .top-specialties .chip:nth-child(n+6) { display: none; }
 }
 
 /* Mobile-only replacement headings: "Search by Specialty" / "Search by
@@ -4039,6 +4042,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         letter-spacing: -0.4px;
         color: #0d3b44;
     }
+    .top-specialties-title { text-align: left; }
     .top-specialties-title .tst-key,
     .cond-title .cond-key { color: #0f766e; }
 
