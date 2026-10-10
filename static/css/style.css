@@ -2459,7 +2459,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         line-height: 1.08;
         letter-spacing: -0.5px;
         color: var(--text);
-        text-shadow: 0 1px 1px rgba(15, 40, 60, .10);
+        text-shadow: 0 2px 3px rgba(15, 40, 60, .14);
     }
     .site-header .logo-text .logo-accent {
         background: linear-gradient(135deg, #35a0b2 0%, #1f6572 100%);
