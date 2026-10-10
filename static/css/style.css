@@ -3891,11 +3891,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         right: 0;
         bottom: 0;
         z-index: 150;
-        background: rgba(255, 255, 255, .96);
+        background: rgba(13, 34, 40, .98);
         -webkit-backdrop-filter: blur(12px);
         backdrop-filter: blur(12px);
-        border-top: 1px solid rgba(13, 148, 136, .16);
-        box-shadow: 0 -8px 24px -12px rgba(3, 32, 38, .25);
+        border-top: 1px solid rgba(255, 255, 255, .10);
+        box-shadow: 0 -8px 24px -12px rgba(0, 0, 0, .55);
         padding: 6px 6px calc(8px + env(safe-area-inset-bottom, 0px));
     }
     .bottom-nav-item {
@@ -3906,21 +3906,21 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         justify-content: center;
         gap: 3px;
         min-height: 52px;
-        color: #64748b;
+        color: #9fb8bd;
         text-decoration: none;
         font-size: 11px;
         font-weight: 700;
         border-radius: 12px;
         transition: color .18s ease, background .18s ease;
     }
-    .bottom-nav-item:active { background: rgba(13, 148, 136, .08); }
-    .bottom-nav-item.active { color: #0d9488; }
+    .bottom-nav-item:active { background: rgba(255, 255, 255, .10); }
+    .bottom-nav-item.active { color: #5eead4; }
     .bottom-nav-item.active::after {
         content: "";
         width: 18px;
         height: 3px;
         border-radius: 999px;
-        background: #0d9488;
+        background: #5eead4;
     }
     .bottom-nav-fab {
         flex: 1 1 0;
@@ -3932,7 +3932,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         border: none;
         background: none;
         cursor: pointer;
-        color: #0f4a55;
+        color: #cfe8ea;
         font-size: 11px;
         font-weight: 700;
         font-family: inherit;
@@ -3947,7 +3947,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 100%);
         box-shadow: 0 8px 18px -6px rgba(20, 184, 166, .55);
         margin-top: -22px;
-        border: 3px solid #fff;
+        border: 3px solid #0d2228;
         transition: transform .18s ease;
         animation: fabGlow 2.4s ease-in-out infinite;
     }
