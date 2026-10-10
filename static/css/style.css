@@ -2351,8 +2351,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 @media (max-width: 768px) {
     /* phones: marquee runs left to right; the title reads emphasized ahead
-       of its content as each pair flows past */
-    .announcement-list { animation-name: announce-scroll-ltr; padding-left: 0; }
+       of its content as each pair flows past. It also runs a touch faster
+       than the desktop loop so the strip feels lively on a small screen. */
+    .announcement-list { animation-name: announce-scroll-ltr; padding-left: 0; animation-duration: 60s; }
     .announcement-title { color: #5eead4; font-weight: 800; }
 }
 
