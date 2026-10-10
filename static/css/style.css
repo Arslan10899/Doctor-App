@@ -118,9 +118,6 @@ input, select, textarea { font-family: inherit; }
 .site-header .logo-icon img { filter: none; width: 38px; height: 38px; }
 .logo-text { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
 .logo-accent { color: var(--primary); }
-/* High-resolution 3D wordmark (transparent PNG). Hidden on desktop, where the
-   live text wordmark and tagline are shown instead; phones swap to the image. */
-.logo-wordmark-img { display: none; }
 
 .main-nav { display: flex; gap: 4px; margin-left: 8px; flex: 1; flex-wrap: nowrap; }
 .nav-link {
@@ -2450,14 +2447,25 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .header-inner { height: 54px; }
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
-    /* Phones show the pre-rendered 3D wordmark image, so the live text (and its
-       tagline) is hidden. The art is a transparent PNG sized to sit snug in the
-       trimmed bar; width follows so the aspect ratio is never distorted. */
-    .site-header .logo-text { display: none; }
-    .site-header .logo-wordmark-img {
-        display: block;
-        height: 36px;
-        width: auto;
+    /* Phones drop the tagline and let the name carry the brand. A soft teal
+       gradient washes the "App" half, so the wordmark reads as designed
+       lettering rather than plain bold text, with a gentle lift underneath. */
+    .site-header .logo-text {
+        display: flex;
+        flex-direction: column;
+        font-size: 25px;
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -0.5px;
+        color: var(--text);
+        text-shadow: 0 1px 1px rgba(15, 40, 60, .10);
+    }
+    .site-header .logo-text .logo-accent {
+        background: linear-gradient(135deg, #35a0b2 0%, #1f6572 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: #1f6572;
     }
     .header-actions { gap: 8px; }
 }
