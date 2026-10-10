@@ -2188,7 +2188,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    .city-slot--pill .city-drop .pin { display: block; color: #0d9488; }
+    .city-slot--pill .city-drop .pin { display: block; color: #ef4444; }
     .city-slot--pill .city-drop .chevron { margin-left: 0; }
     .city-slot--pill .city-drop.open { background: rgba(13, 148, 136, .09); }
     /* the pill sits on the right of the row, so the list opens to the left from
