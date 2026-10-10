@@ -2062,7 +2062,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         backdrop-filter: blur(3px);
         -webkit-backdrop-filter: blur(3px);
         border: 1px solid rgba(13, 148, 136, .22);
-        box-shadow: 0 10px 26px -16px rgba(13, 94, 102, .40);
+        /* a soft teal shade hugs the border all the way round, on top of the
+           drop shadow, so the box edge reads as lifted rather than flat */
+        box-shadow:
+            0 0 0 3px rgba(13, 148, 136, .06),
+            0 10px 26px -16px rgba(13, 94, 102, .40);
     }
     .hero-book-label { padding: 0 2px 8px; font-size: 10.5px; letter-spacing: .6px; }
     .hero-book-label,
