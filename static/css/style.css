@@ -2075,8 +2075,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .hero-book-label { padding: 0 2px 8px; font-size: 12px; letter-spacing: .6px; }
     /* the label reads a touch larger, so its calendar glyph grows with it */
     .hero-book-label svg { width: 17px; height: 17px; }
-    .hero-book-label,
-    .hero-book-label svg { color: #55737c; }
+    /* a darker, higher-contrast label so it clearly reads above the buttons */
+    .hero-book-label { color: #0d3b44; }
+    .hero-book-label svg { color: #0f766e; }
     .hero-book-actions { gap: 6px; }
     /* Both CTAs were previously a faint outline next to a solid fill, which read
        as "the other one is disabled" rather than as two equal choices. They are
