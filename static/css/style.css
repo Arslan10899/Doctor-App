@@ -2205,10 +2205,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .city-menu-head,
     .city-menu li { font-size: 12.5px; }
     /* the search bar is a white pill, so on the white hero it needs a teal edge
-       to stay a surface rather than disappear into the page */
+       to stay a surface rather than disappear into the page. A very light teal
+       halo rings it so the pill reads as a soft, shaded chip rather than a hard
+       outlined box. */
     .search-bar-wrap {
-        border-color: rgba(13, 148, 136, .20);
-        box-shadow: 0 6px 20px -8px rgba(13, 94, 102, .28);
+        border-color: rgba(13, 148, 136, .22);
+        box-shadow:
+            0 0 0 4px rgba(13, 148, 136, .06),
+            0 6px 20px -8px rgba(13, 94, 102, .28);
     }
 }
 
