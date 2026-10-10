@@ -2459,8 +2459,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         line-height: 1.08;
         letter-spacing: -0.5px;
         color: var(--text);
-        transform: rotate(-8deg);
+        /* A gentle tilt with the left edge pinned so the name reads as lifted
+           from one side, not a whole line shifted upward out of the bar. */
         transform-origin: left center;
+        transform: translateY(2px) rotate(-5deg);
         text-shadow:
             0 2px 2px rgba(15, 40, 60, .10),
             0 6px 12px rgba(15, 40, 60, .10);
