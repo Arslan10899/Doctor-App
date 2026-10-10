@@ -2043,7 +2043,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        the next section, and the slider below has padding-top: 0, so the box read
        as glued to both. 18px is enough to let it breathe without the 52px band
        of dead green this rule originally replaced. */
-    .hero { padding-bottom: 18px; }
+    .hero { padding-bottom: 12px; }
 
     .hero-book-box {
         display: block;
@@ -3970,8 +3970,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .featured-city-heading {
         display: block;
         margin: 0;
-        padding: 18px 18px 4px;
-        text-align: center;
+        padding: 0 18px 12px;
+        text-align: left;
         font-size: 17px;
         font-weight: 800;
         letter-spacing: -0.2px;
