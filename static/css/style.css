@@ -2447,14 +2447,15 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .header-inner { height: 54px; }
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
-    /* Phones drop the tagline and let the name carry the brand. A soft teal
-       gradient washes the "App" half, so the wordmark reads as designed
-       lettering rather than plain bold text, with a gentle lift underneath. */
+    /* Phones drop the tagline and let the name carry the brand. A rounded,
+       heavy Poppins 900 gives the cartoon wordmark look, and a soft teal
+       gradient washes the "App" half so it reads as designed lettering. */
     .site-header .logo-text {
         display: flex;
         flex-direction: column;
-        font-size: 25px;
-        font-weight: 800;
+        font-family: 'Poppins', 'Plus Jakarta Sans', var(--font);
+        font-size: 24px;
+        font-weight: 900;
         line-height: 1.08;
         letter-spacing: -0.5px;
         color: var(--text);
