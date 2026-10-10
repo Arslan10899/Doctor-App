@@ -710,15 +710,19 @@ document.addEventListener("DOMContentLoaded", function () {
             if (d.today_open) return d.today_open + " onwards";
             return "";
         }
-        function doctorTimingMatches(d) {
-            // The Online badge only glows when the chosen check-up time falls
-            // inside the doctor's own timing for today.
-            if (chosenVisit !== "Online Check-up" || !d.online || d.today_closed) return false;
-            var slot = slotInput ? slotInput.value : "";
-            var s = hmToMin(slot), o = hmToMin(d.today_open), c = hmToMin(d.today_close);
-            if (s === null || o === null) return false;
-            if (c === null) return s >= o;
-            return s >= o && s <= c;
+        function nowMinutes() {
+            var n = new Date();
+            return n.getHours() * 60 + n.getMinutes();
+        }
+        function doctorOnlineNow(d) {
+            // Green "Online" only while the current clock time sits inside the
+            // doctor's own timing for today; outside it the label stays but
+            // loses its colour.
+            if (!d.online || d.today_closed) return false;
+            var o = hmToMin(d.today_open), c = hmToMin(d.today_close), now = nowMinutes();
+            if (o === null) return false;
+            if (c === null) return now >= o;
+            return now >= o && now <= c;
         }
 
         function renderSuggestions(matches) {
@@ -738,7 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 main.className = "bs-main";
                 const fee = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
                 const online = d.online
-                    ? '<span class="bs-badge bs-online' + (doctorTimingMatches(d) ? " glow" : "") + '">Online</span>'
+                    ? '<span class="bs-badge bs-online ' + (doctorOnlineNow(d) ? "on" : "off") + '">Online</span>'
                     : '<span class="bs-badge bs-offline">In person</span>';
                 const left = document.createElement("div");
                 left.className = "bs-left";
