@@ -2068,7 +2068,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
             0 0 0 3px rgba(13, 148, 136, .06),
             0 10px 26px -16px rgba(13, 94, 102, .40);
     }
-    .hero-book-label { padding: 0 2px 8px; font-size: 10.5px; letter-spacing: .6px; }
+    .hero-book-label { padding: 0 2px 8px; font-size: 12px; letter-spacing: .6px; }
+    /* the label reads a touch larger, so its calendar glyph grows with it */
+    .hero-book-label svg { width: 17px; height: 17px; }
     .hero-book-label,
     .hero-book-label svg { color: #55737c; }
     .hero-book-actions { gap: 6px; }
@@ -2234,7 +2236,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .search-section input::placeholder { font-size: 13px; }
     .city-drop .city-drop-text { font-size: 12px; }
     .hero-book-box { padding: 9px 10px; border-radius: 14px; }
-    .hero-book-label { font-size: 10px; padding-bottom: 7px; }
+    .hero-book-label { font-size: 11px; padding-bottom: 7px; }
     .hero-book-actions { gap: 5px; }
     .hero-book-btn { font-size: 12px; min-height: 54px; gap: 3px; padding: 9px 5px; }
     .hero-book-btn svg { width: 18px; height: 18px; }
