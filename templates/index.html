@@ -1110,6 +1110,10 @@
         return;
     }
     var qi = 0, timer = null, paused = false;
+    // Hover hold is for mouse devices only: on touch screens a tap fires a
+    // synthetic mouseenter with no matching mouseleave, which used to freeze
+    // the ticker forever after one accidental tap on the bar.
+    var canHover = window.matchMedia && matchMedia('(hover: hover)').matches;
     function later(fn, ms) {
         if (timer) clearTimeout(timer);
         timer = setTimeout(fn, ms);
@@ -1132,14 +1136,16 @@
             later(showSlide, 750);
         }, s.hold);
     }
-    bar.addEventListener('mouseenter', function () {
-        paused = true;
-        if (timer) { clearTimeout(timer); timer = null; }
-    });
-    bar.addEventListener('mouseleave', function () {
-        paused = false;
-        showSlide();
-    });
+    if (canHover) {
+        bar.addEventListener('mouseenter', function () {
+            paused = true;
+            if (timer) { clearTimeout(timer); timer = null; }
+        });
+        bar.addEventListener('mouseleave', function () {
+            paused = false;
+            showSlide();
+        });
+    }
     showSlide();
 })();
 </script>
