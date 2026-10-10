@@ -1079,9 +1079,10 @@
 })();
 </script>
 <script>
-/* Announcement ticker: left-to-right staged loop. Each announcement shows
-   its title first (in from the left, hold, out right), then its content the
-   same way. Hover holds the current slide. */
+/* Announcement ticker (mobile only): left-to-right staged loop. Each
+   announcement shows its title first (in from the left, hold, out right),
+   then its content the same way. Hover holds the current slide. Desktops
+   keep the original marquee; without JS the marquee remains everywhere. */
 (function () {
     var bar = document.getElementById('announceBar');
     var list = document.getElementById('announceList');
@@ -1097,18 +1098,11 @@
         if (content) queue.push({ text: content, cls: '', hold: 3600 });
     });
     if (!queue.length) return;
+    // Staged ticker is mobile-only: desktops keep the original continuous
+    // marquee exactly as before (list stays visible, stage stays hidden).
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    list.style.display = 'none';
-    stage.hidden = false;
-    if (reduce) {
-        var first = queue[0];
-        var still = document.createElement('span');
-        still.className = ('announce-slide in ' + first.cls).trim();
-        still.style.transition = 'none';
-        still.textContent = first.text;
-        stage.appendChild(still);
-        return;
-    }
+    var mqMobile = window.matchMedia ? matchMedia('(max-width: 768px)') : null;
+    var stageMode = null; // 'staged' | 'static' | null (null = desktop marquee)
     var qi = 0, timer = null, paused = false;
     // Hover hold is for mouse devices only: on touch screens a tap fires a
     // synthetic mouseenter with no matching mouseleave, which used to freeze
@@ -1119,6 +1113,7 @@
         timer = setTimeout(fn, ms);
     }
     function showSlide() {
+        if (stageMode !== 'staged') return;
         timer = null;
         if (paused) { later(showSlide, 600); return; }
         var s = queue[qi];
@@ -1136,17 +1131,58 @@
             later(showSlide, 750);
         }, s.hold);
     }
+    function stopStaged() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        paused = false;
+        qi = 0;
+        stage.innerHTML = '';
+        stage.hidden = true;
+        list.style.display = '';
+        stageMode = null;
+    }
+    function syncMode() {
+        var mobile = mqMobile ? mqMobile.matches : true;
+        if (!mobile) { stopStaged(); return; } // desktop marquee untouched
+        if (reduce) {
+            if (stageMode === 'static') return;
+            if (timer) { clearTimeout(timer); timer = null; }
+            list.style.display = 'none';
+            stage.hidden = false;
+            stage.innerHTML = '';
+            var first = queue[0];
+            var still = document.createElement('span');
+            still.className = ('announce-slide in ' + first.cls).trim();
+            still.style.transition = 'none';
+            still.textContent = first.text;
+            stage.appendChild(still);
+            stageMode = 'static';
+            return;
+        }
+        if (stageMode === 'staged') return;
+        list.style.display = 'none';
+        stage.hidden = false;
+        stageMode = 'staged';
+        paused = false;
+        qi = 0;
+        showSlide();
+    }
     if (canHover) {
         bar.addEventListener('mouseenter', function () {
+            if (stageMode !== 'staged') return;
             paused = true;
             if (timer) { clearTimeout(timer); timer = null; }
         });
         bar.addEventListener('mouseleave', function () {
+            if (stageMode !== 'staged') return;
             paused = false;
             showSlide();
         });
     }
-    showSlide();
+    if (mqMobile) {
+        if (mqMobile.addEventListener) mqMobile.addEventListener('change', syncMode);
+        else if (mqMobile.addListener) mqMobile.addListener(syncMode);
+    }
+    syncMode();
 })();
 </script>
 
