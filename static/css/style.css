@@ -2275,8 +2275,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .announcement-bar {
     background: linear-gradient(90deg, #0a2e3c, #12303b);
     color: #d7f3ef;
-    padding: 9px 0;
-    font-size: 13.5px;
+    padding: 10px 0;
+    font-size: 15px;
     font-weight: 600;
     position: sticky;
     top: 68px;
@@ -2405,7 +2405,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     color: #5eead4;
     padding: 2px 11px;
     border-radius: 999px;
-    font-size: 11.5px;
+    font-size: 13px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .05em;
