@@ -1980,7 +1980,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        forced 30px, which was actually LARGER than the desktop clamp at this
        width, so the headline and its accent band grew on phones. */
     .hero h1 {
-        font-size: 25px;
+        font-size: 23px;
         line-height: 1.2;
         white-space: normal;
         color: #0d3b44;
@@ -2168,14 +2168,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .city-slot--pill .city-drop {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 10px 14px 10px 12px;
+        gap: 4px;
+        padding: 8px 12px 8px 10px;
         border-radius: 9999px;
         background: #fff;
         border: 1px solid rgba(13, 148, 136, .22);
         box-shadow: 0 4px 14px -8px rgba(13, 94, 102, .30);
         color: #0f4a55;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 600;
         width: auto;
         max-width: 100%;
@@ -2221,10 +2221,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 
 @media (max-width: 400px) {
-    .hero h1 { font-size: 22px; }
-    /* narrowest phones: the headline takes its own full row and the city
-       pill drops underneath at full tap width instead of squeezing the h1 */
-    .hero-head-text h1 { flex: 1 1 100%; }
+    .hero h1 { font-size: 20px; }
+    /* narrowest phones: keep the question and the city pill on ONE row by
+       letting both shrink, instead of forcing the headline to a full line and
+       dropping the pill underneath */
+    .hero-head-text h1 { flex: 1 1 auto; }
     .city-slot--pill { max-width: none; }
     .search-section input,
     .search-section input::placeholder { font-size: 13px; }
