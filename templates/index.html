@@ -427,11 +427,14 @@
 </section>
 
 <!-- ================= SEARCH BY CONDITION ================= -->
-<section class="section">
+<section class="section cond-section">
     <div class="container">
         <div class="section-header">
-            <h2>Search Doctor by Condition</h2>
-            <p>Not sure which specialist you need? Start with your condition.</p>
+            <h2 class="cond-title">
+                <span class="ct-desktop">Search Doctor by Condition</span>
+                <span class="ct-mobile">Search by <span class="cond-key">Condition</span></span>
+            </h2>
+            <p class="cond-sub">Not sure which specialist you need? Start with your condition.</p>
         </div>
         <div class="chip-grid cols-4">
             {% for cond in conditions[:8] %}
