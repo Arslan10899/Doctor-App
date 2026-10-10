@@ -2368,10 +2368,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     font-size: 13.5px;
     font-weight: 600;
     color: #d7f3ef;
-    transition: left .55s cubic-bezier(.45, 0, .19, 1), transform .55s cubic-bezier(.45, 0, .19, 1);
+    opacity: 0;
+    transition: left .7s cubic-bezier(.22, .8, .3, 1), transform .7s cubic-bezier(.22, .8, .3, 1), opacity .45s ease;
 }
-.announce-slide.in { left: 24px; transform: translate(0, -50%); }
-.announce-slide.out { left: 100%; transform: translate(0, -50%); }
+.announce-slide.in { left: 24px; transform: translate(0, -50%); opacity: 1; }
+.announce-slide.out { left: 100%; transform: translate(0, -50%); opacity: 0; }
 .announce-slide.is-title {
     color: #5eead4;
     font-weight: 800;
