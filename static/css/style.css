@@ -3367,8 +3367,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .book-suggest-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
     padding: 9px 13px;
     cursor: pointer;
     font-size: 13.5px;
@@ -3376,6 +3377,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border-bottom: 1px solid #f1f6f8;
 }
 .book-suggest-item:last-child { border-bottom: none; }
+.bs-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .bs-left { min-width: 0; flex: 1; }
 .bs-left strong {
     display: block;
@@ -3418,7 +3424,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-top: 3px;
+    align-self: flex-end;
+    margin-top: 1px;
     color: #0f766e;
     font-size: 11.5px;
     font-weight: 600;

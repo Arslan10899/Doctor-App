@@ -734,6 +734,8 @@ document.addEventListener("DOMContentLoaded", function () {
             matches.forEach(function (d) {
                 const item = document.createElement("div");
                 item.className = "book-suggest-item";
+                const main = document.createElement("div");
+                main.className = "bs-main";
                 const fee = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
                 const online = d.online
                     ? '<span class="bs-badge bs-online' + (doctorTimingMatches(d) ? " glow" : "") + '">Online</span>'
@@ -746,14 +748,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 meta.textContent = d.specialty_name + " \u00b7 " + d.city_name;
                 left.appendChild(nm);
                 left.appendChild(meta);
-                const timing = doctorTimingText(d);
-                if (timing) {
-                    const tm = document.createElement("span");
-                    tm.className = "bs-timing";
-                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
-                    tm.querySelector("span").textContent = timing;
-                    left.appendChild(tm);
-                }
                 const right = document.createElement("div");
                 right.className = "bs-right";
                 const feeEl = document.createElement("span");
@@ -761,8 +755,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 feeEl.textContent = fee;
                 right.appendChild(feeEl);
                 right.insertAdjacentHTML("beforeend", online);
-                item.appendChild(left);
-                item.appendChild(right);
+                main.appendChild(left);
+                main.appendChild(right);
+                item.appendChild(main);
+                const timing = doctorTimingText(d);
+                if (timing) {
+                    const tm = document.createElement("span");
+                    tm.className = "bs-timing";
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.querySelector("span").textContent = timing;
+                    item.appendChild(tm);
+                }
+                item.addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                    selectDoctor(d);
+                });
+                suggestBox.appendChild(item);
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
                     selectDoctor(d);
