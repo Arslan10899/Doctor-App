@@ -2155,6 +2155,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         align-items: center;
         justify-content: space-between;
         gap: 7px 10px;
+        /* a touch more air above the headline + city pill pair on phones */
+        margin-top: 12px;
     }
     .hero-head-text h1 { flex: 1 1 auto; min-width: 0; }
     .city-slot--bar { display: none; }
