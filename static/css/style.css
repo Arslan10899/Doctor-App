@@ -4027,9 +4027,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .top-specialties .chip:nth-child(n+6) { display: none; }
 }
 
-/* Mobile-only replacement headings: "Search by Specialty" / "Search by
-   Condition". They borrow the hero "Need a Doctor?" colour scheme (dark teal
-   with the keyword in teal) and keep the desktop copy untouched. */
+/* Mobile-only headings for the specialty / condition sections: "Search
+   Specialty..." and "Search Condition...". Professional treatment: the hero
+   "Need a Doctor?" colour scheme (dark teal, keyword in teal), a compact
+   left-aligned header with a short teal accent rule and a tighter vertical
+   rhythm. Desktop keeps the original copy. */
 .tst-mobile,
 .ct-mobile { display: none; }
 @media (max-width: 768px) {
@@ -4038,21 +4040,41 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .top-specialties-title .tst-mobile,
     .cond-title .ct-mobile { display: inline; }
 
+    /* tighter, evenly spaced vertical rhythm for these two stacked sections */
+    .top-specialties.section,
+    .cond-section.section { padding: 30px 0; }
+
+    .top-specialties .section-header,
+    .cond-section .section-header {
+        max-width: none;
+        margin: 0 0 16px;
+        text-align: left;
+    }
+
     .top-specialties-title,
     .cond-title {
         font-family: var(--font-display);
         font-size: 20px;
+        line-height: 1.2;
         font-weight: 800;
-        letter-spacing: -0.4px;
+        letter-spacing: -0.3px;
         color: #0d3b44;
+        margin: 0;
     }
-    .top-specialties-title,
-    .cond-title { text-align: left; }
     .top-specialties-title .tst-key,
     .cond-title .cond-key { color: #0f766e; }
 
+    /* a short teal accent rule replaces the rainbow underline */
     .top-specialties .section-header h2::after,
-    .cond-section .section-header h2::after { display: none; }
+    .cond-section .section-header h2::after {
+        display: block;
+        content: "";
+        width: 38px;
+        height: 3px;
+        margin: 9px 0 0;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #14b8a6, #2a7f8e);
+    }
 
     .top-specialties-sub,
     .cond-sub { display: none; }
