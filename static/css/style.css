@@ -2343,6 +2343,42 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border-right: 1px solid rgba(45, 212, 191, .18);
 }
 .announcement-item:first-child { border-left: 1px solid rgba(45, 212, 191, .18); }
+/* Staged ticker (JS-driven, left to right): each announcement shows its
+   title first, then its content. Slides enter from the left, hold readable,
+   exit right. The marquee above stays as the no-JS fallback. */
+.announce-stage {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    min-height: 22px;
+    overflow: hidden;
+    -webkit-mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
+    mask: linear-gradient(90deg, transparent 0, #000 110px, #000 calc(100% - 40px), transparent 100%);
+}
+.announce-slide {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-115%, -50%);
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #d7f3ef;
+    transition: left .55s cubic-bezier(.45, 0, .19, 1), transform .55s cubic-bezier(.45, 0, .19, 1);
+}
+.announce-slide.in { left: 24px; transform: translate(0, -50%); }
+.announce-slide.out { left: 100%; transform: translate(0, -50%); }
+.announce-slide.is-title {
+    color: #5eead4;
+    font-weight: 800;
+    font-size: 12.5px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
 
 /* ===== Live search autocomplete ===== */
 .ac-wrap { position: relative; flex: 1; }
@@ -2592,6 +2628,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 @media (max-width: 640px) {
     .announcement-list { font-size: 12.5px; }
+    .announce-slide { font-size: 12.5px; }
     /* phones: speaker icon stays, the "Announcement" word is dropped */
     .announce-tag-text { display: none; }
 }

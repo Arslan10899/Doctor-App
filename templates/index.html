@@ -44,6 +44,7 @@
         </span>
         {% endfor %}
     </div>
+    <div class="announce-stage" id="announceStage" hidden></div>
     <button type="button" class="announce-close" id="announceClose" aria-label="Dismiss announcements">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
@@ -1072,10 +1073,74 @@
         if (closed) bar.hidden = true;
     }
 
-    /* The announcements scroll in a CSS marquee, the same loop a desktop runs.
-       There is no stepping, no timer and no dots here, so nothing to build and
-       nothing to keep in sync. The only script this bar still needs is the
-       dismiss button, so a phone can clear the strip for the session. */
+    /* The staged ticker below takes over when JS runs (title first, then
+       content, left to right); without JS the CSS marquee above remains. The
+       dismiss button works either way, so a phone can clear the strip. */
+})();
+</script>
+<script>
+/* Announcement ticker: left-to-right staged loop. Each announcement shows
+   its title first (in from the left, hold, out right), then its content the
+   same way. Hover holds the current slide. */
+(function () {
+    var bar = document.getElementById('announceBar');
+    var list = document.getElementById('announceList');
+    var stage = document.getElementById('announceStage');
+    if (!bar || !list || !stage) return;
+    var queue = [];
+    Array.prototype.forEach.call(list.querySelectorAll('.announcement-item'), function (el) {
+        var t = el.querySelector('.announcement-title');
+        var c = el.querySelector('.announcement-content');
+        var title = t ? t.textContent.trim() : '';
+        var content = c ? c.textContent.trim() : '';
+        if (title) queue.push({ text: title, cls: 'is-title', hold: 2200 });
+        if (content) queue.push({ text: content, cls: '', hold: 3600 });
+    });
+    if (!queue.length) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    list.style.display = 'none';
+    stage.hidden = false;
+    if (reduce) {
+        var first = queue[0];
+        var still = document.createElement('span');
+        still.className = ('announce-slide in ' + first.cls).trim();
+        still.style.transition = 'none';
+        still.textContent = first.text;
+        stage.appendChild(still);
+        return;
+    }
+    var qi = 0, timer = null, paused = false;
+    function later(fn, ms) {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(fn, ms);
+    }
+    function showSlide() {
+        timer = null;
+        if (paused) { later(showSlide, 600); return; }
+        var s = queue[qi];
+        qi = (qi + 1) % queue.length;
+        stage.innerHTML = '';
+        var el = document.createElement('span');
+        el.className = ('announce-slide ' + s.cls).trim();
+        el.textContent = s.text;
+        stage.appendChild(el);
+        void el.offsetWidth;
+        el.classList.add('in');
+        later(function () {
+            el.classList.remove('in');
+            el.classList.add('out');
+            later(showSlide, 600);
+        }, s.hold);
+    }
+    bar.addEventListener('mouseenter', function () {
+        paused = true;
+        if (timer) { clearTimeout(timer); timer = null; }
+    });
+    bar.addEventListener('mouseleave', function () {
+        paused = false;
+        showSlide();
+    });
+    showSlide();
 })();
 </script>
 
