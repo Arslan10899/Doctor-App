@@ -118,6 +118,9 @@ input, select, textarea { font-family: inherit; }
 .site-header .logo-icon img { filter: none; width: 38px; height: 38px; }
 .logo-text { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
 .logo-accent { color: var(--primary); }
+/* High-resolution 3D wordmark (transparent PNG). Hidden on desktop, where the
+   live text wordmark and tagline are shown instead; phones swap to the image. */
+.logo-wordmark-img { display: none; }
 
 .main-nav { display: flex; gap: 4px; margin-left: 8px; flex: 1; flex-wrap: nowrap; }
 .nav-link {
@@ -2447,29 +2450,15 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .header-inner { height: 54px; }
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
-    /* Wordmark gets a bigger, punchier treatment on phones: the tagline is
-       gone here, so the name carries the brand on its own. Size up and add
-       weight plus tight tracking so it reads as a proper logotype. */
-    .site-header .logo-text {
-        font-size: 24px;
-        font-weight: 900;
-        letter-spacing: -0.7px;
-        /* 3D isometric wordmark: stacked, blur-free shadows march off to the
-           bottom-right as one solid block of teal that fades from light to
-           dark, like lit extruded lettering. A white top-left edge lights the
-           bevel and a soft cast shadow lands underneath for the pop-out. */
-        text-shadow:
-            -1px -1px 0 #ffffff,
-            -1px -1px 1px rgba(255, 255, 255, .8),
-            1px 1px 0 #5bb8c4,
-            2px 2px 0 #2a8794,
-            3px 3px 0 #176f7c,
-            4px 4px 0 #0f5a66,
-            5px 5px 0 #0a4650,
-            6px 6px 0 #073039,
-            7px 9px 12px rgba(7, 40, 47, .38);
+    /* Phones show the pre-rendered 3D wordmark image, so the live text (and its
+       tagline) is hidden. The art is a transparent PNG sized to sit snug in the
+       trimmed bar; width follows so the aspect ratio is never distorted. */
+    .site-header .logo-text { display: none; }
+    .site-header .logo-wordmark-img {
+        display: block;
+        height: 36px;
+        width: auto;
     }
-    .site-header .logo-tagline { font-size: 9px; letter-spacing: .5px; }
     .header-actions { gap: 8px; }
 }
 
