@@ -695,6 +695,32 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 160);
         });
 
+        function hmToMin(t) {
+            // "7:00 AM" / "12:30 PM" -> minutes past midnight
+            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || ""));
+            if (!m) return null;
+            var h = parseInt(m[1], 10) % 12;
+            if (/PM/i.test(m[3])) h += 12;
+            return h * 60 + parseInt(m[2], 10);
+        }
+        function doctorTimingText(d) {
+            if (chosenVisit !== "Online Check-up") return "";
+            if (d.today_closed) return "Closed today";
+            if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
+            if (d.today_open) return d.today_open + " onwards";
+            return "";
+        }
+        function doctorTimingMatches(d) {
+            // The Online badge only glows when the chosen check-up time falls
+            // inside the doctor's own timing for today.
+            if (chosenVisit !== "Online Check-up" || !d.online || d.today_closed) return false;
+            var slot = slotInput ? slotInput.value : "";
+            var s = hmToMin(slot), o = hmToMin(d.today_open), c = hmToMin(d.today_close);
+            if (s === null || o === null) return false;
+            if (c === null) return s >= o;
+            return s >= o && s <= c;
+        }
+
         function renderSuggestions(matches) {
             suggestBox.innerHTML = "";
             if (matches.length === 0) {
@@ -709,7 +735,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const item = document.createElement("div");
                 item.className = "book-suggest-item";
                 const fee = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
-                const online = d.online ? '<span class="bs-badge bs-online">Online</span>' : '<span class="bs-badge bs-offline">In person</span>';
+                const online = d.online
+                    ? '<span class="bs-badge bs-online' + (doctorTimingMatches(d) ? " glow" : "") + '">Online</span>'
+                    : '<span class="bs-badge bs-offline">In person</span>';
                 const left = document.createElement("div");
                 left.className = "bs-left";
                 const nm = document.createElement("strong");
@@ -718,6 +746,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 meta.textContent = d.specialty_name + " \u00b7 " + d.city_name;
                 left.appendChild(nm);
                 left.appendChild(meta);
+                const timing = doctorTimingText(d);
+                if (timing) {
+                    const tm = document.createElement("span");
+                    tm.className = "bs-timing";
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.querySelector("span").textContent = timing;
+                    left.appendChild(tm);
+                }
                 const right = document.createElement("div");
                 right.className = "bs-right";
                 const feeEl = document.createElement("span");

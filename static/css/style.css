@@ -3412,6 +3412,30 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .bs-online { background: #e3f6ef; color: #12876f; }
 .bs-offline { background: #eef2f4; color: #5b7480; }
+
+/* Same-day surgery/OPD timing shown under a doctor in the booking list */
+.bs-timing {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    color: #0f766e;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.bs-timing svg { flex-shrink: 0; }
+
+/* The Online badge breathes only when the chosen check-up time sits inside
+   the doctor's own timing for today; otherwise it stays flat. */
+@keyframes bsOnlineGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(18, 135, 111, 0), 0 0 0 0 rgba(18, 135, 111, 0); }
+    50% { box-shadow: 0 0 0 3px rgba(18, 135, 111, .30), 0 0 12px 1px rgba(18, 135, 111, .55); }
+}
+.bs-online.glow { animation: bsOnlineGlow 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+    .bs-online.glow { animation: none; box-shadow: 0 0 0 2px rgba(18, 135, 111, .35); }
+}
 .book-suggest-item:hover, .book-suggest-item.active { background: var(--bg-light, #f0f5f7); }
 .book-slots {
     display: grid;

@@ -1074,6 +1074,33 @@ def doctors():
     )
 
 
+def _today_timing(timings_json):
+    """Return (open, close, closed) for today's weekday from a clinic timings JSON.
+
+    Clinic timings are stored as {"Monday - Urdu": {"open": "7:00 AM",
+    "close": "12:00 PM", "isClosed": false}, ...}. Keys may carry an Urdu
+    suffix after " - ", so only the weekday name is compared.
+    """
+    if not timings_json:
+        return "", "", False
+    try:
+        data = json.loads(timings_json)
+    except (ValueError, TypeError):
+        return "", "", False
+    if not isinstance(data, dict):
+        return "", "", False
+    today = datetime.now().strftime("%A").lower()
+    for key, info in data.items():
+        if str(key).split(" - ")[0].strip().lower() != today:
+            continue
+        if not isinstance(info, dict):
+            continue
+        if info.get("isClosed"):
+            return "", "", True
+        return info.get("open") or "", info.get("close") or "", False
+    return "", "", False
+
+
 @app.route("/api/doctors-list")
 def api_doctors_list():
     q = request.args.get("q", "").strip()
@@ -1095,7 +1122,19 @@ def api_doctors_list():
             "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
             "ORDER BY d.rating DESC, d.reviews DESC"
         )
-    return jsonify([dict(r) for r in docs])
+    # One pass over clinics so each doctor carries today's open/close times.
+    timing_map = {}
+    for cr in query("SELECT doctor_id, timings FROM clinics WHERE timings IS NOT NULL AND timings != '' ORDER BY id"):
+        timing_map.setdefault(cr["doctor_id"], cr["timings"])
+    rows = []
+    for r in docs:
+        d = dict(r)
+        o, c, closed = _today_timing(timing_map.get(d["id"]))
+        d["today_open"] = o
+        d["today_close"] = c
+        d["today_closed"] = closed
+        rows.append(d)
+    return jsonify(rows)
 
 
 @app.route("/booking-request", methods=["POST"])
