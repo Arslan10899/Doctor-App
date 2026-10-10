@@ -2194,6 +2194,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         min-width: 210px;
         max-width: calc(100vw - 24px);
     }
+    /* phones: logo keeps "Doctor App", the tagline underneath is dropped */
+    .logo-tagline { display: none; }
     .search-section input { font-size: 14px; }
     .search-section input::placeholder { font-size: 14px; }
     .city-drop,
