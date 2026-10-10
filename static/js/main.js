@@ -558,7 +558,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 visitSummary.style.setProperty("--vs-bg", th.bg);
                 visitSummary.style.setProperty("--vs-bd", th.bd);
             }
+            // A doctor picked under the old type may not fit the new one (an
+            // in-person doctor after switching to Online Check-up); drop it so
+            // the suggestion list and the summary stay consistent.
+            if (doctorIdInput.value) {
+                const sel = doctorCache.filter(function (d) { return String(d.id) === String(doctorIdInput.value); })[0];
+                if (sel && !doctorFitsVisit(sel)) {
+                    doctorInput.value = "";
+                    doctorIdInput.value = "";
+                    updateContact(null);
+                }
+            }
             setStep("form");
+        }
+
+        function doctorFitsVisit(d) {
+            // Online Check-up only lists doctors who actually consult online.
+            return chosenVisit !== "Online Check-up" || !!d.online;
+        }
+        function doctorPool() {
+            return doctorCache.filter(doctorFitsVisit);
         }
 
         function waDigits(raw) {
@@ -592,7 +611,14 @@ document.addEventListener("DOMContentLoaded", function () {
             if (doctorCache.length === 0) {
                 fetch("/api/doctors-list")
                     .then(function (r) { return r.json(); })
-                    .then(function (data) { doctorCache = data; })
+                    .then(function (data) {
+                        doctorCache = data;
+                        // the field may already be focused while the list was
+                        // loading; fill the panel now that it is here
+                        if (document.activeElement === doctorInput && !doctorInput.value.trim()) {
+                            renderSuggestions(doctorPool());
+                        }
+                    })
                     .catch(function () {});
             }
         }
@@ -656,11 +682,11 @@ document.addEventListener("DOMContentLoaded", function () {
             if (q.length < 1) {
                 suggestBox.classList.remove("open");
                 doctorIdInput.value = "";
-                renderSuggestions(doctorCache);
+                renderSuggestions(doctorPool());
                 return;
             }
             debounceTimer = setTimeout(function () {
-                const matches = doctorCache.filter(
+                const matches = doctorPool().filter(
                     function (d) {
                         return (d.doctor_name + " " + d.specialty_name + " " + d.city_name).toLowerCase().indexOf(q.toLowerCase()) !== -1;
                     }
@@ -718,7 +744,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         doctorInput.addEventListener("focus", function () {
             if (doctorCache.length && !doctorInput.value.trim()) {
-                renderSuggestions(doctorCache);
+                renderSuggestions(doctorPool());
             }
         });
         doctorInput.addEventListener("blur", function () {
