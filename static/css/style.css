@@ -2454,15 +2454,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         font-size: 24px;
         font-weight: 900;
         letter-spacing: -0.7px;
-        /* 3D raised wordmark: a light highlight on the top-left edge and a
-           soft teal shadow trailing to the bottom-right lift the letters off
-           the white bar like embossed metal. */
+        /* 3D isometric wordmark: stacked, blur-free shadows march off to the
+           bottom-right as one solid block of teal that fades from light to
+           dark, like lit extruded lettering. A white top-left edge lights the
+           bevel and a soft cast shadow lands underneath for the pop-out. */
         text-shadow:
-            -1px -1px 0 rgba(255, 255, 255, .95),
-            -1px -1px 1px rgba(255, 255, 255, .75),
-            1px 1px 0 rgba(12, 94, 102, .30),
-            2px 2px 3px rgba(12, 94, 102, .28),
-            0 6px 10px rgba(12, 94, 102, .16);
+            -1px -1px 0 #ffffff,
+            -1px -1px 1px rgba(255, 255, 255, .8),
+            1px 1px 0 #5bb8c4,
+            2px 2px 0 #2a8794,
+            3px 3px 0 #176f7c,
+            4px 4px 0 #0f5a66,
+            5px 5px 0 #0a4650,
+            6px 6px 0 #073039,
+            7px 9px 12px rgba(7, 40, 47, .38);
     }
     .site-header .logo-tagline { font-size: 9px; letter-spacing: .5px; }
     .header-actions { gap: 8px; }
