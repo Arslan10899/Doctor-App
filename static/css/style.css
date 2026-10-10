@@ -2441,7 +2441,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* ---- Header breathing room ----
        The mascot tile is 38px with an 11px gap, which pushed the wordmark close
        to the hamburger. Shrink the tile a little and give the actions more air so
-       the row stops reading as crowded. */
+       the row stops reading as crowded. On phones the bar was left 68px tall, so
+       the funnel of white above and below the 34px tile read as dead space around
+       the logo; trim the height so the icon and wordmark sit snug in the strip. */
+    .header-inner { height: 54px; }
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
     /* Wordmark gets a bigger, punchier treatment on phones: the tagline is
@@ -2449,7 +2452,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        weight plus tight tracking so it reads as a proper logotype. */
     .site-header .logo-text {
         font-size: 24px;
-        font-weight: 800;
+        font-weight: 900;
         letter-spacing: -0.7px;
     }
     .site-header .logo-tagline { font-size: 9px; letter-spacing: .5px; }
