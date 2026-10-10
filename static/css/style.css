@@ -3962,3 +3962,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         .bottom-nav-fab svg { animation: none; }
     }
 }
+
+/* Mobile-only heading that sits between the hero and the carousel and echoes
+   the city picked in the hero ("your City" until a specific city is chosen). */
+.featured-city-heading { display: none; }
+@media (max-width: 768px) {
+    .featured-city-heading {
+        display: block;
+        margin: 0;
+        padding: 18px 18px 4px;
+        text-align: center;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.2px;
+        color: var(--text);
+    }
+    .featured-city-heading .fch-city { color: #0d9488; }
+}

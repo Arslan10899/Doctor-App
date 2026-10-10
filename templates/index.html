@@ -254,6 +254,8 @@
 
 <!-- ================= CAROUSEL ================= -->
 {% if carousel %}
+<!-- Mobile-only: ties the carousel below to the city picked in the hero -->
+<h2 class="featured-city-heading">Featured Doctors in <span class="fch-city" id="featuredCityName">your City</span></h2>
 <section class="section hero-slider-section" style="padding-top:0;padding-bottom:0;width:100%;">
     <div id="heroSlider" class="hero-slider">
         <button class="car-nav prev" aria-label="Previous">&#8249;</button>
@@ -1035,6 +1037,8 @@
                 x.classList.toggle('selected', x.getAttribute('data-city') === value);
             });
         });
+        var cityName = document.getElementById('featuredCityName');
+        if (cityName) cityName.textContent = value ? value : 'your City';
     }
     slots.forEach(function (slot) {
         var drop = slot.querySelector('.city-drop');
