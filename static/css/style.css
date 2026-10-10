@@ -3258,6 +3258,26 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-contact-wa { background: #e6f9ee; color: #12876f; border-color: rgba(18, 135, 111, .24); }
 .book-contact-profile { background: #eef1fb; color: #3b4b8a; border-color: rgba(59, 75, 138, .22); }
 
+/* "OR" separator between the quick-contact shortcuts and the manual form. */
+.book-or {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2px 0;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.book-or::before,
+.book-or::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: #e3e9ec;
+}
+
 .book-form { display: flex; flex-direction: column; gap: 11px; }
 .book-form[hidden] { display: none; }
 .book-step[hidden] { display: none; }
