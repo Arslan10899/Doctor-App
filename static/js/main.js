@@ -5,8 +5,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const navToggle = document.getElementById("navToggle");
     const mainNav = document.getElementById("mainNav");
     if (navToggle && mainNav) {
+        const navScrim = document.getElementById("navScrim");
+        const navMenuClose = document.getElementById("navMenuClose");
+        function setNav(open) {
+            mainNav.classList.toggle("open", open);
+            navToggle.classList.toggle("open", open);
+            navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+            if (navScrim) navScrim.classList.toggle("show", open);
+        }
         navToggle.addEventListener("click", function () {
-            mainNav.classList.toggle("open");
+            setNav(!mainNav.classList.contains("open"));
+        });
+        if (navScrim) navScrim.addEventListener("click", function () { setNav(false); });
+        if (navMenuClose) navMenuClose.addEventListener("click", function () { setNav(false); });
+        mainNav.querySelectorAll("a").forEach(function (a) {
+            a.addEventListener("click", function () { setNav(false); });
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && mainNav.classList.contains("open")) setNav(false);
+        });
+        window.addEventListener("resize", function () {
+            if (window.matchMedia("(min-width: 1201px)").matches) setNav(false);
         });
     }
 

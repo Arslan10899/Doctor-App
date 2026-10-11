@@ -169,6 +169,10 @@ input, select, textarea { font-family: inherit; }
    header duplicate buttons. */
 .nav-menu-slot { display: none; }
 .nav-admin-slot { display: none; }
+/* Mobile menu extras: only visible once the nav collapses (<=1200px). */
+.nav-menu-head { display: none; }
+.nav-link .nav-ico { display: none; }
+.nav-scrim { display: none; }
 /* the bar copy is one flex item now, so it has to supply the gap that
    .header-actions used to give the two buttons between them */
 .hdr-acct-slot { display: inline-flex; align-items: center; gap: 10px; }
@@ -189,6 +193,11 @@ input, select, textarea { font-family: inherit; }
     border-radius: 2px;
     transition: all .25s;
 }
+.nav-toggle { border-radius: 12px; transition: background .2s; -webkit-tap-highlight-color: transparent; }
+.nav-toggle:active { background: var(--primary-light); }
+.nav-toggle.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); background: var(--primary); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; transform: scaleX(.3); }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); background: var(--primary); }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -1925,17 +1934,112 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* Container caps at 1200px (1160px of content). Above that the inline nav
        is guaranteed to fit; below it we collapse before anything can wrap. */
     .nav-toggle { display: flex; }
+    /* ---- Floating "glass" menu ----
+       Instead of a full-width sheet that swallows the phone screen, the menu is
+       now a compact rounded card that drops from the top-right, frosted, with an
+       icon row per link. A soft scrim dims the page behind it. */
     .main-nav {
         position: fixed;
-        top: 68px; left: 0; right: 0;
-        background: #fff;
+        top: 76px; right: 14px; left: auto;
+        width: min(340px, calc(100vw - 28px));
+        max-height: calc(100vh - 96px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background: rgba(255, 255, 255, .94);
+        -webkit-backdrop-filter: blur(20px) saturate(165%);
+        backdrop-filter: blur(20px) saturate(165%);
+        border: 1px solid rgba(15, 40, 60, .08);
+        border-radius: 22px;
+        box-shadow: 0 26px 60px -20px rgba(15, 40, 60, .40), 0 8px 22px -10px rgba(15, 40, 60, .18);
         flex-direction: column;
-        padding: 16px 20px 24px;
-        gap: 6px;
-        box-shadow: var(--shadow-lg);
+        margin-left: 0;
+        flex: none;
+        padding: 8px;
+        gap: 2px;
+        z-index: 121;
+        transform-origin: top right;
         display: none;
     }
-    .main-nav.open { display: flex; }
+    .main-nav.open {
+        display: flex;
+        animation: navMenuIn .28s cubic-bezier(.2, .85, .3, 1.04) both;
+    }
+    @keyframes navMenuIn {
+        from { opacity: 0; transform: translateY(-10px) scale(.95); }
+        to { opacity: 1; transform: none; }
+    }
+    .nav-menu-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 8px 10px 14px;
+        margin-bottom: 3px;
+    }
+    .nav-menu-title {
+        font-size: 11.5px;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: #7c99a3;
+    }
+    .nav-menu-close {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(15, 40, 60, .06);
+        color: #43646e;
+        cursor: pointer;
+        transition: background .18s, color .18s, transform .18s;
+    }
+    .nav-menu-close:hover { background: var(--primary); color: #fff; }
+    .nav-menu-close:active { transform: scale(.9); }
+    .main-nav .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-size: 15.5px;
+        font-weight: 600;
+        color: #17424c;
+        box-shadow: none;
+        transition: background .16s, color .16s, transform .16s;
+    }
+    .main-nav .nav-link .nav-ico {
+        display: block;
+        width: 19px;
+        height: 19px;
+        color: var(--primary);
+        transition: color .16s;
+    }
+    .main-nav .nav-link:hover,
+    .main-nav .nav-link:active { background: var(--primary-light); color: var(--primary); }
+    .main-nav .nav-link.active {
+        background: linear-gradient(135deg, var(--primary), #43a6b5);
+        color: #fff;
+        box-shadow: 0 10px 22px -12px rgba(42, 127, 142, .9);
+    }
+    .main-nav .nav-link.active .nav-ico { color: #fff; }
+    .nav-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 119;
+        background: rgba(10, 32, 40, .40);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .22s ease, visibility .22s ease;
+    }
+    .nav-scrim.show { opacity: 1; visibility: visible; }
+    @media (prefers-reduced-motion: reduce) {
+        .main-nav.open { animation: none; }
+    }
     .admin-entry { padding: 7px 10px; font-size: 13px; }
     .admin-entry span { display: none; }
     .admin-entry { padding: 7px 9px; }
@@ -1943,10 +2047,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        so the top bar is just the logo and the 3-dot. Exactly one copy of each is
        ever shown. */
     .hdr-admin-slot, .hdr-acct-slot { display: none; }
-    .nav-menu-slot { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
-    .nav-menu-slot .nav-acct { display: flex; width: 100%; justify-content: center; padding: 11px 14px; }
-    .nav-admin-slot { display: block; margin-top: 4px; }
-    .nav-admin-slot .admin-entry { display: flex; width: 100%; padding: 11px 14px; font-size: 14px; }
+    .nav-menu-slot { display: flex; flex-direction: column; gap: 9px; margin-top: 8px; padding: 12px 6px 4px; border-top: 1px solid var(--border); }
+    .nav-menu-slot .nav-acct { display: flex; width: 100%; justify-content: center; padding: 12px 14px; border-radius: 14px; }
+    .nav-admin-slot { display: block; margin: 4px 6px 2px; }
+    .nav-admin-slot .admin-entry { display: flex; width: 100%; justify-content: center; padding: 12px 14px; font-size: 14px; border-radius: 14px; }
     /* The rule above strips the label to leave room in the bar; inside the
        menu it has to come back. */
     .nav-admin-slot .admin-entry span { display: inline; }
@@ -2731,6 +2835,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        the funnel of white above and below the 34px tile read as dead space around
        the logo; trim the height so the icon and wordmark sit snug in the strip. */
     .header-inner { height: 54px; }
+    .main-nav { top: 62px; }
     .site-header .logo { gap: 8px; }
     .site-header .logo-icon img { width: 34px; height: 34px; }
     /* Phones drop the tagline and let the name carry the brand. A rounded,

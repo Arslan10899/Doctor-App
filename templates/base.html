@@ -69,15 +69,22 @@
             </a>
 
             <nav class="main-nav" id="mainNav">
-                <a href="{{ url_for('doctors') }}" class="nav-link{% if request.endpoint == 'doctors' %} active{% endif %}">Find Doctors</a>
-                <a href="{{ url_for('specialties_page') }}" class="nav-link{% if request.endpoint == 'specialties_page' %} active{% endif %}">Specialties</a>
-                <a href="{{ url_for('conditions_page') }}" class="nav-link{% if request.endpoint == 'conditions_page' %} active{% endif %}">Conditions</a>
-                <a href="{{ url_for('hospitals') }}" class="nav-link{% if request.endpoint == 'hospitals' %} active{% endif %}">Hospitals</a>
-                <a href="{{ url_for('about') }}" class="nav-link{% if request.endpoint == 'about' %} active{% endif %}">About Us</a>
-                <a href="{{ url_for('contact') }}" class="nav-link{% if request.endpoint == 'contact' %} active{% endif %}">Contact</a>
+                <div class="nav-menu-head">
+                    <span class="nav-menu-title">Menu</span>
+                    <button type="button" class="nav-menu-close" id="navMenuClose" aria-label="Close menu">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                    </button>
+                </div>
+                <a href="{{ url_for('doctors') }}" class="nav-link{% if request.endpoint == 'doctors' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Find Doctors</a>
+                <a href="{{ url_for('specialties_page') }}" class="nav-link{% if request.endpoint == 'specialties_page' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>Specialties</a>
+                <a href="{{ url_for('conditions_page') }}" class="nav-link{% if request.endpoint == 'conditions_page' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4.5 12 2.5-6H21"/></svg>Conditions</a>
+                <a href="{{ url_for('hospitals') }}" class="nav-link{% if request.endpoint == 'hospitals' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15"/><path d="M14 10h4a1 1 0 0 1 1 1v10"/><path d="M8 8.5v5M5.5 11h5"/><path d="M2.5 21h19"/></svg>Hospitals</a>
+                <a href="{{ url_for('about') }}" class="nav-link{% if request.endpoint == 'about' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg>About Us</a>
+                <a href="{{ url_for('contact') }}" class="nav-link{% if request.endpoint == 'contact' %} active{% endif %}"><svg class="nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>Contact</a>
                 <span class="nav-menu-slot">{{ account_entries() }}</span>
                 <span class="nav-admin-slot">{{ admin_entry() }}</span>
     </nav>
+    <div class="nav-scrim" id="navScrim"></div>
 
     {# Quick "Book" menu for the bottom-nav FAB: two bubbles that pop above the
        button so the visitor picks Clinic or Online before the modal opens. #}
@@ -99,7 +106,7 @@
             </div>
 
 
-            <button class="nav-toggle" id="navToggle" aria-label="Menu">
+            <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="mainNav">
                 <span></span><span></span><span></span>
             </button>
         </div>
