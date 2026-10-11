@@ -749,24 +749,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 const nm = document.createElement("strong");
                 nm.textContent = d.doctor_name;
                 left.appendChild(nm);
-                if (d.specialty_name) {
+                if (d.specialty_name || d.city_name) {
                     const spec = document.createElement("small");
                     spec.className = "bs-spec";
-                    spec.textContent = d.specialty_name;
+                    spec.textContent = [d.specialty_name, d.city_name].filter(Boolean).join(" \u00b7 ");
                     left.appendChild(spec);
                 }
-                const meta = document.createElement("div");
-                meta.className = "bs-meta";
-                if (d.city_name) {
-                    const city = document.createElement("span");
-                    city.className = "bs-city";
-                    city.textContent = d.city_name;
-                    meta.appendChild(city);
-                }
-                if (meta.childNodes.length) left.appendChild(meta);
 
                 const right = document.createElement("div");
                 right.className = "bs-right";
+                const feeEl = document.createElement("span");
+                feeEl.className = "bs-fee";
+                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
+                right.appendChild(feeEl);
                 right.insertAdjacentHTML(
                     "beforeend",
                     d.online
