@@ -2463,11 +2463,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-item-doctor {
     display: flex;
     align-items: flex-start;
-    gap: 11px;
-    padding: 10px 11px;
+    gap: 10px;
+    padding: 12px 11px;
+    background: #fff;
+    border: 1px solid #e2edf1;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15, 40, 60, .05);
+    transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.ac-item-doctor + .ac-item-doctor { margin-top: 9px; }
+.ac-item-doctor:hover {
+    background: #f7fcfc;
+    border-color: rgba(13, 148, 136, .38);
+    box-shadow: 0 8px 20px -10px rgba(13, 94, 102, .45);
 }
 .ac-doc-media {
-    width: 46px;
+    width: 52px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -2475,9 +2486,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     gap: 3px;
 }
 .ac-doc-img {
-    width: 46px;
-    height: 46px;
-    border-radius: 11px;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
     background: #eef4f5;
@@ -2486,7 +2497,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-doc-namerow {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
 }
 .ac-doc-namerow .ac-doc-name { flex: 1 1 auto; min-width: 0; }
 .ac-doc-fee {
@@ -2512,14 +2523,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-doc-rating {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    font-size: 11px;
+    gap: 2px;
+    font-size: 10.5px;
     font-weight: 700;
     color: #8a5a00;
     background: #fff4da;
     border: 1px solid #ffe1a8;
     border-radius: 7px;
-    padding: 2px 6px;
+    padding: 1px 4px;
     line-height: 1;
     flex-shrink: 0;
 }
@@ -2528,7 +2539,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-doc-name {
     color: #0c3444;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.25;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2585,12 +2596,15 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     flex-shrink: 0;
 }
 .ac-doc-timing {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 4px;
-    margin-top: 5px;
-    color: #0f766e;
+    margin-top: 9px;
+    padding: 3px 9px;
+    border-radius: 8px;
+    background: #f0f8f6;
+    border: 1px solid rgba(13, 148, 136, .14);
+    color: #0d7a6d;
     font-size: 11.5px;
     font-weight: 600;
     white-space: nowrap;

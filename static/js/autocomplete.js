@@ -21,26 +21,8 @@
 
         function closeBox() { box.style.display = "none"; box.innerHTML = ""; items = []; }
 
-        function hmToMin(t) {
-            // "7:00 AM" / "12:30 PM" -> minutes past midnight
-            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || ""));
-            if (!m) return null;
-            var h = parseInt(m[1], 10) % 12;
-            if (/PM/i.test(m[3])) h += 12;
-            return h * 60 + parseInt(m[2], 10);
-        }
-        function onlineNow(d) {
-            // Green "Online" only while the current clock time sits inside the
-            // doctor's own timing for today; outside it the label stays greyed.
-            if (!d.online || d.today_closed) return false;
-            var o = hmToMin(d.today_open), c = hmToMin(d.today_close);
-            var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
-            if (o === null) return false;
-            if (c === null) return now >= o;
-            return now >= o && now <= c;
-        }
         function timingText(d) {
-            if (!d.online) return "";
+            // Today's clinic hours, shown for every doctor.
             if (d.today_closed) return "Closed today";
             if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
             if (d.today_open) return d.today_open + " onwards";
@@ -148,10 +130,6 @@
                     city.textContent = it.city || "";
                     foot.appendChild(spec);
                     foot.appendChild(city);
-                    var badge = document.createElement("span");
-                    badge.className = "bs-badge " + (it.online ? "bs-online " + (onlineNow(it) ? "on" : "off") : "bs-offline");
-                    badge.textContent = it.online ? "Online" : "In person";
-                    foot.appendChild(badge);
                     body.appendChild(foot);
                     var timing = timingText(it);
                     if (timing) {
