@@ -103,28 +103,15 @@
                     dn.className = "ac-doc-name";
                     dn.textContent = it.name;
                     namerow.appendChild(dn);
-                    var rate = document.createElement("span");
-                    rate.className = "ac-doc-rating";
-                    rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
-                    rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
-                    namerow.appendChild(rate);
                     body.appendChild(namerow);
-                    var feeEl = document.createElement("span");
-                    feeEl.className = "ac-doc-fee";
-                    feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
                     if (it.urdu_name) {
-                        // Urdu name on the left, fee pushed to the right of it.
                         var urduRow = document.createElement("div");
                         urduRow.className = "ac-doc-urdurow";
                         var du = document.createElement("div");
                         du.className = "ac-doc-urdu";
                         du.textContent = it.urdu_name;
                         urduRow.appendChild(du);
-                        urduRow.appendChild(feeEl);
                         body.appendChild(urduRow);
-                    } else {
-                        feeEl.className += " ac-doc-fee-solo";
-                        body.appendChild(feeEl);
                     }
                     var actions = document.createElement("div");
                     actions.className = "ac-doc-actions";
@@ -161,14 +148,26 @@
                     foot.appendChild(spec);
                     foot.appendChild(city);
                     body.appendChild(foot);
+                    var meta = document.createElement("div");
+                    meta.className = "ac-doc-meta";
+                    var rate = document.createElement("span");
+                    rate.className = "ac-doc-rating";
+                    rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
+                    rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
+                    meta.appendChild(rate);
+                    var feeEl = document.createElement("span");
+                    feeEl.className = "ac-doc-fee";
+                    feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
+                    meta.appendChild(feeEl);
                     var timing = timingText(it);
                     if (timing) {
-                        var tm = document.createElement("div");
+                        var tm = document.createElement("span");
                         tm.className = "ac-doc-timing";
                         tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                         tm.querySelector("span").textContent = timing;
-                        body.appendChild(tm);
+                        meta.appendChild(tm);
                     }
+                    body.appendChild(meta);
                     el.appendChild(media);
                     el.appendChild(body);
                 } else {

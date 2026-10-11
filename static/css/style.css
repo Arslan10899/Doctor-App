@@ -2520,19 +2520,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
     flex-shrink: 0;
 }
-.ac-doc-fee-solo {
-    display: block;
-    text-align: right;
-    margin-top: 2px;
-}
 .ac-doc-urdurow {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
     margin-top: 1px;
 }
-.ac-doc-urdurow .ac-doc-urdu { flex: 1 1 auto; min-width: 0; margin-top: 0; }
-.ac-doc-urdurow .ac-doc-fee { margin-left: auto; }
 .ac-doc-rating {
     display: inline-flex;
     align-items: center;
@@ -2623,6 +2613,38 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .ac-doc-timing svg { flex-shrink: 0; }
+.ac-doc-meta {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 10px;
+    padding: 4px 9px;
+    background: #f2f9f7;
+    border: 1px solid #e3f0ec;
+    border-radius: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+}
+.ac-doc-meta .ac-doc-rating {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #8a5a00;
+}
+.ac-doc-meta .ac-doc-fee {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #0d9488;
+}
+.ac-doc-meta .ac-doc-timing {
+    margin-top: 0;
+    margin-left: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #3f7f88;
+}
 .ac-doc-spec {
     color: #0d5e66;
     font-weight: 600;
