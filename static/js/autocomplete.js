@@ -48,21 +48,32 @@
 
         function sizeBox(isMobile) {
             // On phones the tile needs to be wider than the search field so a
-            // full doctor name can sit on one line; anchor it to the viewport
-            // with a small margin instead of the input's own width.
+            // full doctor name can sit on one line. Because "Featured Doctors in
+            // your City" sits only ~150px below the search field, a tall floating
+            // dropdown would collide with it, so we turn the panel into a
+            // near-fullscreen overlay: from just under the input down to a small
+            // margin above the bottom edge, with the results scrolling inside.
             if (!isMobile) {
                 box.style.width = "";
                 box.style.left = "";
                 box.style.right = "";
+                box.style.top = "";
+                box.style.bottom = "";
+                box.style.position = "";
                 box.style.maxHeight = "";
+                box.style.borderRadius = "";
                 return;
             }
             var margin = 12;
             var r = wrap.getBoundingClientRect();
-            box.style.width = (window.innerWidth - margin * 2) + "px";
-            box.style.left = (margin - r.left) + "px";
-            box.style.right = "auto";
-            box.style.maxHeight = (window.innerHeight - r.bottom - 14) + "px";
+            box.style.position = "fixed";
+            box.style.top = (r.bottom + 6) + "px";
+            box.style.left = margin + "px";
+            box.style.right = margin + "px";
+            box.style.bottom = margin + "px";
+            box.style.maxHeight = "none";
+            box.style.width = "";
+            box.style.borderRadius = "18px";
         }
 
         function render() {
