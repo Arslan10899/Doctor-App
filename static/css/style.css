@@ -2531,6 +2531,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     color: #64748b;
     min-width: 0;
 }
+.ac-doc-foot .bs-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.ac-doc-timing {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 5px;
+    color: #0f766e;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.ac-doc-timing svg { flex-shrink: 0; }
 .ac-doc-spec {
     color: #0d5e66;
     font-weight: 600;

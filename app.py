@@ -1240,7 +1240,7 @@ def api_search():
         return jsonify({"results": []})
     like = f"%{q}%"
     doctors = query(
-        "SELECT d.id, d.name, d.urdu_name, d.image_url, d.fee, "
+        "SELECT d.id, d.name, d.urdu_name, d.image_url, d.fee, d.online, "
         "s.name AS specialty_name, c.name AS city_name "
         "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
         "WHERE d.name LIKE ? OR s.name LIKE ? OR c.name LIKE ? OR d.urdu_name LIKE ? "
@@ -1250,8 +1250,12 @@ def api_search():
     specialties = query("SELECT name FROM specialties WHERE name LIKE ? LIMIT 4", (like,))
     hospitals = query("SELECT name FROM hospitals WHERE name LIKE ? LIMIT 4", (like,))
     qs = re.sub(r"[^A-Za-z0-9]+", "+", q).strip("+")
+    timing_map = {}
+    for cr in query("SELECT doctor_id, timings FROM clinics WHERE timings IS NOT NULL AND timings != '' ORDER BY id"):
+        timing_map.setdefault(cr["doctor_id"], cr["timings"])
     results = []
     for d in doctors:
+        o, c, closed = _today_timing(timing_map.get(d["id"]))
         results.append({
             "type": "doctor",
             "id": d["id"],
@@ -1261,6 +1265,10 @@ def api_search():
             "city": d["city_name"],
             "fee": d["fee"] or 0,
             "image": d["image_url"] or "",
+            "online": bool(d["online"]),
+            "today_open": o,
+            "today_close": c,
+            "today_closed": closed,
             "sub": d["specialty_name"] + " \u00b7 " + d["city_name"],
             "url": "/doctor/%d" % d["id"],
         })

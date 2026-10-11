@@ -21,6 +21,32 @@
 
         function closeBox() { box.style.display = "none"; box.innerHTML = ""; items = []; }
 
+        function hmToMin(t) {
+            // "7:00 AM" / "12:30 PM" -> minutes past midnight
+            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || ""));
+            if (!m) return null;
+            var h = parseInt(m[1], 10) % 12;
+            if (/PM/i.test(m[3])) h += 12;
+            return h * 60 + parseInt(m[2], 10);
+        }
+        function onlineNow(d) {
+            // Green "Online" only while the current clock time sits inside the
+            // doctor's own timing for today; outside it the label stays greyed.
+            if (!d.online || d.today_closed) return false;
+            var o = hmToMin(d.today_open), c = hmToMin(d.today_close);
+            var n = new Date(), now = n.getHours() * 60 + n.getMinutes();
+            if (o === null) return false;
+            if (c === null) return now >= o;
+            return now >= o && now <= c;
+        }
+        function timingText(d) {
+            if (!d.online) return "";
+            if (d.today_closed) return "Closed today";
+            if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
+            if (d.today_open) return d.today_open + " onwards";
+            return "";
+        }
+
         function sizeBox(isMobile) {
             // On phones the tile needs to be wider than the search field so a
             // full doctor name can sit on one line; anchor it to the viewport
@@ -100,7 +126,19 @@
                     city.textContent = it.city || "";
                     foot.appendChild(spec);
                     foot.appendChild(city);
+                    var badge = document.createElement("span");
+                    badge.className = "bs-badge " + (it.online ? "bs-online " + (onlineNow(it) ? "on" : "off") : "bs-offline");
+                    badge.textContent = it.online ? "Online" : "In person";
+                    foot.appendChild(badge);
                     body.appendChild(foot);
+                    var timing = timingText(it);
+                    if (timing) {
+                        var tm = document.createElement("div");
+                        tm.className = "ac-doc-timing";
+                        tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                        tm.querySelector("span").textContent = timing;
+                        body.appendChild(tm);
+                    }
                     el.appendChild(img);
                     el.appendChild(body);
                 } else {
