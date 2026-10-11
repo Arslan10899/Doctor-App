@@ -806,6 +806,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // modal straight onto a doctor and visit type.
         window.openBooking = function (doctorId, visitType) {
             openModal();
+            // Phones: mirror the hero "Book an Appointment" buttons and open the
+            // slim popup (quick-contact + doctor search) instead of the full
+            // form, with the tapped doctor already selected.
+            if (MOBILE_MQ.matches) bookingModal.classList.add("book-compact");
             if (visitType) selectVisitType(visitType);
             if (!doctorId) return;
             var pick = function () {
