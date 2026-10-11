@@ -38,11 +38,20 @@
             if (s) s.style.display = "none";
         }
 
+        function shortTime(t) {
+            // "7:00 AM" -> "7 AM", "12:00 PM" -> "12 PM"; keep minutes when non-zero.
+            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || "").trim());
+            if (!m) return String(t || "").trim();
+            var h = parseInt(m[1], 10);
+            var min = parseInt(m[2], 10);
+            var hh = (min === 0) ? String(h) : (String(h) + ":" + (min < 10 ? "0" + min : String(min)));
+            return hh + " " + m[3].toUpperCase();
+        }
         function timingText(d) {
             // Today's clinic hours, shown for every doctor.
             if (d.today_closed) return "Closed today";
-            if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
-            if (d.today_open) return d.today_open + " onwards";
+            if (d.today_open && d.today_close) return shortTime(d.today_open) + " \u2013 " + shortTime(d.today_close);
+            if (d.today_open) return shortTime(d.today_open) + " onwards";
             return "";
         }
 
