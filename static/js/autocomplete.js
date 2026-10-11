@@ -166,9 +166,12 @@
                         tm.querySelector("span").textContent = timing;
                         foot.appendChild(tm);
                     }
-                    body.appendChild(foot);
-                    el.appendChild(media);
-                    el.appendChild(body);
+                    var top = document.createElement("div");
+                    top.className = "ac-doc-top";
+                    top.appendChild(media);
+                    top.appendChild(body);
+                    el.appendChild(top);
+                    el.appendChild(foot);
                 } else {
                     var tag = document.createElement("span");
                     tag.className = "ac-type ac-type-" + it.type;
