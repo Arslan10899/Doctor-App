@@ -614,11 +614,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(function (r) { return r.json(); })
                     .then(function (data) {
                         doctorCache = data;
-                        // the field may already be focused while the list was
-                        // loading; fill the panel now that it is here
-                        if (document.activeElement === doctorInput && !doctorInput.value.trim()) {
-                            renderSuggestions(doctorPool());
-                        }
                     })
                     .catch(function () {});
             }
@@ -690,8 +685,8 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorIdInput.value = "";
             if (q.length < 1) {
                 suggestBox.classList.remove("open");
+                suggestBox.innerHTML = "";
                 doctorIdInput.value = "";
-                renderSuggestions(doctorPool());
                 return;
             }
             debounceTimer = setTimeout(function () {
@@ -817,8 +812,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 100);
         };
         doctorInput.addEventListener("focus", function () {
-            if (doctorCache.length && !doctorInput.value.trim()) {
-                renderSuggestions(doctorPool());
+            // Nothing shows until the user actually types, so the full doctor
+            // list never pops up on its own.
+            if (!doctorInput.value.trim()) {
+                suggestBox.classList.remove("open");
+                suggestBox.innerHTML = "";
             }
         });
         doctorInput.addEventListener("blur", function () {
