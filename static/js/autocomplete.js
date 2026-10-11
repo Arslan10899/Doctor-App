@@ -43,7 +43,10 @@
             // quick-contact popup over it (Doctor search + Call / WhatsApp /
             // All Doctor). The flag is read once the profile page loads.
             if (it && it.type === "doctor" && window.matchMedia("(max-width: 768px)").matches) {
-                try { sessionStorage.setItem("bookPopupOnLoad", "1"); } catch (e) {}
+                try {
+                    sessionStorage.setItem("bookPopupOnLoad", "1");
+                    sessionStorage.setItem("bookPopupDoctorId", String(it.id));
+                } catch (e) {}
             }
             window.location.href = it.url;
         }

@@ -857,12 +857,15 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         // A doctor-card tap on the home search navigated here with a flag; raise
         // the slim quick-contact popup (Doctor search + Call / WhatsApp / All
-        // Doctor) over the profile. Tapping the blurred backdrop closes it and
-        // the profile is revealed.
+        // Doctor) over the profile, with the tapped doctor already filled in.
+        // Deferred a tick so it runs after the rest of this init settles.
+        // Tapping the blurred backdrop closes it and the profile is revealed.
         try {
             if (MOBILE_MQ.matches && sessionStorage.getItem("bookPopupOnLoad") === "1") {
+                var preId = sessionStorage.getItem("bookPopupDoctorId");
                 sessionStorage.removeItem("bookPopupOnLoad");
-                window.openBooking(null, "Clinic Visit");
+                sessionStorage.removeItem("bookPopupDoctorId");
+                setTimeout(function () { window.openBooking(preId || null, "Clinic Visit"); }, 0);
             }
         } catch (e) {}
         doctorInput.addEventListener("focus", function () {
