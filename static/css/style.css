@@ -2431,7 +2431,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     padding: 6px;
     max-height: 320px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     text-align: left;
+}
+.ac-box::-webkit-scrollbar { width: 6px; }
+.ac-box::-webkit-scrollbar-track { background: transparent; }
+.ac-box::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, .28); border-radius: 3px; }
+.ac-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 190;
+    background: rgba(12, 52, 68, .42);
+    display: none;
+    -webkit-tap-highlight-color: transparent;
 }
 .ac-item {
     display: block;

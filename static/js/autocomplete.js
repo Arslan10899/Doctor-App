@@ -19,7 +19,24 @@
         var timer = null;
         var items = [];
 
-        function closeBox() { box.style.display = "none"; box.innerHTML = ""; items = []; }
+        function getScrim() {
+            var s = document.querySelector("body > .ac-scrim");
+            if (!s) {
+                s = document.createElement("div");
+                s.className = "ac-scrim";
+                s.addEventListener("click", closeBox);
+                document.body.appendChild(s);
+            }
+            return s;
+        }
+
+        function closeBox() {
+            box.style.display = "none";
+            box.innerHTML = "";
+            items = [];
+            var s = document.querySelector("body > .ac-scrim");
+            if (s) s.style.display = "none";
+        }
 
         function timingText(d) {
             // Today's clinic hours, shown for every doctor.
@@ -37,6 +54,7 @@
                 box.style.width = "";
                 box.style.left = "";
                 box.style.right = "";
+                box.style.maxHeight = "";
                 return;
             }
             var margin = 12;
@@ -44,6 +62,7 @@
             box.style.width = (window.innerWidth - margin * 2) + "px";
             box.style.left = (margin - r.left) + "px";
             box.style.right = "auto";
+            box.style.maxHeight = (window.innerHeight - r.bottom - 14) + "px";
         }
 
         function render() {
@@ -161,6 +180,7 @@
                 box.appendChild(el);
             });
             box.style.display = "block";
+            if (isMobile) getScrim().style.display = "block";
         }
 
         function fetchSuggestions() {
@@ -189,6 +209,7 @@
         });
         input.addEventListener("keydown", function (e) {
             var el = box.querySelector("[data-i='0']");
+            if (e.key === "Escape") { closeBox(); input.blur(); return; }
             if (e.key === "ArrowDown" && el) { e.preventDefault(); el.scrollIntoView({ block: "nearest" }); }
             if (e.key === "Enter") {
                 if (box.style.display !== "none" && items.length === 1) {
