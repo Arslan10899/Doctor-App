@@ -3544,6 +3544,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     background: #fff;
     transition: border-color .2s, box-shadow .2s;
 }
+/* The doctor suggestion panel anchors to the field (it sits just outside the
+   input box) so it can become an in-flow panel on phones. */
+.book-field-doctor { position: relative; }
 .book-input-wrap:focus-within {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(42, 127, 142, .15);
@@ -3599,8 +3602,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
-    padding: 9px 13px;
+    gap: 5px;
+    padding: 11px 13px;
     cursor: pointer;
     font-size: 13.5px;
     color: var(--text);
@@ -3610,7 +3613,22 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .bs-main {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 11px;
+}
+.bs-avatar {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: .02em;
+    background: linear-gradient(135deg, #2a7f8e, #0f766e);
+    box-shadow: 0 6px 14px -6px rgba(15, 118, 110, .55);
 }
 .bs-left { min-width: 0; flex: 1; }
 .bs-left strong {
@@ -3624,10 +3642,42 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .bs-left small { display: block; color: var(--text-light); margin-top: 1px; font-size: 11.5px; }
+.bs-left small.bs-spec {
+    color: #0f766e;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bs-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px 7px;
+    margin-top: 4px;
+}
+.bs-meta > span {
+    font-size: 11px;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+.bs-meta .bs-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #fff4da;
+    color: #8a5a00;
+    font-weight: 700;
+    font-size: 10.5px;
+}
+.bs-meta .bs-rating svg { color: #f5a623; }
 .bs-right {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
     flex-shrink: 0;
 }
 .bs-fee {

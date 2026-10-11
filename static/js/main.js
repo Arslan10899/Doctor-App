@@ -729,6 +729,27 @@ document.addEventListener("DOMContentLoaded", function () {
             return now >= o && now <= c;
         }
 
+        const AVATAR_BGS = [
+            "linear-gradient(135deg,#2a7f8e,#0f766e)",
+            "linear-gradient(135deg,#2b6fd4,#1e4fa3)",
+            "linear-gradient(135deg,#e07b39,#c96a1f)",
+            "linear-gradient(135deg,#7c4dff,#5a2fd1)",
+            "linear-gradient(135deg,#0f8a8a,#0b6b6b)"
+        ];
+        function avatarBg(name) {
+            var h = 0, s = String(name || "");
+            for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return AVATAR_BGS[h % AVATAR_BGS.length];
+        }
+        function doctorInitials(name) {
+            var n = String(name || "").replace(/^dr\.?\s*/i, "").trim();
+            var parts = n.split(/\s+/).filter(Boolean);
+            if (!parts.length) return "DR";
+            var a = parts[0].charAt(0);
+            var b = parts.length > 1 ? parts[1].charAt(0) : "";
+            return (a + b).toUpperCase();
+        }
+
         function renderSuggestions(matches) {
             suggestBox.innerHTML = "";
             if (matches.length === 0) {
@@ -744,25 +765,61 @@ document.addEventListener("DOMContentLoaded", function () {
                 item.className = "book-suggest-item";
                 const main = document.createElement("div");
                 main.className = "bs-main";
-                const fee = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
-                const online = d.online
-                    ? '<span class="bs-badge bs-online ' + (doctorOnlineNow(d) ? "on" : "off") + '">Online</span>'
-                    : '<span class="bs-badge bs-offline">In person</span>';
+
+                // Round initials badge, tinted per doctor, stands in for a photo.
+                const av = document.createElement("span");
+                av.className = "bs-avatar";
+                av.textContent = doctorInitials(d.doctor_name);
+                av.style.background = avatarBg(d.doctor_name);
+
                 const left = document.createElement("div");
                 left.className = "bs-left";
                 const nm = document.createElement("strong");
                 nm.textContent = d.doctor_name;
-                const meta = document.createElement("small");
-                meta.textContent = d.specialty_name + " \u00b7 " + d.city_name;
                 left.appendChild(nm);
-                left.appendChild(meta);
+                if (d.specialty_name) {
+                    const spec = document.createElement("small");
+                    spec.className = "bs-spec";
+                    spec.textContent = d.specialty_name;
+                    left.appendChild(spec);
+                }
+                const meta = document.createElement("div");
+                meta.className = "bs-meta";
+                if (d.city_name) {
+                    const city = document.createElement("span");
+                    city.className = "bs-city";
+                    city.textContent = d.city_name;
+                    meta.appendChild(city);
+                }
+                if (d.experience && d.experience > 0) {
+                    const exp = document.createElement("span");
+                    exp.className = "bs-exp";
+                    exp.textContent = d.experience + (d.experience === 1 ? " yr exp" : " yrs exp");
+                    meta.appendChild(exp);
+                }
+                if (d.rating && d.rating > 0) {
+                    const rt = document.createElement("span");
+                    rt.className = "bs-rating";
+                    rt.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.8 5.9 20.4 7.2 13.7l-5-4.7 6.8-.8z"/></svg><span></span>';
+                    rt.querySelector("span").textContent = Number(d.rating).toFixed(1);
+                    meta.appendChild(rt);
+                }
+                if (meta.childNodes.length) left.appendChild(meta);
+
                 const right = document.createElement("div");
                 right.className = "bs-right";
                 const feeEl = document.createElement("span");
                 feeEl.className = "bs-fee";
-                feeEl.textContent = fee;
+                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
                 right.appendChild(feeEl);
-                right.insertAdjacentHTML("beforeend", online);
+                right.insertAdjacentHTML(
+                    "beforeend",
+                    d.online
+                        ? '<span class="bs-badge bs-online ' + (doctorOnlineNow(d) ? "on" : "off") + '">Online</span>'
+                        : '<span class="bs-badge bs-offline">In person</span>'
+                );
+
+                main.appendChild(av);
                 main.appendChild(left);
                 main.appendChild(right);
                 item.appendChild(main);
@@ -774,11 +831,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     tm.querySelector("span").textContent = timing;
                     item.appendChild(tm);
                 }
-                item.addEventListener("mousedown", function (e) {
-                    e.preventDefault();
-                    selectDoctor(d);
-                });
-                suggestBox.appendChild(item);
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
                     selectDoctor(d);
