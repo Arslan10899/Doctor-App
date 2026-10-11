@@ -3378,7 +3378,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .promo-vid-stage {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 9; /* replaced by JS once the clip reports its own ratio */
     max-height: 92vh;
     background: #000;
     border-radius: 20px;

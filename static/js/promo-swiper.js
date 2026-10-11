@@ -154,11 +154,18 @@
         void ov.offsetHeight; // restart the fade/scale transition
         ov.classList.add("open");
     }
+    function fitStage(ov, w, h) {
+        if (!ov) return;
+        var stage = ov.querySelector(".promo-vid-stage");
+        if (w > 0 && h > 0 && stage) stage.style.aspectRatio = (w / h).toFixed(4);
+    }
     function openLocalOverlay(card, v) {
         var ov = ensureOverlay();
         // A fresh <video> in the stage (never move the card's own element: on
         // mobile browsers re-parenting the playing/muted node can black it
-        // out). Same source, ready for controls + sound.
+        // out). Same source, ready for controls + sound. The frame then
+        // adjusts to the clip's own shape (TV-like wide or phone-like tall) so
+        // it always fills at a nice big size.
         var stage = ov.querySelector(".promo-vid-stage");
         stage.innerHTML = "";
         var src = v.currentSrc || v.getAttribute("src") || "";
@@ -169,6 +176,9 @@
         nv.setAttribute("playsinline", "");
         nv.preload = "auto";
         if (src) nv.src = src;
+        nv.addEventListener("loadedmetadata", function () {
+            fitStage(ov, nv.videoWidth, nv.videoHeight);
+        });
         stage.appendChild(nv);
         ov._ownerCard = card;
         showOverlay();
