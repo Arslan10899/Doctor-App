@@ -3342,6 +3342,94 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .promo-swiper .swiper-slide-shadow-left { background-image: linear-gradient(to left, rgba(15, 23, 42, .32), transparent 70%); }
 .promo-swiper .swiper-slide-shadow-right { background-image: linear-gradient(to right, rgba(15, 23, 42, .32), transparent 70%); }
 
+/* -------------------- Promo video lightbox (mobile) -------------------- */
+/* Tapping a promo card's play button lifts the clip out of the small card and
+   plays it big over a dark blurred backdrop; closing returns the card exactly
+   to the state it had before. */
+.promo-vid {
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.promo-vid[hidden] { display: none; }
+.promo-vid-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 20, 26, .82);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    animation: promoVidFade .25s ease;
+}
+.promo-vid-panel {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+}
+.promo-vid-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 78vh;
+    background: #000;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px -14px rgba(0, 0, 0, .72);
+    animation: promoVidIn .3s cubic-bezier(.2, .85, .3, 1.04) both;
+}
+.promo-vid-stage .mcard-video,
+.promo-vid-stage .mcard-frame,
+.promo-vid-stage video,
+.promo-vid-stage iframe {
+    position: static !important;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: 0;
+    border-radius: 0;
+    display: block;
+    margin: 0;
+    background: #000;
+}
+.promo-vid-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 6;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    cursor: pointer;
+    background: rgba(255, 255, 255, .16);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .25);
+    transition: background .18s, transform .18s, color .18s;
+    animation: promoVidFade .25s ease;
+}
+.promo-vid-close:hover { background: #fff; color: #0f172a; transform: scale(1.06); }
+.promo-vid-close:active { transform: scale(.92); }
+@keyframes promoVidIn {
+    from { opacity: 0; transform: translateY(16px) scale(.92); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes promoVidFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+body.promo-vid-lock { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+    .promo-vid-stage, .promo-vid-backdrop, .promo-vid-close { animation: none; }
+}
+
 /* -------------------- Booking modal -------------------- */
 .book-modal {
     position: fixed;
