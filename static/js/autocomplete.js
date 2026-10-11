@@ -95,6 +95,15 @@
                     img.src = it.image || "/static/img/no-image.jpeg";
                     img.addEventListener("error", function () { this.src = "/static/img/no-image.jpeg"; });
                     media.appendChild(img);
+                    var rate = document.createElement("span");
+                    rate.className = "ac-doc-rating";
+                    rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
+                    rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
+                    media.appendChild(rate);
+                    var feeEl = document.createElement("span");
+                    feeEl.className = "ac-doc-fee";
+                    feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
+                    media.appendChild(feeEl);
                     var body = document.createElement("div");
                     body.className = "ac-doc-body";
                     var namerow = document.createElement("div");
@@ -148,26 +157,14 @@
                     foot.appendChild(spec);
                     foot.appendChild(city);
                     body.appendChild(foot);
-                    var meta = document.createElement("div");
-                    meta.className = "ac-doc-meta";
-                    var rate = document.createElement("span");
-                    rate.className = "ac-doc-rating";
-                    rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
-                    rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
-                    meta.appendChild(rate);
-                    var feeEl = document.createElement("span");
-                    feeEl.className = "ac-doc-fee";
-                    feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
-                    meta.appendChild(feeEl);
                     var timing = timingText(it);
                     if (timing) {
                         var tm = document.createElement("span");
                         tm.className = "ac-doc-timing";
                         tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                         tm.querySelector("span").textContent = timing;
-                        meta.appendChild(tm);
+                        body.appendChild(tm);
                     }
-                    body.appendChild(meta);
                     el.appendChild(media);
                     el.appendChild(body);
                 } else {
