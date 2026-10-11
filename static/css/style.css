@@ -2467,7 +2467,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     padding: 10px 11px;
 }
 .ac-doc-media {
-    width: 54px;
+    width: 46px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -2483,6 +2483,12 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     background: #eef4f5;
     border: 1px solid rgba(12, 52, 68, .08);
 }
+.ac-doc-namerow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ac-doc-namerow .ac-doc-name { flex: 1 1 auto; min-width: 0; }
 .ac-doc-fee {
     font-size: 11.5px;
     font-weight: 700;
@@ -2506,11 +2512,16 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-doc-rating {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    font-size: 10.5px;
+    gap: 3px;
+    font-size: 11px;
     font-weight: 700;
-    color: #0c3444;
-    line-height: 1.1;
+    color: #8a5a00;
+    background: #fff4da;
+    border: 1px solid #ffe1a8;
+    border-radius: 7px;
+    padding: 2px 6px;
+    line-height: 1;
+    flex-shrink: 0;
 }
 .ac-doc-rating svg { color: #f5a623; flex-shrink: 0; }
 .ac-doc-body { min-width: 0; flex: 1; }
