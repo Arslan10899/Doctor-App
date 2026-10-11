@@ -77,7 +77,21 @@
                 <a href="{{ url_for('contact') }}" class="nav-link{% if request.endpoint == 'contact' %} active{% endif %}">Contact</a>
                 <span class="nav-menu-slot">{{ account_entries() }}</span>
                 <span class="nav-admin-slot">{{ admin_entry() }}</span>
-            </nav>
+    </nav>
+
+    {# Quick "Book" menu for the bottom-nav FAB: two bubbles that pop above the
+       button so the visitor picks Clinic or Online before the modal opens. #}
+    <div class="nav-book-scrim" id="navBookScrim" hidden></div>
+    <div class="nav-book-bubbles" id="navBookBubbles" hidden>
+        <button type="button" class="nav-book-bubble nb-clinic" data-visit="Clinic Visit">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 8h-2V5a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3H5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zm-8-3h2v3h-2V5zm6 14H7v-3h4v1h2v-1h4v3zm-4-5H7v-2h2v-2h2v2h2v2h-2z"/></svg>
+            <span>Clinic Visit</span>
+        </button>
+        <button type="button" class="nav-book-bubble nb-online" data-visit="Online Check-up">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17 1H7a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm-5 20a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4zm5-4H7V4h10v13z"/></svg>
+            <span>Online Checkup</span>
+        </button>
+    </div>
 
             <div class="header-actions">
                 <span class="hdr-acct-slot">{{ account_entries() }}</span>
@@ -221,7 +235,7 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 3.3A1 1 0 0 1 6 2h12a1 1 0 0 1 1 1v5a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6V3.3z"/><path d="M4 9H2v2a4 4 0 0 0 4 4V9zM20 9h2v2a4 4 0 0 1-4 4V9z"/><path d="M12 14v7"/></svg>
             <span>Doctors</span>
         </a>
-        <button type="button" class="bottom-nav-fab js-book-now" aria-label="Book an appointment">
+        <button type="button" class="bottom-nav-fab" id="navBookBtn" aria-label="Book an appointment" aria-haspopup="true" aria-expanded="false">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
             <span>Book</span>
         </button>

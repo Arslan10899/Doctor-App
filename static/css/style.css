@@ -4249,6 +4249,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    renders it; on phones the body gets matching bottom padding (plus the
    iPhone home-indicator safe area) so the footer is never covered. */
 .bottom-nav { display: none; }
+/* The FAB's quick "Book" bubbles are mobile-only too. */
+.nav-book-scrim, .nav-book-bubbles { display: none; }
 @media (max-width: 768px) {
     body { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
     .bottom-nav {
@@ -4328,6 +4330,69 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     @media (prefers-reduced-motion: reduce) {
         .bottom-nav-fab svg { animation: none; }
+    }
+
+    /* Quick "Book" menu: the centre FAB pops two bubbles above itself. */
+    .nav-book-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 160;
+        background: rgba(9, 30, 40, .32);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+    }
+    .nav-book-bubbles {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        position: fixed;
+        left: 50%;
+        bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+        transform: translateX(-50%);
+        z-index: 170;
+    }
+    .nav-book-bubbles::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-top: 9px solid rgba(13, 34, 40, .98);
+    }
+    .nav-book-scrim[hidden],
+    .nav-book-bubbles[hidden] { display: none; }
+    .nav-book-bubble {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 20px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        color: #fff;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+        box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .55);
+        animation: navBubbleIn .24s cubic-bezier(.2, .9, .3, 1.25) both;
+    }
+    .nav-book-bubble svg { flex-shrink: 0; }
+    .nav-book-bubble.nb-clinic { background: linear-gradient(145deg, #fb923c, #ea580c); }
+    .nav-book-bubble.nb-online { background: linear-gradient(145deg, #38bdf8, #2563eb); }
+    .nav-book-bubble:active { transform: scale(.96); }
+    @keyframes navBubbleIn {
+        from { opacity: 0; transform: translateY(10px) scale(.9); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .nav-book-bubble { animation: none; }
     }
 }
 

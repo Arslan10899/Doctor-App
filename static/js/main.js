@@ -641,6 +641,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
+        // Bottom-nav "Book" FAB: pops two bubbles (Clinic Visit / Online
+        // Check-up) above the button instead of jumping into the modal. Picking
+        // one opens the booking for that visit type.
+        var navBookBtn = document.getElementById("navBookBtn");
+        var navBookBubbles = document.getElementById("navBookBubbles");
+        var navBookScrim = document.getElementById("navBookScrim");
+        function closeNavBook() {
+            if (navBookBubbles) navBookBubbles.hidden = true;
+            if (navBookScrim) navBookScrim.hidden = true;
+            if (navBookBtn) navBookBtn.setAttribute("aria-expanded", "false");
+        }
+        if (navBookBtn && navBookBubbles) {
+            navBookBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var opening = navBookBubbles.hidden;
+                navBookBubbles.hidden = !opening;
+                if (navBookScrim) navBookScrim.hidden = !opening;
+                navBookBtn.setAttribute("aria-expanded", opening ? "true" : "false");
+            });
+            navBookBubbles.querySelectorAll(".nav-book-bubble").forEach(function (b) {
+                b.addEventListener("click", function () {
+                    var visit = b.getAttribute("data-visit");
+                    closeNavBook();
+                    if (window.openBooking) window.openBooking(null, visit);
+                });
+            });
+        }
+        if (navBookScrim) navBookScrim.addEventListener("click", closeNavBook);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeNavBook();
+        });
         bookingModal.querySelectorAll("[data-book-close]").forEach(function (el) {
             el.addEventListener("click", closeModal);
         });
