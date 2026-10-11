@@ -2199,6 +2199,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .book-modal.book-compact .book-modal-back { display: none; }
     .book-modal.book-compact .book-field-doctor { order: -1; }
+    /* The popup card scrolls, so an absolutely-positioned dropdown used to get
+       clipped as soon as a search returned many doctors. Make the list an
+       in-flow panel: it grows the popup and scrolls inside itself instead. */
+    .book-modal.book-compact .book-suggest {
+        position: static;
+        margin-top: 8px;
+        max-height: min(48vh, 340px);
+        border-radius: 14px;
+        box-shadow: 0 10px 26px rgba(15, 40, 60, .12);
+    }
+    .book-modal.book-compact .book-suggest::-webkit-scrollbar { width: 6px; }
+    .book-modal.book-compact .book-suggest::-webkit-scrollbar-track { background: transparent; }
+    .book-modal.book-compact .book-suggest::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, .28); border-radius: 3px; }
 
     /* ---- Mobile search bar + city pill ----
        Cramming the field, the city dropdown and the search button into one bar
