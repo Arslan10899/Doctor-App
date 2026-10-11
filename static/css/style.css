@@ -2187,7 +2187,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
     /* Compact booking popup (hero Clinic/Online buttons on phones): only the
        quick-contact buttons and the optional doctor search are shown, so the
-       user can call, WhatsApp, browse all doctors, or pick one -- nothing else. */
+       user can call, WhatsApp, browse all doctors, or pick one -- nothing else.
+       The doctor search sits on top and the contact buttons below. */
     .book-modal.book-compact .book-step-dots,
     .book-modal.book-compact .book-visitsummary,
     .book-modal.book-compact .book-or,
@@ -2196,6 +2197,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .book-modal.book-compact .book-error {
         display: none;
     }
+    .book-modal.book-compact .book-modal-back { display: none; }
+    .book-modal.book-compact .book-field-doctor { order: -1; }
 
     /* ---- Mobile search bar + city pill ----
        Cramming the field, the city dropdown and the search button into one bar
