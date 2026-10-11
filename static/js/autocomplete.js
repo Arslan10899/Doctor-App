@@ -24,22 +24,58 @@
         function render() {
             box.innerHTML = "";
             if (!items.length) { closeBox(); return; }
+            var isMobile = window.matchMedia("(max-width: 768px)").matches;
             items.forEach(function (it, i) {
                 var el = document.createElement("div");
                 el.className = "ac-item";
-                var tag = document.createElement("span");
-                tag.className = "ac-type ac-type-" + it.type;
-                tag.textContent = it.type[0].toUpperCase() + it.type.slice(1);
-                var name = document.createElement("span");
-                name.className = "ac-name";
-                name.textContent = it.name;
-                var sub = document.createElement("span");
-                sub.className = "ac-sub";
-                sub.textContent = it.sub || "";
-                el.appendChild(tag);
-                el.appendChild(name);
-                if (it.sub) el.appendChild(document.createElement("br"));
-                if (it.sub) el.appendChild(sub);
+                if (isMobile && it.type === "doctor") {
+                    el.className = "ac-item ac-item-doctor";
+                    var img = document.createElement("img");
+                    img.className = "ac-doc-img";
+                    img.alt = it.name;
+                    img.loading = "lazy";
+                    img.src = it.image || "/static/img/no-image.jpeg";
+                    img.addEventListener("error", function () { this.src = "/static/img/no-image.jpeg"; });
+                    var body = document.createElement("div");
+                    body.className = "ac-doc-body";
+                    var dn = document.createElement("div");
+                    dn.className = "ac-doc-name";
+                    dn.textContent = it.name;
+                    body.appendChild(dn);
+                    if (it.urdu_name) {
+                        var du = document.createElement("div");
+                        du.className = "ac-doc-urdu";
+                        du.textContent = it.urdu_name;
+                        body.appendChild(du);
+                    }
+                    var foot = document.createElement("div");
+                    foot.className = "ac-doc-foot";
+                    var city = document.createElement("span");
+                    city.className = "ac-doc-city";
+                    city.textContent = it.city || "";
+                    var fee = document.createElement("span");
+                    fee.className = "ac-doc-fee";
+                    fee.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "Fee on request";
+                    foot.appendChild(city);
+                    foot.appendChild(fee);
+                    body.appendChild(foot);
+                    el.appendChild(img);
+                    el.appendChild(body);
+                } else {
+                    var tag = document.createElement("span");
+                    tag.className = "ac-type ac-type-" + it.type;
+                    tag.textContent = it.type[0].toUpperCase() + it.type.slice(1);
+                    var name = document.createElement("span");
+                    name.className = "ac-name";
+                    name.textContent = it.name;
+                    var sub = document.createElement("span");
+                    sub.className = "ac-sub";
+                    sub.textContent = it.sub || "";
+                    el.appendChild(tag);
+                    el.appendChild(name);
+                    if (it.sub) el.appendChild(document.createElement("br"));
+                    if (it.sub) el.appendChild(sub);
+                }
                 el.dataset.i = i;
                 el.addEventListener("click", function () { window.location.href = items[this.dataset.i].url; });
                 box.appendChild(el);
