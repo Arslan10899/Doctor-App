@@ -2612,7 +2612,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .ac-doc-foot .ac-doc-timing {
     margin-top: 0;
-    margin-left: auto;
     flex-shrink: 0;
     padding: 2px 7px;
     font-size: 10.5px;
@@ -2633,7 +2632,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .ac-doc-timing svg { flex-shrink: 0; }
 .ac-doc-spec {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
     color: #0d5e66;
     font-weight: 600;
