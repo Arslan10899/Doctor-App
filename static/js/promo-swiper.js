@@ -147,6 +147,13 @@
         document.body.appendChild(promoOverlay);
         return promoOverlay;
     }
+    function showOverlay() {
+        var ov = ensureOverlay();
+        ov.classList.remove("closing");
+        ov.hidden = false;
+        void ov.offsetHeight; // restart the fade/scale transition
+        ov.classList.add("open");
+    }
     function openLocalOverlay(card, v) {
         var ov = ensureOverlay();
         if (ov.contains(v)) return;
@@ -154,7 +161,7 @@
         ov.querySelector(".promo-vid-stage").appendChild(v);
         v.muted = false;
         v.controls = true;
-        ov.hidden = false;
+        showOverlay();
         document.body.classList.add("promo-vid-lock");
         if (swiper && swiper.autoplay) swiper.autoplay.stop();
         var p = v.play();
@@ -177,30 +184,37 @@
         card._manual = true;
         card._ytSound = true;
         ov._ownerCard = card;
-        ov.hidden = false;
+        showOverlay();
         document.body.classList.add("promo-vid-lock");
         if (swiper && swiper.autoplay) swiper.autoplay.stop();
     }
     function closePromoOverlay() {
-        if (!promoOverlay) return;
-        promoOverlay.hidden = true;
-        document.body.classList.remove("promo-vid-lock");
-        var stage = promoOverlay.querySelector(".promo-vid-stage");
-        var v = stage.querySelector("video");
-        if (v) {
-            try { v.pause(); } catch (e) { /* nothing playing */ }
-            v.muted = true;
-            v.controls = false;
-            var card = promoOverlay._ownerCard;
-            if (card && card.contains) { card.insertBefore(v, card.firstChild); }
-            if (card) card.classList.remove("is-playing");
-        }
-        var ifr = stage.querySelector("iframe.mcard-frame");
-        if (ifr) stage.removeChild(ifr);
-        var oc = promoOverlay._ownerCard;
-        if (oc && oc.classList.contains("mcard--yt") && oc._ytSound) { oc._ytSound = false; oc.classList.remove("is-playing"); }
-        promoOverlay._ownerCard = null;
-        soundCheck();
+        if (!promoOverlay || promoOverlay.hidden || promoOverlay._closing) return;
+        var ov = promoOverlay;
+        ov._closing = true;
+        ov.classList.remove("open");
+        // Let the fade/scale-out play, then hide and put the media back exactly
+        // where it came from.
+        setTimeout(function () {
+            ov.hidden = true;
+            ov._closing = false;
+            document.body.classList.remove("promo-vid-lock");
+            var stage = ov.querySelector(".promo-vid-stage");
+            var v = stage.querySelector("video");
+            if (v) {
+                try { v.pause(); } catch (e) { /* nothing playing */ }
+                v.muted = true;
+                v.controls = false;
+                var card = ov._ownerCard;
+                if (card) { card.insertBefore(v, card.firstChild); card.classList.remove("is-playing"); }
+            }
+            var ifr = stage.querySelector("iframe.mcard-frame");
+            if (ifr) stage.removeChild(ifr);
+            var oc = ov._ownerCard;
+            if (oc && oc.classList.contains("mcard--yt") && oc._ytSound) { oc._ytSound = false; oc.classList.remove("is-playing"); }
+            ov._ownerCard = null;
+            soundCheck();
+        }, 280);
     }
 
     // Tap a video card (or its glass play button): inline playback with sound.
