@@ -156,22 +156,33 @@
     }
     function openLocalOverlay(card, v) {
         var ov = ensureOverlay();
-        if (ov.contains(v)) return;
+        // A fresh <video> in the stage (never move the card's own element: on
+        // mobile browsers re-parenting the playing/muted node can black it
+        // out). Same source, ready for controls + sound.
+        var stage = ov.querySelector(".promo-vid-stage");
+        stage.innerHTML = "";
+        var src = v.currentSrc || v.getAttribute("src") || "";
+        var nv = document.createElement("video");
+        nv.className = "mcard-video";
+        nv.controls = true;
+        nv.playsInline = true;
+        nv.setAttribute("playsinline", "");
+        nv.preload = "auto";
+        if (src) nv.src = src;
+        stage.appendChild(nv);
         ov._ownerCard = card;
-        ov.querySelector(".promo-vid-stage").appendChild(v);
-        v.muted = false;
-        v.controls = true;
         showOverlay();
         document.body.classList.add("promo-vid-lock");
         if (swiper && swiper.autoplay) swiper.autoplay.stop();
-        var p = v.play();
-        if (p && p.catch) p.catch(function () { v.muted = true; v.play().catch(function () {}); });
+        var p = nv.play();
+        if (p && p.catch) p.catch(function () { /* sound autoplay blocked; the controls let the user start it */ });
     }
     function openYtOverlay(card) {
         var ov = ensureOverlay();
         ytStop(card); // drop any muted autoplay frame in the card first
         pauseAll(null);
         var stage = ov.querySelector(".promo-vid-stage");
+        stage.innerHTML = "";
         var id = card.getAttribute("data-yt");
         var f = document.createElement("iframe");
         f.className = "mcard-frame";
@@ -193,20 +204,16 @@
         var ov = promoOverlay;
         ov._closing = true;
         ov.classList.remove("open");
-        // Let the fade/scale-out play, then hide and put the media back exactly
-        // where it came from.
+        // Let the fade/scale-out play, then hide and drop the stage media.
         setTimeout(function () {
             ov.hidden = true;
             ov._closing = false;
             document.body.classList.remove("promo-vid-lock");
             var stage = ov.querySelector(".promo-vid-stage");
-            var v = stage.querySelector("video");
-            if (v) {
-                try { v.pause(); } catch (e) { /* nothing playing */ }
-                v.muted = true;
-                v.controls = false;
-                var card = ov._ownerCard;
-                if (card) { card.insertBefore(v, card.firstChild); card.classList.remove("is-playing"); }
+            var nv = stage.querySelector("video");
+            if (nv) {
+                try { nv.pause(); } catch (e) { /* nothing playing */ }
+                stage.removeChild(nv);
             }
             var ifr = stage.querySelector("iframe.mcard-frame");
             if (ifr) stage.removeChild(ifr);
