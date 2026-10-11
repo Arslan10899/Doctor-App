@@ -600,6 +600,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function openModal() {
             bookingModal.hidden = false;
+            bookingModal.classList.remove("book-compact");
             document.body.style.overflow = "hidden";
             successBox.hidden = true;
             errorBox.hidden = true;
@@ -634,7 +635,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Mobile hero buttons preselect the visit type so the user does
                 // not have to tap through the "type" step again.
                 var preset = btn.getAttribute("data-book-visit");
-                if (preset) selectVisitType(preset);
+                if (preset) {
+                    // On phones the hero Clinic/Online buttons open a slim
+                    // popup: just the quick-contact buttons and the optional
+                    // doctor search, no details form.
+                    if (MOBILE_MQ.matches && btn.classList.contains("hero-book-btn")) {
+                        bookingModal.classList.add("book-compact");
+                    }
+                    selectVisitType(preset);
+                }
             });
         });
         bookingModal.querySelectorAll("[data-book-close]").forEach(function (el) {

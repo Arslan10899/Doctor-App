@@ -2185,6 +2185,18 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         min-width: 0;
     }
 
+    /* Compact booking popup (hero Clinic/Online buttons on phones): only the
+       quick-contact buttons and the optional doctor search are shown, so the
+       user can call, WhatsApp, browse all doctors, or pick one -- nothing else. */
+    .book-modal.book-compact .book-step-dots,
+    .book-modal.book-compact .book-visitsummary,
+    .book-modal.book-compact .book-or,
+    .book-modal.book-compact .book-field:not(.book-field-doctor),
+    .book-modal.book-compact .book-submit,
+    .book-modal.book-compact .book-error {
+        display: none;
+    }
+
     /* ---- Mobile search bar + city pill ----
        Cramming the field, the city dropdown and the search button into one bar
        left the city part a ~100px tap target and clipped the placeholder. So on
