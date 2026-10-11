@@ -2594,14 +2594,14 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .ac-doc-btn:active { transform: scale(.96); }
 .ac-doc-btn-clinic {
-    color: #0f766e;
-    background: #eafaf5;
-    border-color: rgba(15, 118, 110, .32);
-}
-.ac-doc-btn-online {
     color: #2b6fd4;
     background: #eaf1fe;
     border-color: rgba(43, 111, 212, .32);
+}
+.ac-doc-btn-online {
+    color: #0f766e;
+    background: #eafaf5;
+    border-color: rgba(15, 118, 110, .32);
 }
 .ac-doc-foot {
     display: flex;
