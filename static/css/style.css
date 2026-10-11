@@ -3622,6 +3622,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     font-size: 13.5px;
     font-weight: 800;
     line-height: 1.3;
+    text-shadow: 0 1px 1px rgba(17, 28, 34, .18);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3642,13 +3643,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     flex-shrink: 0;
 }
 .bs-fee {
-    font-size: 11.5px;
+    font-size: 12.5px;
     font-weight: 700;
-    color: #0f766e;
-    background: #eafaf5;
-    border: 1px solid #cdeee3;
-    padding: 2px 9px;
-    border-radius: 999px;
+    color: var(--text);
     white-space: nowrap;
 }
 .bs-badge {
