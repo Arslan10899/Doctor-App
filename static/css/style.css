@@ -3353,7 +3353,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
 }
 .promo-vid[hidden] { display: none; }
 .promo-vid-backdrop {
@@ -3367,17 +3367,17 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .promo-vid-panel {
     position: relative;
     width: 100%;
-    max-width: 620px;
+    max-width: 860px;
 }
 .promo-vid-stage {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    max-height: 78vh;
+    max-height: 92vh;
     background: #000;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 30px 70px -14px rgba(0, 0, 0, .72);
+    box-shadow: 0 34px 80px -16px rgba(0, 0, 0, .78);
     animation: promoVidIn .3s cubic-bezier(.2, .85, .3, 1.04) both;
 }
 .promo-vid-stage .mcard-video,

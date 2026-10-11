@@ -98,14 +98,14 @@
     function settleVideos() {
         if (!swiper) return;
         var active = swiper.slides[swiper.activeIndex];
+        // No autoplay: a clip is only ever started by an explicit tap, so
+        // leaving the active slide just stops anything that was playing and
+        // returns a muted-unmute card to its poster state.
         ytCards().forEach(function (card) {
             if (!active || !active.contains(card)) {
                 if (ytFrame(card)) ytStop(card);
-                return;
             }
-            if (card.getAttribute("data-autoplay") === "1" && !card._manual && !ytFrame(card)) {
-                ytPlay(card, true);
-            }
+            if (card._ytSound) card._ytSound = false;
         });
         videos().forEach(function (v) {
             var card = v.closest(".mcard--video");
@@ -114,12 +114,6 @@
                 // an explicit unmute never leaks: leaving the slide returns
                 // the card to its muted poster state
                 if (v._manualSound) { v._manualSound = false; v.muted = true; }
-                return;
-            }
-            if (card && card.getAttribute("data-autoplay") === "1" && !v._manual && v.paused) {
-                v.muted = true;
-                var p = v.play();
-                if (p && p.catch) p.catch(function () { /* autoplay blocked, poster stays */ });
             }
         });
     }
