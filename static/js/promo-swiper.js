@@ -119,120 +119,169 @@
     }
 
     // ----- Fullscreen-ish lightbox -----
-    // On phones the inline frame is small, so playing a clip lifts it out of the
-    // card into a big 16:9 stage over a dark blurred backdrop. The <video> is
-    // moved (not cloned) so playback state is preserved; closing moves it back
-    // into the card exactly where it was. A <video> already being played inline
-    // (native controls) is left alone, so native fullscreen keeps priority.
-    var promoOverlay = null;
-    function ensureOverlay() {
-        if (promoOverlay) return promoOverlay;
-        promoOverlay = document.createElement("div");
-        promoOverlay.className = "promo-vid";
-        promoOverlay.id = "promoVid";
-        promoOverlay.hidden = true;
-        promoOverlay.innerHTML =
-            '<div class="promo-vid-backdrop"></div>' +
-            '<div class="promo-vid-panel">' +
-                '<button type="button" class="promo-vid-close" aria-label="Close video">' +
-                    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
-                '</button>' +
-                '<div class="promo-vid-stage"></div>' +
-            '</div>';
-        promoOverlay.querySelector(".promo-vid-backdrop").addEventListener("click", closePromoOverlay);
-        promoOverlay.querySelector(".promo-vid-close").addEventListener("click", closePromoOverlay);
-        promoOverlay.addEventListener("click", function (e) {
-            if (e.target === promoOverlay) closePromoOverlay();
-        });
-        document.body.appendChild(promoOverlay);
-        return promoOverlay;
-    }
-    function showOverlay() {
-        var ov = ensureOverlay();
-        ov.classList.remove("closing");
-        ov.hidden = false;
-        void ov.offsetHeight; // restart the fade/scale transition
-        ov.classList.add("open");
-    }
-    function fitStage(ov, w, h) {
-        if (!ov) return;
-        var stage = ov.querySelector(".promo-vid-stage");
-        if (w > 0 && h > 0 && stage) stage.style.aspectRatio = (w / h).toFixed(4);
-    }
-    function openLocalOverlay(card, v) {
-        var ov = ensureOverlay();
-        // A fresh <video> in the stage (never move the card's own element: on
-        // mobile browsers re-parenting the playing/muted node can black it
-        // out). Same source, ready for controls + sound. The frame then
-        // adjusts to the clip's own shape (TV-like wide or phone-like tall) so
-        // it always fills at a nice big size.
-        var stage = ov.querySelector(".promo-vid-stage");
-        stage.innerHTML = "";
-        var src = v.currentSrc || v.getAttribute("src") || "";
-        var nv = document.createElement("video");
-        nv.className = "mcard-video";
-        nv.controls = true;
-        nv.playsInline = true;
-        nv.setAttribute("playsinline", "");
-        nv.preload = "auto";
-        if (src) nv.src = src;
-        nv.addEventListener("loadedmetadata", function () {
-            fitStage(ov, nv.videoWidth, nv.videoHeight);
-        });
-        stage.appendChild(nv);
-        ov._ownerCard = card;
-        showOverlay();
-        document.body.classList.add("promo-vid-lock");
-        if (swiper && swiper.autoplay) swiper.autoplay.stop();
-        var p = nv.play();
-        if (p && p.catch) p.catch(function () { /* sound autoplay blocked; the controls let the user start it */ });
-    }
-    function openYtOverlay(card) {
-        var ov = ensureOverlay();
-        ytStop(card); // drop any muted autoplay frame in the card first
-        pauseAll(null);
-        var stage = ov.querySelector(".promo-vid-stage");
-        stage.innerHTML = "";
-        var id = card.getAttribute("data-yt");
-        var f = document.createElement("iframe");
-        f.className = "mcard-frame";
-        f.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0&enablejsapi=1&playsinline=1";
-        f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-        f.setAttribute("frameborder", "0");
-        f.setAttribute("allowfullscreen", "");
-        f.setAttribute("title", card.getAttribute("data-name") || "Video");
-        stage.appendChild(f);
-        card._manual = true;
-        card._ytSound = true;
-        ov._ownerCard = card;
-        showOverlay();
-        document.body.classList.add("promo-vid-lock");
-        if (swiper && swiper.autoplay) swiper.autoplay.stop();
-    }
-    function closePromoOverlay() {
-        if (!promoOverlay || promoOverlay.hidden || promoOverlay._closing) return;
-        var ov = promoOverlay;
-        ov._closing = true;
-        ov.classList.remove("open");
-        // Let the fade/scale-out play, then hide and drop the stage media.
-        setTimeout(function () {
-            ov.hidden = true;
-            ov._closing = false;
-            document.body.classList.remove("promo-vid-lock");
+    // On phones the inline frame is small, so playing a clip lifts it out: a
+    // big stage over a dark blurred backdrop grows up from the tapped card's
+    // place and keeps the clip's own shape (TV-wide or phone-tall). A fresh
+    // <video> is created (never the card's own node - moving that can black it
+    // out on mobile) and dropped again once the frame shrinks back on close.
+        var promoOverlay = null;
+        function ensureOverlay() {
+            if (promoOverlay) return promoOverlay;
+            promoOverlay = document.createElement("div");
+            promoOverlay.className = "promo-vid";
+            promoOverlay.id = "promoVid";
+            promoOverlay.hidden = true;
+            promoOverlay.innerHTML =
+                '<div class="promo-vid-backdrop"></div>' +
+                '<div class="promo-vid-panel">' +
+                    '<button type="button" class="promo-vid-close" aria-label="Close video">' +
+                        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+                    '</button>' +
+                    '<div class="promo-vid-stage">' +
+                        '<div class="promo-vid-loading" hidden><i></i></div>' +
+                    '</div>' +
+                '</div>';
+            promoOverlay.querySelector(".promo-vid-backdrop").addEventListener("click", closePromoOverlay);
+            promoOverlay.querySelector(".promo-vid-close").addEventListener("click", closePromoOverlay);
+            promoOverlay.addEventListener("click", function (e) {
+                if (e.target === promoOverlay) closePromoOverlay();
+            });
+            document.body.appendChild(promoOverlay);
+            return promoOverlay;
+        }
+        function showOverlay() {
+            var ov = ensureOverlay();
+            ov.classList.remove("closing");
+            ov.hidden = false;
+            void ov.offsetHeight; // restart the fade/scale transition
+            requestAnimationFrame(function () { ov.classList.add("open"); });
+        }
+        // The frame's px box: fills the viewport generously while always keeping
+        // the clip's real shape. A wide/TV clip gets a big wide box, a tall/phone
+        // clip gets a big tall box - nothing is ever squeezed into a wrong frame.
+        // Capped so the playback stays light (minimal buffering).
+        function sizeStage(ov, w, h) {
             var stage = ov.querySelector(".promo-vid-stage");
-            var nv = stage.querySelector("video");
-            if (nv) {
-                try { nv.pause(); } catch (e) { /* nothing playing */ }
-                stage.removeChild(nv);
+            if (!stage) return;
+            if (!(w > 0) || !(h > 0)) { w = 16; h = 9; }
+            var maxW = Math.min(window.innerWidth - 16, 760);
+            var maxH = window.innerHeight * 0.86;
+            var r = w / h, W, H;
+            if (r >= 1) {
+                W = Math.min(maxW, maxH * r);
+                H = W / r;
+            } else {
+                H = Math.min(maxH, maxW / r);
+                W = H * r;
             }
-            var ifr = stage.querySelector("iframe.mcard-frame");
-            if (ifr) stage.removeChild(ifr);
-            var oc = ov._ownerCard;
-            if (oc && oc.classList.contains("mcard--yt") && oc._ytSound) { oc._ytSound = false; oc.classList.remove("is-playing"); }
-            ov._ownerCard = null;
-            soundCheck();
-        }, 280);
-    }
+            stage.style.width = Math.round(W) + "px";
+            stage.style.height = Math.round(H) + "px";
+        }
+        // Start point of the grow animation: the big frame first sits exactly on
+        // the tapped card's place, then rises up to its final centered box.
+        function stageFromCard(ov) {
+            var stage = ov.querySelector(".promo-vid-stage");
+            var card = ov._ownerCard;
+            if (!stage) return;
+            if (!card || !card.isConnected) {
+                stage.style.setProperty("--pv-s", "0");
+                return;
+            }
+            var cr = card.getBoundingClientRect();
+            var stageW = parseFloat(stage.style.width) || (window.innerWidth - 16);
+            var s = cr.width / stageW;
+            var tx = (cr.left + cr.width / 2) - window.innerWidth / 2;
+            var ty = (cr.top + cr.height / 2) - window.innerHeight / 2;
+            if (!(s > 0)) s = 0;
+            stage.style.setProperty("--pv-s", s.toFixed(4));
+            stage.style.setProperty("--pv-sx", tx.toFixed(1) + "px");
+            stage.style.setProperty("--pv-sy", ty.toFixed(1) + "px");
+        }
+        function openLocalOverlay(card, v) {
+            var ov = ensureOverlay();
+            // A fresh <video> in the stage (never move the card's own element: on
+            // mobile browsers re-parenting the playing/muted node can black it
+            // out). Same source, ready for controls + sound.
+            var stage = ov.querySelector(".promo-vid-stage");
+            var old = stage.querySelector("video, iframe.mcard-frame");
+            if (old) stage.removeChild(old);
+            var spinner = stage.querySelector(".promo-vid-loading");
+            var nv = document.createElement("video");
+            nv.className = "mcard-video";
+            nv.controls = true;
+            nv.playsInline = true;
+            nv.setAttribute("playsinline", "");
+            nv.preload = "auto";
+            var src = v.currentSrc || v.getAttribute("src") || "";
+            if (src) nv.src = src;
+            nv.addEventListener("loadedmetadata", function () {
+                sizeStage(ov, nv.videoWidth, nv.videoHeight);
+            });
+            nv.addEventListener("waiting", function () { if (spinner) spinner.hidden = false; });
+            nv.addEventListener("canplay", function () { if (spinner) spinner.hidden = true; });
+            nv.addEventListener("playing", function () { if (spinner) spinner.hidden = true; });
+            if (spinner) spinner.hidden = false;
+            ov._ownerCard = card;
+            stage.appendChild(nv);
+            sizeStage(ov, 16, 9); // placeholder box until the clip reports its shape
+            stageFromCard(ov);    // start the grow right on the card
+            showOverlay();
+            document.body.classList.add("promo-vid-lock");
+            if (swiper && swiper.autoplay) swiper.autoplay.stop();
+            var p = nv.play();
+            if (p && p.catch) p.catch(function () { if (spinner) spinner.hidden = true; });
+        }
+        function openYtOverlay(card) {
+            var ov = ensureOverlay();
+            ytStop(card); // drop any muted autoplay frame in the card first
+            pauseAll(null);
+            var stage = ov.querySelector(".promo-vid-stage");
+            var old = stage.querySelector("video, iframe.mcard-frame");
+            if (old) stage.removeChild(old);
+            var id = card.getAttribute("data-yt");
+            var f = document.createElement("iframe");
+            f.className = "mcard-frame";
+            f.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0&enablejsapi=1&playsinline=1";
+            f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            f.setAttribute("frameborder", "0");
+            f.setAttribute("allowfullscreen", "");
+            f.setAttribute("title", card.getAttribute("data-name") || "Video");
+            stage.appendChild(f);
+            card._manual = true;
+            card._ytSound = true;
+            ov._ownerCard = card;
+            sizeStage(ov, 16, 9);
+            stageFromCard(ov);
+            showOverlay();
+            document.body.classList.add("promo-vid-lock");
+            if (swiper && swiper.autoplay) swiper.autoplay.stop();
+        }
+        function closePromoOverlay() {
+            if (!promoOverlay || promoOverlay.hidden || promoOverlay._closing) return;
+            var ov = promoOverlay;
+            ov._closing = true;
+            ov.classList.remove("open");
+            // With the vars still pointing at the card, the fade/scale-out plays
+            // as a shrink back into the card; then the page unlocks and the stage
+            // media is dropped.
+            setTimeout(function () {
+                ov.hidden = true;
+                ov._closing = false;
+                document.body.classList.remove("promo-vid-lock");
+                var stage = ov.querySelector(".promo-vid-stage");
+                var nv = stage.querySelector("video");
+                if (nv) {
+                    try { nv.pause(); } catch (e) { /* nothing playing */ }
+                    stage.removeChild(nv);
+                }
+                var ifr = stage.querySelector("iframe.mcard-frame");
+                if (ifr) stage.removeChild(ifr);
+                var oc = ov._ownerCard;
+                if (oc && oc.classList.contains("mcard--yt") && oc._ytSound) { oc._ytSound = false; oc.classList.remove("is-playing"); }
+                ov._ownerCard = null;
+                soundCheck();
+            }, 360);
+        }
 
     // Tap a video card (or its glass play button): inline playback with sound.
     // YouTube first: it has no <video> element, only the embed. From here a

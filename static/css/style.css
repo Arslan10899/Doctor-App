@@ -3377,18 +3377,38 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .promo-vid-stage {
     position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9; /* replaced by JS once the clip reports its own ratio */
-    max-height: 92vh;
     background: #000;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 34px 80px -16px rgba(0, 0, 0, .78);
-    transform: translateY(16px) scale(.93);
+    /* JS sizes the box (px) to the clip's own ratio and animates it up from
+       the card's position via these variables. */
+    width: 374px;
+    height: 210px;
+    transform: translate3d(var(--pv-sx, 0), var(--pv-sy, 0), 0) scale(var(--pv-s, 0));
     opacity: 0;
-    transition: transform .32s cubic-bezier(.2, .85, .3, 1.02), opacity .28s ease;
+    transition: width .34s ease, height .34s ease,
+                transform .4s cubic-bezier(.2, .85, .25, 1), opacity .3s ease;
 }
-.promo-vid.open .promo-vid-stage { transform: none; opacity: 1; }
+.promo-vid.open .promo-vid-stage { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+.promo-vid-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, .35);
+}
+.promo-vid-loading[hidden] { display: none; }
+.promo-vid-loading i {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, .32);
+    border-top-color: #fff;
+    animation: promoSpin .8s linear infinite;
+}
+@keyframes promoSpin { to { transform: rotate(360deg); } }
 .promo-vid-stage .mcard-video,
 .promo-vid-stage .mcard-frame,
 .promo-vid-stage video,
@@ -3430,7 +3450,7 @@ body.promo-vid-lock { overflow: hidden; }
     .promo-vid, .promo-vid-backdrop, .promo-vid-stage { transition: none; }
     .promo-vid { opacity: 1; }
     .promo-vid.open .promo-vid-backdrop { opacity: 1; }
-    .promo-vid.open .promo-vid-stage { opacity: 1; }
+    .promo-vid.open .promo-vid-stage { opacity: 1; transform: none; }
 }
 
 /* -------------------- Booking modal -------------------- */
