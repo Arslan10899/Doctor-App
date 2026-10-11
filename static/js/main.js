@@ -708,7 +708,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return h * 60 + parseInt(m[2], 10);
         }
         function doctorTimingText(d) {
-            if (chosenVisit !== "Online Check-up") return "";
             if (d.today_closed) return "Closed today";
             if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
             if (d.today_open) return d.today_open + " onwards";
@@ -729,27 +728,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return now >= o && now <= c;
         }
 
-        const AVATAR_BGS = [
-            "linear-gradient(135deg,#2a7f8e,#0f766e)",
-            "linear-gradient(135deg,#2b6fd4,#1e4fa3)",
-            "linear-gradient(135deg,#e07b39,#c96a1f)",
-            "linear-gradient(135deg,#7c4dff,#5a2fd1)",
-            "linear-gradient(135deg,#0f8a8a,#0b6b6b)"
-        ];
-        function avatarBg(name) {
-            var h = 0, s = String(name || "");
-            for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-            return AVATAR_BGS[h % AVATAR_BGS.length];
-        }
-        function doctorInitials(name) {
-            var n = String(name || "").replace(/^dr\.?\s*/i, "").trim();
-            var parts = n.split(/\s+/).filter(Boolean);
-            if (!parts.length) return "DR";
-            var a = parts[0].charAt(0);
-            var b = parts.length > 1 ? parts[1].charAt(0) : "";
-            return (a + b).toUpperCase();
-        }
-
         function renderSuggestions(matches) {
             suggestBox.innerHTML = "";
             if (matches.length === 0) {
@@ -765,12 +743,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 item.className = "book-suggest-item";
                 const main = document.createElement("div");
                 main.className = "bs-main";
-
-                // Round initials badge, tinted per doctor, stands in for a photo.
-                const av = document.createElement("span");
-                av.className = "bs-avatar";
-                av.textContent = doctorInitials(d.doctor_name);
-                av.style.background = avatarBg(d.doctor_name);
 
                 const left = document.createElement("div");
                 left.className = "bs-left";
@@ -819,7 +791,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         : '<span class="bs-badge bs-offline">In person</span>'
                 );
 
-                main.appendChild(av);
                 main.appendChild(left);
                 main.appendChild(right);
                 item.appendChild(main);
