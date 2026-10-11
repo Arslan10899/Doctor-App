@@ -773,16 +773,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const right = document.createElement("div");
                 right.className = "bs-right";
-                const feeEl = document.createElement("span");
-                feeEl.className = "bs-fee";
-                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
-                right.appendChild(feeEl);
                 right.insertAdjacentHTML(
                     "beforeend",
                     d.online
                         ? '<span class="bs-badge bs-online ' + (doctorOnlineNow(d) ? "on" : "off") + '">Online</span>'
                         : '<span class="bs-badge bs-offline">In person</span>'
                 );
+                const feeEl = document.createElement("span");
+                feeEl.className = "bs-fee";
+                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
+                right.appendChild(feeEl);
 
                 main.appendChild(left);
                 main.appendChild(right);
