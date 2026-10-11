@@ -38,6 +38,16 @@
             if (s) s.style.display = "none";
         }
 
+        function goToResult(it) {
+            // On phones, opening a doctor's profile also raises the slim
+            // quick-contact popup over it (Doctor search + Call / WhatsApp /
+            // All Doctor). The flag is read once the profile page loads.
+            if (it && it.type === "doctor" && window.matchMedia("(max-width: 768px)").matches) {
+                try { sessionStorage.setItem("bookPopupOnLoad", "1"); } catch (e) {}
+            }
+            window.location.href = it.url;
+        }
+
         function shortTime(t) {
             // "7:00 AM" -> "7 AM", "12:00 PM" -> "12 PM"; keep minutes when non-zero.
             var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || "").trim());
@@ -197,7 +207,7 @@
                     if (it.sub) el.appendChild(sub);
                 }
                 el.dataset.i = i;
-                el.addEventListener("click", function () { window.location.href = items[this.dataset.i].url; });
+                el.addEventListener("click", function () { goToResult(items[this.dataset.i]); });
                 box.appendChild(el);
             });
             box.style.display = "block";
@@ -235,7 +245,7 @@
             if (e.key === "Enter") {
                 if (box.style.display !== "none" && items.length === 1) {
                     e.preventDefault();
-                    window.location.href = items[0].url;
+                    goToResult(items[0]);
                 }
             }
         });

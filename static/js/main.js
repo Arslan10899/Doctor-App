@@ -855,6 +855,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (pick() || ++tries > 25) clearInterval(iv);
             }, 100);
         };
+        // A doctor-card tap on the home search navigated here with a flag; raise
+        // the slim quick-contact popup (Doctor search + Call / WhatsApp / All
+        // Doctor) over the profile. Tapping the blurred backdrop closes it and
+        // the profile is revealed.
+        try {
+            if (MOBILE_MQ.matches && sessionStorage.getItem("bookPopupOnLoad") === "1") {
+                sessionStorage.removeItem("bookPopupOnLoad");
+                window.openBooking(null, "Clinic Visit");
+            }
+        } catch (e) {}
         doctorInput.addEventListener("focus", function () {
             // Nothing shows until the user actually types, so the full doctor
             // list never pops up on its own.
