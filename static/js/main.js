@@ -790,6 +790,23 @@ document.addEventListener("DOMContentLoaded", function () {
             updateContact(d);
             loadSlots();
         }
+        // Lets other widgets (e.g. the hero search suggestions) open the booking
+        // modal straight onto a doctor and visit type.
+        window.openBooking = function (doctorId, visitType) {
+            openModal();
+            if (visitType) selectVisitType(visitType);
+            if (!doctorId) return;
+            var pick = function () {
+                var d = doctorCache.filter(function (x) { return String(x.id) === String(doctorId); })[0];
+                if (d) { selectDoctor(d); return true; }
+                return false;
+            };
+            if (pick()) return;
+            var tries = 0;
+            var iv = setInterval(function () {
+                if (pick() || ++tries > 25) clearInterval(iv);
+            }, 100);
+        };
         doctorInput.addEventListener("focus", function () {
             if (doctorCache.length && !doctorInput.value.trim()) {
                 renderSuggestions(doctorPool());

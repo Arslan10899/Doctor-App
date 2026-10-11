@@ -21,10 +21,28 @@
 
         function closeBox() { box.style.display = "none"; box.innerHTML = ""; items = []; }
 
+        function sizeBox(isMobile) {
+            // On phones the tile needs to be wider than the search field so a
+            // full doctor name can sit on one line; anchor it to the viewport
+            // with a small margin instead of the input's own width.
+            if (!isMobile) {
+                box.style.width = "";
+                box.style.left = "";
+                box.style.right = "";
+                return;
+            }
+            var margin = 12;
+            var r = wrap.getBoundingClientRect();
+            box.style.width = (window.innerWidth - margin * 2) + "px";
+            box.style.left = (margin - r.left) + "px";
+            box.style.right = "auto";
+        }
+
         function render() {
             box.innerHTML = "";
             if (!items.length) { closeBox(); return; }
             var isMobile = window.matchMedia("(max-width: 768px)").matches;
+            sizeBox(isMobile);
             items.forEach(function (it, i) {
                 var el = document.createElement("div");
                 el.className = "ac-item";
@@ -48,16 +66,40 @@
                         du.textContent = it.urdu_name;
                         body.appendChild(du);
                     }
+                    var actions = document.createElement("div");
+                    actions.className = "ac-doc-actions";
+                    var clinicBtn = document.createElement("button");
+                    clinicBtn.type = "button";
+                    clinicBtn.className = "ac-doc-btn ac-doc-btn-clinic";
+                    clinicBtn.textContent = "Clinic Check-up";
+                    var onlineBtn = document.createElement("button");
+                    onlineBtn.type = "button";
+                    onlineBtn.className = "ac-doc-btn ac-doc-btn-online";
+                    onlineBtn.textContent = "Online Check-up";
+                    function bookWith(visit) {
+                        return function (ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            closeBox();
+                            if (window.openBooking) window.openBooking(it.id, visit);
+                            else window.location.href = it.url;
+                        };
+                    }
+                    clinicBtn.addEventListener("click", bookWith("Clinic Visit"));
+                    onlineBtn.addEventListener("click", bookWith("Online Check-up"));
+                    actions.appendChild(clinicBtn);
+                    actions.appendChild(onlineBtn);
+                    body.appendChild(actions);
                     var foot = document.createElement("div");
                     foot.className = "ac-doc-foot";
+                    var spec = document.createElement("span");
+                    spec.className = "ac-doc-spec";
+                    spec.textContent = it.specialty || "";
                     var city = document.createElement("span");
                     city.className = "ac-doc-city";
                     city.textContent = it.city || "";
-                    var fee = document.createElement("span");
-                    fee.className = "ac-doc-fee";
-                    fee.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "Fee on request";
+                    foot.appendChild(spec);
                     foot.appendChild(city);
-                    foot.appendChild(fee);
                     body.appendChild(foot);
                     el.appendChild(img);
                     el.appendChild(body);
@@ -103,6 +145,9 @@
         input.addEventListener("focus", function () { if (input.value.trim().length >= 2) fetchSuggestions(); });
         document.addEventListener("click", function (e) {
             if (!wrap.contains(e.target)) closeBox();
+        });
+        window.addEventListener("resize", function () {
+            if (box.style.display === "block") sizeBox(window.matchMedia("(max-width: 768px)").matches);
         });
         input.addEventListener("keydown", function (e) {
             var el = box.querySelector("[data-i='0']");

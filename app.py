@@ -1254,8 +1254,10 @@ def api_search():
     for d in doctors:
         results.append({
             "type": "doctor",
+            "id": d["id"],
             "name": d["name"],
             "urdu_name": d["urdu_name"] or "",
+            "specialty": d["specialty_name"],
             "city": d["city_name"],
             "fee": d["fee"] or 0,
             "image": d["image_url"] or "",
