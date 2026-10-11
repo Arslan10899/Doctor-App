@@ -715,7 +715,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return (m[2] === "00" ? h : h + ":" + m[2]) + " " + m[3].toUpperCase();
         }
         function doctorTimingText(d) {
-            if (d.today_closed) return "Closed today";
+            if (d.today_closed) return "On leave today";
             if (d.today_open && d.today_close) return shortTime(d.today_open) + " \u2013 " + shortTime(d.today_close);
             if (d.today_open) return shortTime(d.today_open) + " onwards";
             return "";

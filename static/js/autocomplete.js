@@ -49,7 +49,7 @@
         }
         function timingText(d) {
             // Today's clinic hours, shown for every doctor.
-            if (d.today_closed) return "Closed today";
+            if (d.today_closed) return "On leave today";
             if (d.today_open && d.today_close) return shortTime(d.today_open) + " \u2013 " + shortTime(d.today_close);
             if (d.today_open) return shortTime(d.today_open) + " onwards";
             return "";
