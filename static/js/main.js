@@ -707,10 +707,17 @@ document.addEventListener("DOMContentLoaded", function () {
             if (/PM/i.test(m[3])) h += 12;
             return h * 60 + parseInt(m[2], 10);
         }
+        function shortTime(t) {
+            // "7:00 AM" -> "7 AM", "12:30 PM" -> "12:30 PM"
+            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || ""));
+            if (!m) return String(t || "");
+            var h = parseInt(m[1], 10);
+            return (m[2] === "00" ? h : h + ":" + m[2]) + " " + m[3].toUpperCase();
+        }
         function doctorTimingText(d) {
             if (d.today_closed) return "Closed today";
-            if (d.today_open && d.today_close) return d.today_open + " \u2013 " + d.today_close;
-            if (d.today_open) return d.today_open + " onwards";
+            if (d.today_open && d.today_close) return shortTime(d.today_open) + " \u2013 " + shortTime(d.today_close);
+            if (d.today_open) return shortTime(d.today_open) + " onwards";
             return "";
         }
         function nowMinutes() {
@@ -755,6 +762,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     spec.textContent = [d.specialty_name, d.city_name].filter(Boolean).join(" \u00b7 ");
                     left.appendChild(spec);
                 }
+                const timing = doctorTimingText(d);
+                if (timing) {
+                    const tm = document.createElement("span");
+                    tm.className = "bs-timing";
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.querySelector("span").textContent = timing;
+                    left.appendChild(tm);
+                }
 
                 const right = document.createElement("div");
                 right.className = "bs-right";
@@ -772,14 +787,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 main.appendChild(left);
                 main.appendChild(right);
                 item.appendChild(main);
-                const timing = doctorTimingText(d);
-                if (timing) {
-                    const tm = document.createElement("span");
-                    tm.className = "bs-timing";
-                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
-                    tm.querySelector("span").textContent = timing;
-                    item.appendChild(tm);
-                }
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
                     selectDoctor(d);

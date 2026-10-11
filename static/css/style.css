@@ -3642,9 +3642,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     flex-shrink: 0;
 }
 .bs-fee {
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 700;
-    color: var(--primary);
+    color: #0f766e;
+    background: #eafaf5;
+    border: 1px solid #cdeee3;
+    padding: 2px 9px;
+    border-radius: 999px;
     white-space: nowrap;
 }
 .bs-badge {
@@ -3667,14 +3671,17 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    align-self: flex-end;
-    margin-top: 1px;
-    color: #0f766e;
-    font-size: 11.5px;
+    margin-top: 6px;
+    padding: 2px 9px 2px 7px;
+    border-radius: 999px;
+    background: #f1f5f7;
+    color: #4a6773;
+    font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
+    width: fit-content;
 }
-.bs-timing svg { flex-shrink: 0; }
+.bs-timing svg { flex-shrink: 0; color: #0f9d8f; }
 
 /* The Online badge breathes only while the current time sits inside the
    doctor's own timing for today; otherwise it stays flat and greyed. */
