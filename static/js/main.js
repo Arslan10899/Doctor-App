@@ -763,27 +763,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     city.textContent = d.city_name;
                     meta.appendChild(city);
                 }
-                if (d.experience && d.experience > 0) {
-                    const exp = document.createElement("span");
-                    exp.className = "bs-exp";
-                    exp.textContent = d.experience + (d.experience === 1 ? " yr exp" : " yrs exp");
-                    meta.appendChild(exp);
-                }
-                if (d.rating && d.rating > 0) {
-                    const rt = document.createElement("span");
-                    rt.className = "bs-rating";
-                    rt.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.8 5.9 20.4 7.2 13.7l-5-4.7 6.8-.8z"/></svg><span></span>';
-                    rt.querySelector("span").textContent = Number(d.rating).toFixed(1);
-                    meta.appendChild(rt);
-                }
                 if (meta.childNodes.length) left.appendChild(meta);
 
                 const right = document.createElement("div");
                 right.className = "bs-right";
-                const feeEl = document.createElement("span");
-                feeEl.className = "bs-fee";
-                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
-                right.appendChild(feeEl);
                 right.insertAdjacentHTML(
                     "beforeend",
                     d.online
