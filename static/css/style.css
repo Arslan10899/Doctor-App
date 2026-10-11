@@ -2484,12 +2484,25 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border: 1px solid rgba(12, 52, 68, .08);
 }
 .ac-doc-fee {
-    font-size: 10px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #0f766e;
     white-space: nowrap;
-    line-height: 1.1;
+    flex-shrink: 0;
 }
+.ac-doc-fee-solo {
+    display: block;
+    text-align: right;
+    margin-top: 2px;
+}
+.ac-doc-urdurow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 1px;
+}
+.ac-doc-urdurow .ac-doc-urdu { flex: 1 1 auto; min-width: 0; margin-top: 0; }
+.ac-doc-urdurow .ac-doc-fee { margin-left: auto; }
 .ac-doc-rating {
     display: inline-flex;
     align-items: center;
