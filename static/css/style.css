@@ -2466,15 +2466,40 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     gap: 11px;
     padding: 10px 11px;
 }
+.ac-doc-media {
+    width: 54px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
 .ac-doc-img {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 11px;
     object-fit: cover;
     flex-shrink: 0;
     background: #eef4f5;
     border: 1px solid rgba(12, 52, 68, .08);
 }
+.ac-doc-fee {
+    font-size: 10px;
+    font-weight: 700;
+    color: #0f766e;
+    white-space: nowrap;
+    line-height: 1.1;
+}
+.ac-doc-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #0c3444;
+    line-height: 1.1;
+}
+.ac-doc-rating svg { color: #f5a623; flex-shrink: 0; }
 .ac-doc-body { min-width: 0; flex: 1; }
 .ac-doc-name {
     color: #0c3444;

@@ -74,12 +74,24 @@
                 el.className = "ac-item";
                 if (isMobile && it.type === "doctor") {
                     el.className = "ac-item ac-item-doctor";
+                    var media = document.createElement("div");
+                    media.className = "ac-doc-media";
                     var img = document.createElement("img");
                     img.className = "ac-doc-img";
                     img.alt = it.name;
                     img.loading = "lazy";
                     img.src = it.image || "/static/img/no-image.jpeg";
                     img.addEventListener("error", function () { this.src = "/static/img/no-image.jpeg"; });
+                    media.appendChild(img);
+                    var feeEl = document.createElement("span");
+                    feeEl.className = "ac-doc-fee";
+                    feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
+                    media.appendChild(feeEl);
+                    var rate = document.createElement("span");
+                    rate.className = "ac-doc-rating";
+                    rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
+                    rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
+                    media.appendChild(rate);
                     var body = document.createElement("div");
                     body.className = "ac-doc-body";
                     var dn = document.createElement("div");
@@ -139,7 +151,7 @@
                         tm.querySelector("span").textContent = timing;
                         body.appendChild(tm);
                     }
-                    el.appendChild(img);
+                    el.appendChild(media);
                     el.appendChild(body);
                 } else {
                     var tag = document.createElement("span");

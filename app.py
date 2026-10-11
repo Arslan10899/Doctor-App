@@ -1240,7 +1240,7 @@ def api_search():
         return jsonify({"results": []})
     like = f"%{q}%"
     doctors = query(
-        "SELECT d.id, d.name, d.urdu_name, d.image_url, d.fee, d.online, "
+        "SELECT d.id, d.name, d.urdu_name, d.image_url, d.fee, d.online, d.rating, "
         "s.name AS specialty_name, c.name AS city_name "
         "FROM doctors d JOIN specialties s ON d.specialty_id=s.id JOIN cities c ON d.city_id=c.id "
         "WHERE d.name LIKE ? OR s.name LIKE ? OR c.name LIKE ? OR d.urdu_name LIKE ? "
@@ -1264,6 +1264,7 @@ def api_search():
             "specialty": d["specialty_name"],
             "city": d["city_name"],
             "fee": d["fee"] or 0,
+            "rating": d["rating"] or 0,
             "image": d["image_url"] or "",
             "online": bool(d["online"]),
             "today_open": o,
