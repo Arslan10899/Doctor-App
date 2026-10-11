@@ -99,11 +99,9 @@
                     rate.className = "ac-doc-rating";
                     rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
                     rate.querySelector("span").textContent = it.rating ? Number(it.rating).toFixed(1) : "\u2014";
-                    media.appendChild(rate);
                     var feeEl = document.createElement("span");
                     feeEl.className = "ac-doc-fee";
                     feeEl.textContent = (it.fee && it.fee > 0) ? ("Rs " + it.fee) : "On request";
-                    media.appendChild(feeEl);
                     var body = document.createElement("div");
                     body.className = "ac-doc-body";
                     var namerow = document.createElement("div");
@@ -112,6 +110,7 @@
                     dn.className = "ac-doc-name";
                     dn.textContent = it.name;
                     namerow.appendChild(dn);
+                    namerow.appendChild(rate);
                     body.appendChild(namerow);
                     if (it.urdu_name) {
                         var urduRow = document.createElement("div");
@@ -120,7 +119,10 @@
                         du.className = "ac-doc-urdu";
                         du.textContent = it.urdu_name;
                         urduRow.appendChild(du);
+                        urduRow.appendChild(feeEl);
                         body.appendChild(urduRow);
+                    } else {
+                        namerow.appendChild(feeEl);
                     }
                     var actions = document.createElement("div");
                     actions.className = "ac-doc-actions";
@@ -156,15 +158,15 @@
                     city.textContent = it.city || "";
                     foot.appendChild(spec);
                     foot.appendChild(city);
-                    body.appendChild(foot);
                     var timing = timingText(it);
                     if (timing) {
                         var tm = document.createElement("span");
                         tm.className = "ac-doc-timing";
-                        tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                        tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                         tm.querySelector("span").textContent = timing;
-                        body.appendChild(tm);
+                        foot.appendChild(tm);
                     }
+                    body.appendChild(foot);
                     el.appendChild(media);
                     el.appendChild(body);
                 } else {
