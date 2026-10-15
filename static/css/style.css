@@ -2735,13 +2735,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     background: #eafaf5;
     border-color: rgba(15, 118, 110, .32);
 }
-.ac-doc-btn:disabled,
-.ac-doc-btn.is-disabled {
-    cursor: not-allowed;
-    opacity: .45;
-    filter: grayscale(.4);
-    box-shadow: none;
-}
 .ac-doc-foot {
     display: flex;
     align-items: center;
@@ -3614,6 +3607,9 @@ body.promo-vid-lock { overflow: hidden; }
     transition: transform .18s cubic-bezier(.2, .7, .3, 1),
                 box-shadow .18s ease, background .2s ease;
 }
+/* The button is display:flex, which would beat the browser's [hidden] rule;
+   restore it so an offline doctor's card can be removed from the step. */
+.book-type-card[hidden] { display: none; }
 /* Glossy sheen across the cap - the modern glassy pop */
 .book-type-card::after {
     content: "";

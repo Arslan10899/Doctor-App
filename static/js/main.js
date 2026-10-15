@@ -499,6 +499,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const errorBox = document.getElementById("bkError");
         const successBox = document.getElementById("bkSuccess");
         const stepType = document.getElementById("bkStepType");
+        const onlineCard = document.querySelector(".book-type-online");
         const visitInput = document.getElementById("bkVisitTypeInput");
         const visitSummary = document.getElementById("bkVisitSummary");
         const visitTypeLabel = document.getElementById("bkVisitType");
@@ -586,6 +587,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     doctorInput.value = "";
                     doctorIdInput.value = "";
                     updateContact(null);
+                    syncOnlineCard(null);
                 }
             }
             setStep("form");
@@ -623,6 +625,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.style.overflow = "hidden";
             successBox.hidden = true;
             errorBox.hidden = true;
+            if (onlineCard) onlineCard.hidden = false;
             visitSummary && visitSummary.style.removeProperty("--vs-c");
             visitSummary && visitSummary.style.removeProperty("--vs-bg");
             visitSummary && visitSummary.style.removeProperty("--vs-bd");
@@ -646,6 +649,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".js-book-now").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 openModal();
+                // A doctor-profile "Book Appointment" button carries the doctor
+                // id, so the modal opens with that doctor already chosen (and
+                // the Online Check-up option is hidden unless they consult
+                // online).
+                fillDoctorById(btn.getAttribute("data-doctor-id"));
                 // Mobile hero buttons preselect the visit type so the user does
                 // not have to tap through the "type" step again.
                 var preset = btn.getAttribute("data-book-visit");
@@ -734,6 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // the site line until a suggestion is chosen again.
             if (doctorIdInput.value) updateContact(null);
             doctorIdInput.value = "";
+            syncOnlineCard(null);
             if (q.length < 1) {
                 suggestBox.classList.remove("open");
                 suggestBox.innerHTML = "";
@@ -851,7 +860,28 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorIdInput.value = d.id;
             suggestBox.classList.remove("open");
             updateContact(d);
+            syncOnlineCard(d);
             loadSlots();
+        }
+        function syncOnlineCard(d) {
+            // A doctor who is not marked "Available for WhatsApp / Online
+            // Consultation" must not offer the Online Check-up option at all.
+            if (onlineCard) onlineCard.hidden = !!(d && !d.online);
+        }
+        // Fills the doctor field from the cached list once it has loaded.
+        function fillDoctorById(doctorId) {
+            if (!doctorId) return false;
+            var pick = function () {
+                var d = doctorCache.filter(function (x) { return String(x.id) === String(doctorId); })[0];
+                if (d) { selectDoctor(d); return true; }
+                return false;
+            };
+            if (pick()) return true;
+            var tries = 0;
+            var iv = setInterval(function () {
+                if (pick() || ++tries > 25) clearInterval(iv);
+            }, 100);
+            return true;
         }
         // Lets other widgets (e.g. the hero search suggestions) open the booking
         // modal straight onto a doctor and visit type.
@@ -862,17 +892,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // form, with the tapped doctor already selected.
             if (MOBILE_MQ.matches) bookingModal.classList.add("book-compact");
             if (visitType) selectVisitType(visitType);
-            if (!doctorId) return;
-            var pick = function () {
-                var d = doctorCache.filter(function (x) { return String(x.id) === String(doctorId); })[0];
-                if (d) { selectDoctor(d); return true; }
-                return false;
-            };
-            if (pick()) return;
-            var tries = 0;
-            var iv = setInterval(function () {
-                if (pick() || ++tries > 25) clearInterval(iv);
-            }, 100);
+            fillDoctorById(doctorId);
         };
         // A doctor-card tap on the home search navigated here with a flag; raise
         // the slim quick-contact popup (Doctor search + Call / WhatsApp / All

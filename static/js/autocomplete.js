@@ -172,10 +172,6 @@
                     clinicBtn.type = "button";
                     clinicBtn.className = "ac-doc-btn ac-doc-btn-clinic";
                     clinicBtn.textContent = "Clinic Check-up";
-                    var onlineBtn = document.createElement("button");
-                    onlineBtn.type = "button";
-                    onlineBtn.className = "ac-doc-btn ac-doc-btn-online";
-                    onlineBtn.textContent = "Online Check-up";
                     function bookWith(visit) {
                         return function (ev) {
                             ev.preventDefault();
@@ -186,18 +182,17 @@
                         };
                     }
                     clinicBtn.addEventListener("click", bookWith("Clinic Visit"));
-                    if (it.online) {
-                        onlineBtn.addEventListener("click", bookWith("Online Check-up"));
-                    } else {
-                        // Doctor is not marked "Available for WhatsApp / Online
-                        // Consultation", so the online check-up option is off.
-                        onlineBtn.disabled = true;
-                        onlineBtn.classList.add("is-disabled");
-                        onlineBtn.title = "This doctor is not available for online consultation";
-                        onlineBtn.setAttribute("aria-disabled", "true");
-                    }
                     actions.appendChild(clinicBtn);
-                    actions.appendChild(onlineBtn);
+                    // Only doctors marked "Available for WhatsApp / Online
+                    // Consultation" get an Online Check-up button at all.
+                    if (it.online) {
+                        var onlineBtn = document.createElement("button");
+                        onlineBtn.type = "button";
+                        onlineBtn.className = "ac-doc-btn ac-doc-btn-online";
+                        onlineBtn.textContent = "Online Check-up";
+                        onlineBtn.addEventListener("click", bookWith("Online Check-up"));
+                        actions.appendChild(onlineBtn);
+                    }
                     body.appendChild(actions);
                     var foot = document.createElement("div");
                     foot.className = "ac-doc-foot";
