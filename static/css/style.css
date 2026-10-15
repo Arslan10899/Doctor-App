@@ -2185,7 +2185,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     /* a darker, higher-contrast label so it clearly reads above the buttons */
     .hero-book-label { color: #0d3b44; }
     .hero-book-label svg { color: #0f766e; }
-    .hero-book-actions { gap: 6px; }
+    .hero-book-actions { gap: 12px; }
     /* Both CTAs were previously a faint outline next to a solid fill, which read
        as "the other one is disabled" rather than as two equal choices. They are
        now equal-weight cards: same size, same corner radius, same white label,
@@ -2195,8 +2195,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
        two-line label. Clinic is a bright card, Online is the vivid gradient
        action — no more murky dark pair. */
     .hero-book-btn {
-        min-height: 66px;
-        padding: 10px 12px;
+        min-height: 58px;
+        padding: 8px 12px;
         border-radius: 16px;
         flex-direction: row;
         justify-content: center;
@@ -2413,8 +2413,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .city-drop .city-drop-text { font-size: 12px; }
     .hero-book-box { padding: 9px 10px; border-radius: 14px; }
     .hero-book-label { font-size: 11px; padding-bottom: 7px; }
-    .hero-book-actions { gap: 5px; }
-    .hero-book-btn { font-size: 12px; min-height: 54px; gap: 3px; padding: 9px 5px; }
+    .hero-book-actions { gap: 10px; }
+    .hero-book-btn { font-size: 12px; min-height: 50px; gap: 3px; padding: 7px 5px; }
+    .hero-book-tx { font-size: 15px; }
     .hero-book-btn svg { width: 18px; height: 18px; }
 }
 
