@@ -501,7 +501,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const stepType = document.getElementById("bkStepType");
         const onlineCard = document.querySelector(".book-type-online");
         const visitInput = document.getElementById("bkVisitTypeInput");
-        const visitSwitch = document.getElementById("bkVisitSwitch");
+        const visitSwitch = null; // removed
+
         const visitSummary = document.getElementById("bkVisitSummary");
         const visitTypeLabel = document.getElementById("bkVisitType");
         const visitIconBox = document.getElementById("bkVisitIcon");
@@ -560,7 +561,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // the date field is hidden on phones, so default it or the
                 // time slots and the submit check would both fail
                 if (ensureMobileDate() && slotGrid) loadSlots();
-                if (!wasForm) setTimeout(function () { if (doctorInput && !doctorInput.value) doctorInput.focus(); }, 100);
+                setTimeout(function () { if (doctorInput && !doctorInput.value) doctorInput.focus(); }, 100);
             }
         }
         function setStepDot(idx) {
@@ -570,15 +571,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
         function setVisitSwitch(value) {
-            if (!visitSwitch) return;
-            visitSwitch.querySelectorAll(".bvs-opt").forEach(function (b) {
-                b.classList.toggle("active", b.getAttribute("data-visit") === value);
-            });
+            // no-op (switch removed)
         }
         function selectVisitType(value) {
             chosenVisit = value;
             visitInput.value = value;
-            setVisitSwitch(value);
+            // setVisitSwitch no longer needed
             if (visitTypeLabel) visitTypeLabel.textContent = value;
             if (visitIconBox) visitIconBox.innerHTML = ICONS[value] || "";
             const th = THEMES[value];
@@ -717,15 +715,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 selectVisitType(card.getAttribute("data-visit"));
             });
         });
-        // Compact visit-type switch inside the form so the choice stays visible
-        // (and changeable) while filling in the booking details.
-        if (visitSwitch) {
-            visitSwitch.querySelectorAll(".bvs-opt").forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    selectVisitType(btn.getAttribute("data-visit"));
-                });
-            });
-        }
+        // Compact visit-type switch inside the form removed
         if (changeBtn) {
             changeBtn.addEventListener("click", function () { setStep("type"); });
         }
