@@ -866,7 +866,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 feeEl.className = "ac-doc-fee";
                 feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
                 specRow.appendChild(feeEl);
-                body.appendChild(specRow);
 
                 // 4) City with the timing beside it.
                 const cityRow = document.createElement("div");
@@ -885,10 +884,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (live) tm.title = "Open now";
                     cityRow.appendChild(tm);
                 }
-                body.appendChild(cityRow);
-
                 top.appendChild(body);
                 item.appendChild(top);
+                item.appendChild(specRow);
+                item.appendChild(cityRow);
 
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();

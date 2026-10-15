@@ -2779,7 +2779,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    card is re-laid-out for it: full English name, full Urdu name, then two
    aligned meta rows (specialty + fee, city + time) split by a hairline. */
 .book-suggest .ac-item-doctor {
-    gap: 8px;
+    gap: 0;
     padding: 12px 13px 11px;
     border-radius: 15px;
 }
