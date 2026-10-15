@@ -858,7 +858,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     body.appendChild(du);
                 }
 
-                // 3) Rating with the specialty beside it.
+                // 3) Rating, specialty, city and timing on one line.
                 const specRow = document.createElement("div");
                 specRow.className = "ac-doc-specrow";
                 const rate = document.createElement("span");
@@ -870,14 +870,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 spec.className = "ac-doc-spec";
                 spec.textContent = d.specialty_name || "";
                 specRow.appendChild(spec);
-
-                // 4) City with the timing beside it.
-                const cityRow = document.createElement("div");
-                cityRow.className = "ac-doc-cityrow";
                 const city = document.createElement("span");
                 city.className = "ac-doc-city";
                 city.textContent = d.city_name || "";
-                cityRow.appendChild(city);
+                specRow.appendChild(city);
                 const timing = doctorTimingText(d);
                 if (timing) {
                     const live = doctorOpenNow(d);
@@ -886,12 +882,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                     tm.querySelector("span").textContent = timing;
                     if (live) tm.title = "Open now";
-                    cityRow.appendChild(tm);
+                    specRow.appendChild(tm);
                 }
                 top.appendChild(body);
                 item.appendChild(top);
                 item.appendChild(specRow);
-                item.appendChild(cityRow);
 
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();

@@ -2821,15 +2821,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
 }
 .book-suggest .ac-doc-specrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px 10px;
+    min-width: 0;
+    max-width: 100%;
     margin-top: 7px;
     padding-top: 6px;
     border-top: 1px solid #edf2f4;
-    justify-content: flex-start;
-    gap: 8px;
 }
-.book-suggest .ac-doc-cityrow { margin-top: 4px; }
 .book-suggest .ac-doc-specrow .ac-doc-spec,
-.book-suggest .ac-doc-cityrow .ac-doc-city {
+.book-suggest .ac-doc-specrow .ac-doc-city {
     flex: 0 1 auto;
     min-width: 0;
     overflow: hidden;
@@ -2837,17 +2841,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
     font-size: 11.5px;
 }
-.book-suggest .ac-doc-cityrow .ac-doc-city {
-    font-size: 11.5px;
+.book-suggest .ac-doc-specrow .ac-doc-city {
     color: #5b7080;
 }
-.book-suggest .ac-doc-cityrow .ac-doc-city::before { display: none; }
-.book-suggest .ac-doc-specrow .ac-doc-fee,
-.book-suggest .ac-doc-cityrow .ac-doc-timing {
+.book-suggest .ac-doc-specrow .ac-doc-city::before { display: none; }
+.book-suggest .ac-doc-specrow .ac-doc-timing {
     flex: 0 0 auto;
     margin: 0;
-}
-.book-suggest .ac-doc-cityrow .ac-doc-timing {
     padding: 2px 7px;
     font-size: 10px;
 }
