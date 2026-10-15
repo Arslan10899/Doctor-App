@@ -3721,7 +3721,12 @@ body.promo-vid-lock { overflow: hidden; }
    on hover into the resting state - and keep the exact desktop sizing so both
    views read as one design. */
 @media (max-width: 768px) {
+    /* Two-tone shade: each button blends its light tint into a deeper shade of
+       the same colour, so on phones they read as a shaded, richer surface. */
+    .book-type-clinic { --tc-bg2: #b6e7d6; }
+    .book-type-online { --tc-bg2: #bfd6fb; }
     .book-type-card {
+        background: linear-gradient(140deg, var(--tc-bg) 0%, var(--tc-bg2) 100%);
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, .95),
             inset 0 -3px 8px rgba(0, 0, 0, .05),
