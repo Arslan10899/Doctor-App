@@ -2735,6 +2735,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     background: #eafaf5;
     border-color: rgba(15, 118, 110, .32);
 }
+.ac-doc-btn:disabled,
+.ac-doc-btn.is-disabled {
+    cursor: not-allowed;
+    opacity: .45;
+    filter: grayscale(.4);
+    box-shadow: none;
+}
 .ac-doc-foot {
     display: flex;
     align-items: center;
@@ -2763,12 +2770,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     border-radius: 8px;
     background: #f0f8f6;
     border: 1px solid rgba(13, 148, 136, .14);
-    color: #0d7a6d;
+    color: #111827;
     font-size: 11.5px;
     font-weight: 600;
     white-space: nowrap;
 }
 .ac-doc-timing svg { flex-shrink: 0; }
+.ac-doc-timing.is-live {
+    animation: acTimingBlink 1.05s ease-in-out infinite;
+}
+@keyframes acTimingBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .25; }
+}
 .ac-doc-spec {
     flex: 0 1 auto;
     min-width: 0;

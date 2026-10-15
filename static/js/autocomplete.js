@@ -68,6 +68,26 @@
             return "";
         }
 
+        function toMinutes(t) {
+            var m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(String(t || "").trim());
+            if (!m) return null;
+            var h = parseInt(m[1], 10) % 12;
+            if (m[3].toUpperCase() === "PM") h += 12;
+            return h * 60 + parseInt(m[2], 10);
+        }
+        function withinHours(d) {
+            // True when the current time sits inside today's clinic hours, so
+            // the timing chip can blink as an "open now" hint.
+            if (!d || d.today_closed) return false;
+            var open = toMinutes(d.today_open);
+            var close = toMinutes(d.today_close);
+            if (open == null || close == null) return false;
+            var now = new Date();
+            var nm = now.getHours() * 60 + now.getMinutes();
+            if (close < open) return nm >= open || nm <= close; // spans midnight
+            return nm >= open && nm <= close;
+        }
+
         function sizeBox(isMobile) {
             // On phones the tile needs to be wider than the search field so a
             // full doctor name can sit on one line. Because "Featured Doctors in
@@ -166,7 +186,16 @@
                         };
                     }
                     clinicBtn.addEventListener("click", bookWith("Clinic Visit"));
-                    onlineBtn.addEventListener("click", bookWith("Online Check-up"));
+                    if (it.online) {
+                        onlineBtn.addEventListener("click", bookWith("Online Check-up"));
+                    } else {
+                        // Doctor is not marked "Available for WhatsApp / Online
+                        // Consultation", so the online check-up option is off.
+                        onlineBtn.disabled = true;
+                        onlineBtn.classList.add("is-disabled");
+                        onlineBtn.title = "This doctor is not available for online consultation";
+                        onlineBtn.setAttribute("aria-disabled", "true");
+                    }
                     actions.appendChild(clinicBtn);
                     actions.appendChild(onlineBtn);
                     body.appendChild(actions);
@@ -183,9 +212,11 @@
                     var timing = timingText(it);
                     if (timing) {
                         var tm = document.createElement("span");
-                        tm.className = "ac-doc-timing";
+                        var live = withinHours(it);
+                        tm.className = "ac-doc-timing" + (live ? " is-live" : "");
                         tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                         tm.querySelector("span").textContent = timing;
+                        if (live) tm.title = "Open now";
                         foot.appendChild(tm);
                     }
                     var top = document.createElement("div");
