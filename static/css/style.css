@@ -2770,11 +2770,16 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .ac-doc-timing svg { flex-shrink: 0; }
 .ac-doc-timing.is-live {
-    animation: acTimingBlink 1.05s ease-in-out infinite;
+    animation: acTimingGlow 1.8s ease-in-out infinite;
 }
-@keyframes acTimingBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: .25; }
+/* Mirrors the booking-list "Online" badge: a soft breathing halo instead of a
+   hard opacity blink, so the chip reads as "open now" without looking jittery. */
+@keyframes acTimingGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+    50% { box-shadow: 0 0 0 3px rgba(13, 148, 136, .22), 0 0 12px 1px rgba(13, 148, 136, .45); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ac-doc-timing.is-live { animation: none; box-shadow: 0 0 0 2px rgba(13, 148, 136, .30); }
 }
 .ac-doc-spec {
     flex: 0 1 auto;
