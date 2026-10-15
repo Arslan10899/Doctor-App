@@ -2776,9 +2776,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 
 /* ---- Booking-modal doctor cards (scoped) ----
    The booking popup is narrower than the search dropdown, so the generic
-   card clipped the name, Urdu name and the two action buttons. Give the
-   modal's cards their own responsive layout: name wraps to 2 lines, the
-   action buttons wrap instead of overflowing, and the foot row wraps. */
+   card clipped the name and Urdu name. Give the modal's cards their own
+   responsive layout: the name wraps to 2 lines and the foot row wraps. */
 .book-suggest .ac-item-doctor { gap: 8px; padding: 11px 11px 10px; }
 .book-suggest .ac-doc-top { gap: 10px; align-items: flex-start; }
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
@@ -2802,8 +2801,6 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.book-suggest .ac-doc-actions { flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.book-suggest .ac-doc-btn { flex: 1 1 auto; min-width: 0; padding: 7px 8px; }
 .book-suggest .ac-doc-foot { flex-wrap: wrap; row-gap: 4px; margin-top: 1px; }
 .book-suggest .ac-doc-foot .ac-doc-spec { min-width: 0; }
 .book-suggest .ac-doc-foot .ac-doc-city { flex-shrink: 0; }

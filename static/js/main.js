@@ -863,34 +863,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     namerow.appendChild(feeEl);
                 }
 
-                const actions = document.createElement("div");
-                actions.className = "ac-doc-actions";
-                const clinicBtn = document.createElement("button");
-                clinicBtn.type = "button";
-                clinicBtn.className = "ac-doc-btn ac-doc-btn-clinic";
-                clinicBtn.textContent = "Clinic Check-up";
-                clinicBtn.addEventListener("mousedown", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectDoctor(d);
-                    selectVisitType("Clinic Visit");
-                });
-                actions.appendChild(clinicBtn);
-                if (d.online) {
-                    const onlineBtn = document.createElement("button");
-                    onlineBtn.type = "button";
-                    onlineBtn.className = "ac-doc-btn ac-doc-btn-online";
-                    onlineBtn.textContent = "Online Check-up";
-                    onlineBtn.addEventListener("mousedown", function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        selectDoctor(d);
-                        selectVisitType("Online Check-up");
-                    });
-                    actions.appendChild(onlineBtn);
-                }
-                body.appendChild(actions);
-
                 top.appendChild(body);
                 item.appendChild(top);
 
