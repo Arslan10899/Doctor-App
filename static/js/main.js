@@ -784,20 +784,10 @@ document.addEventListener("DOMContentLoaded", function () {
             var n = new Date();
             return n.getHours() * 60 + n.getMinutes();
         }
-        function doctorOnlineNow(d) {
-            // Green "Online" only while the current clock time sits inside the
-            // doctor's own timing for today; outside it the label stays but
-            // loses its colour.
-            if (!d.online || d.today_closed) return false;
-            var o = hmToMin(d.today_open), c = hmToMin(d.today_close), now = nowMinutes();
-            if (o === null) return false;
-            if (c === null) return now >= o;
-            return now >= o && now <= c;
-        }
         function doctorOpenNow(d) {
-            // Timing-only sibling of doctorOnlineNow: true whenever the clock
-            // sits inside today's clinic hours, whether or not the doctor is
-            // flagged for online consultation. Drives the timing chip glow.
+            // True whenever the clock sits inside today's clinic hours, whether
+            // or not the doctor is flagged for online consultation. Drives the
+            // timing chip glow in the booking list.
             if (d.today_closed) return false;
             var o = hmToMin(d.today_open), c = hmToMin(d.today_close), now = nowMinutes();
             if (o === null) return false;
@@ -845,12 +835,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const right = document.createElement("div");
                 right.className = "bs-right";
-                right.insertAdjacentHTML(
-                    "beforeend",
-                    d.online
-                        ? '<span class="bs-badge bs-online ' + (doctorOnlineNow(d) ? "on" : "off") + '">Online</span>'
-                        : '<span class="bs-badge bs-offline">In person</span>'
-                );
+                if (!d.online) {
+                    // No "Online" badge here any more; only doctors who are
+                    // not available online keep the "In person" label.
+                    right.insertAdjacentHTML("beforeend", '<span class="bs-badge bs-offline">In person</span>');
+                }
                 const feeEl = document.createElement("span");
                 feeEl.className = "bs-fee";
                 feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
