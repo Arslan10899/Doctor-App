@@ -2780,19 +2780,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
    aligned meta rows (specialty + fee, city + time) split by a hairline. */
 .book-suggest .ac-item-doctor {
     gap: 0;
-    padding: 12px 13px 11px;
-    border-radius: 15px;
+    padding: 10px 12px 9px;
+    border-radius: 14px;
 }
-.book-suggest .ac-doc-top { gap: 12px; align-items: flex-start; }
+.book-suggest .ac-doc-top { gap: 11px; align-items: flex-start; }
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
 .book-suggest .ac-doc-name {
     white-space: normal;
     overflow-wrap: anywhere;
     overflow: visible;
     text-overflow: clip;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 800;
-    line-height: 1.25;
+    line-height: 1.2;
     color: #0b3444;
 }
 .book-suggest .ac-doc-urdu {
@@ -2800,9 +2800,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: visible;
     overflow-wrap: anywhere;
     text-overflow: clip;
-    font-size: 12px;
-    line-height: 1.4;
-    margin-top: 5px;
+    font-size: 11px;
+    line-height: 1.35;
+    margin-top: 4px;
 }
 .book-suggest .ac-doc-specrow,
 .book-suggest .ac-doc-cityrow {
@@ -2814,11 +2814,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
 }
 .book-suggest .ac-doc-specrow {
-    margin-top: 9px;
-    padding-top: 8px;
+    margin-top: 7px;
+    padding-top: 6px;
     border-top: 1px solid #edf2f4;
 }
-.book-suggest .ac-doc-cityrow { margin-top: 5px; }
+.book-suggest .ac-doc-cityrow { margin-top: 4px; }
 .book-suggest .ac-doc-specrow .ac-doc-spec,
 .book-suggest .ac-doc-cityrow .ac-doc-city {
     flex: 0 1 auto;
@@ -2826,9 +2826,10 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 11.5px;
 }
 .book-suggest .ac-doc-cityrow .ac-doc-city {
-    font-size: 12px;
+    font-size: 11.5px;
     color: #5b7080;
 }
 .book-suggest .ac-doc-cityrow .ac-doc-city::before { display: none; }
@@ -2838,8 +2839,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     margin: 0;
 }
 .book-suggest .ac-doc-cityrow .ac-doc-timing {
-    padding: 2px 8px;
-    font-size: 10.5px;
+    padding: 2px 7px;
+    font-size: 10px;
 }
 .ac-doc-timing.is-live {
     animation: acTimingGlow 1.8s ease-in-out infinite;
@@ -4211,7 +4212,7 @@ body.promo-vid-lock { overflow: hidden; }
     .book-modal-head h3 { font-size: 21px; }
     /* Let the doctor cards use more of the screen so names fit on one line. */
     .bs-cards { padding: 6px; }
-    .book-suggest .ac-item-doctor { padding: 12px 12px 11px; }
+    .book-suggest .ac-item-doctor { padding: 10px 12px 9px; }
     .book-suggest .ac-doc-top { gap: 10px; }
 }
 
