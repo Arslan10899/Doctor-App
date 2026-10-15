@@ -846,10 +846,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 dn.className = "ac-doc-name";
                 dn.textContent = d.doctor_name;
                 namerow.appendChild(dn);
-                const feeEl = document.createElement("span");
-                feeEl.className = "ac-doc-fee";
-                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
                 body.appendChild(namerow);
+
                 if (d.urdu_name) {
                     const urduRow = document.createElement("div");
                     urduRow.className = "ac-doc-urdurow";
@@ -857,11 +855,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     du.className = "ac-doc-urdu";
                     du.textContent = d.urdu_name;
                     urduRow.appendChild(du);
-                    urduRow.appendChild(feeEl);
                     body.appendChild(urduRow);
-                } else {
-                    namerow.appendChild(feeEl);
                 }
+
+                // Timing + fee sit together on their own row, under the Urdu name.
+                const timing = doctorTimingText(d);
+                const live = timing ? doctorOpenNow(d) : false;
+                const feeRow = document.createElement("div");
+                feeRow.className = "ac-doc-feetime";
+                if (timing) {
+                    const tm = document.createElement("span");
+                    tm.className = "ac-doc-timing" + (live ? " is-live" : "");
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.querySelector("span").textContent = timing;
+                    if (live) tm.title = "Open now";
+                    feeRow.appendChild(tm);
+                }
+                const feeEl = document.createElement("span");
+                feeEl.className = "ac-doc-fee";
+                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
+                feeRow.appendChild(feeEl);
+                body.appendChild(feeRow);
 
                 top.appendChild(body);
                 item.appendChild(top);
@@ -876,14 +890,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 city.textContent = d.city_name || "";
                 foot.appendChild(spec);
                 foot.appendChild(city);
-                const timing = doctorTimingText(d);
-                const live = doctorTimingText(d) ? doctorOpenNow(d) : false;
-                const tm = document.createElement("span");
-                tm.className = "ac-doc-timing" + (live ? " is-live" : "");
-                tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
-                tm.querySelector("span").textContent = timing || "";
-                if (live) tm.title = "Open now";
-                foot.appendChild(tm);
                 item.appendChild(foot);
 
                 item.addEventListener("mousedown", function (e) {

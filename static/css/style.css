@@ -2692,6 +2692,15 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .ac-doc-rating svg { color: #f5a623; flex-shrink: 0; }
 .ac-doc-body { min-width: 0; flex: 1; }
+.ac-doc-feetime {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 5px;
+}
+.ac-doc-feetime .ac-doc-timing { margin-top: 0; }
+.ac-doc-feetime .ac-doc-fee { margin-left: 0; }
 .ac-doc-name {
     color: #0c3444;
     font-weight: 700;
