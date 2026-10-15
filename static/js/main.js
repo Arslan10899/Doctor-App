@@ -847,12 +847,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 dn.textContent = d.doctor_name;
                 body.appendChild(dn);
 
-                // 2) Full Urdu name.
+                // 2) Full Urdu name (rendered full-width below the top row so
+                //    it never has to wrap around the photo).
+                let urduEl = null;
                 if (d.urdu_name) {
-                    const du = document.createElement("div");
-                    du.className = "ac-doc-urdu";
-                    du.textContent = d.urdu_name;
-                    body.appendChild(du);
+                    urduEl = document.createElement("div");
+                    urduEl.className = "ac-doc-urdu";
+                    urduEl.textContent = d.urdu_name;
                 }
 
                 // 3) Specialty with the fee beside it.
@@ -886,6 +887,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 top.appendChild(body);
                 item.appendChild(top);
+                if (urduEl) item.appendChild(urduEl);
                 item.appendChild(specRow);
                 item.appendChild(cityRow);
 

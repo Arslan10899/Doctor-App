@@ -2787,6 +2787,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
 .book-suggest .ac-doc-name {
     white-space: normal;
+    overflow-wrap: anywhere;
     overflow: visible;
     text-overflow: clip;
     font-size: 13.5px;
@@ -2797,10 +2798,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-urdu {
     white-space: normal;
     overflow: visible;
+    overflow-wrap: anywhere;
     text-overflow: clip;
     font-size: 12px;
     line-height: 1.4;
-    margin-top: 2px;
+    margin-top: 5px;
 }
 .book-suggest .ac-doc-specrow,
 .book-suggest .ac-doc-cityrow {
@@ -4204,8 +4206,13 @@ body.promo-vid-lock { overflow: hidden; }
 .book-success h4 { margin: 0 0 6px; font-size: 19px; font-weight: 800; color: var(--text); }
 .book-success p { margin: 0 0 18px; font-size: 13.5px; color: var(--text-light); }
 @media (max-width: 520px) {
-    .book-modal-card { padding: 24px 18px 18px; }
+    .book-modal { padding: 10px; }
+    .book-modal-card { padding: 18px 15px 16px; }
     .book-modal-head h3 { font-size: 21px; }
+    /* Let the doctor cards use more of the screen so names fit on one line. */
+    .bs-cards { padding: 6px; }
+    .book-suggest .ac-item-doctor { padding: 12px 12px 11px; }
+    .book-suggest .ac-doc-top { gap: 10px; }
 }
 
 /* ============================================================
