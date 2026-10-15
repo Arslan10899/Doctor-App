@@ -2804,16 +2804,19 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-urdurow { align-items: flex-start; gap: 6px; }
 .book-suggest .ac-doc-urdu {
     white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 11.5px;
+    line-height: 1.3;
 }
-.book-suggest .ac-doc-foot { flex-wrap: wrap; row-gap: 4px; margin-top: 1px; }
-.book-suggest .ac-doc-foot .ac-doc-spec { min-width: 0; }
+.book-suggest .ac-doc-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    margin-top: 4px;
+}
+.book-suggest .ac-doc-foot .ac-doc-spec { max-width: 100%; }
 .book-suggest .ac-doc-foot .ac-doc-city { flex-shrink: 0; }
-.book-suggest .ac-doc-foot .ac-doc-timing { margin-left: auto; }
 .ac-doc-timing.is-live {
     animation: acTimingGlow 1.8s ease-in-out infinite;
 }
