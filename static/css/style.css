@@ -2206,7 +2206,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .hero-book-btn svg { width: 26px; height: 26px; }
     .hero-book-tx { display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; font-size: 16px; font-weight: 800; letter-spacing: -.1px; }
-    .hero-book-urdu { margin-top: 3px; font-size: 12px; font-weight: 600; letter-spacing: 0; opacity: .8; line-height: 1.35; }
+    .hero-book-eng { text-shadow: 0 1px 3px rgba(0, 0, 0, .6), 0 0 2px rgba(0, 0, 0, .45); }
+    .hero-book-urdu { margin-top: 3px; font-size: 12px; font-weight: 600; letter-spacing: 0; color: #000; line-height: 1.35; text-shadow: none; }
     /* help-grid tile colours: Clinic matches the peach Clinic Appointment
        tile, Online matches the blue Video Consultation tile. */
     .hero-book-clinic {
