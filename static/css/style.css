@@ -2773,6 +2773,41 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     white-space: nowrap;
 }
 .ac-doc-timing svg { flex-shrink: 0; }
+
+/* ---- Booking-modal doctor cards (scoped) ----
+   The booking popup is narrower than the search dropdown, so the generic
+   card clipped the name, Urdu name and the two action buttons. Give the
+   modal's cards their own responsive layout: name wraps to 2 lines, the
+   action buttons wrap instead of overflowing, and the foot row wraps. */
+.book-suggest .ac-item-doctor { gap: 8px; padding: 11px 11px 10px; }
+.book-suggest .ac-doc-top { gap: 10px; align-items: flex-start; }
+.book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
+.book-suggest .ac-doc-namerow { align-items: flex-start; gap: 5px; }
+.book-suggest .ac-doc-name {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.28;
+}
+.book-suggest .ac-doc-fee { margin-top: 1px; }
+.book-suggest .ac-doc-urdurow { align-items: flex-start; gap: 6px; }
+.book-suggest .ac-doc-urdu {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.book-suggest .ac-doc-actions { flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.book-suggest .ac-doc-btn { flex: 1 1 auto; min-width: 0; padding: 7px 8px; }
+.book-suggest .ac-doc-foot { flex-wrap: wrap; row-gap: 4px; margin-top: 1px; }
+.book-suggest .ac-doc-foot .ac-doc-spec { min-width: 0; }
+.book-suggest .ac-doc-foot .ac-doc-city { flex-shrink: 0; }
+.book-suggest .ac-doc-foot .ac-doc-timing { margin-left: auto; }
 .ac-doc-timing.is-live {
     animation: acTimingGlow 1.8s ease-in-out infinite;
 }
