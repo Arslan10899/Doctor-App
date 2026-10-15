@@ -2806,7 +2806,11 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     gap: 3px;
     margin-top: 4px;
 }
-.book-suggest .ac-doc-foot .ac-doc-spec { max-width: 100%; }
+.book-suggest .ac-doc-body .ac-doc-spec {
+    display: block;
+    max-width: 100%;
+    margin-top: 3px;
+}
 .book-suggest .ac-doc-cityrow {
     display: flex;
     align-items: center;

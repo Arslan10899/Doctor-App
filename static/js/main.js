@@ -863,16 +863,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     body.appendChild(urduRow);
                 }
 
+                // Specialty sits right under the Urdu name.
+                const spec = document.createElement("div");
+                spec.className = "ac-doc-spec";
+                spec.textContent = d.specialty_name || "";
+                body.appendChild(spec);
+
                 top.appendChild(body);
                 item.appendChild(top);
 
-                // Foot: specialty on top, then city + timing on the same line.
+                // Foot: city + timing on one line.
                 const foot = document.createElement("div");
                 foot.className = "ac-doc-foot";
-                const spec = document.createElement("span");
-                spec.className = "ac-doc-spec";
-                spec.textContent = d.specialty_name || "";
-                foot.appendChild(spec);
                 const cityRow = document.createElement("div");
                 cityRow.className = "ac-doc-cityrow";
                 const city = document.createElement("span");
