@@ -877,15 +877,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 foot.appendChild(spec);
                 foot.appendChild(city);
                 const timing = doctorTimingText(d);
-                if (timing) {
-                    const live = doctorOpenNow(d);
-                    const tm = document.createElement("span");
-                    tm.className = "ac-doc-timing" + (live ? " is-live" : "");
-                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
-                    tm.querySelector("span").textContent = timing;
-                    if (live) tm.title = "Open now";
-                    item.appendChild(foot);
-                }
+                const live = doctorTimingText(d) ? doctorOpenNow(d) : false;
+                const tm = document.createElement("span");
+                tm.className = "ac-doc-timing" + (live ? " is-live" : "");
+                tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                tm.querySelector("span").textContent = timing || "";
+                if (live) tm.title = "Open now";
+                foot.appendChild(tm);
+                item.appendChild(foot);
 
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
