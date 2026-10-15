@@ -2824,6 +2824,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     margin-top: 7px;
     padding-top: 6px;
     border-top: 1px solid #edf2f4;
+    justify-content: flex-start;
+    gap: 8px;
 }
 .book-suggest .ac-doc-cityrow { margin-top: 4px; }
 .book-suggest .ac-doc-specrow .ac-doc-spec,
