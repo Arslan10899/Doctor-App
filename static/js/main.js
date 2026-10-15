@@ -841,11 +841,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 const body = document.createElement("div");
                 body.className = "ac-doc-body";
 
-                // 1) Full English name.
+                // 1) English name, with the fee at its right, aligned to the
+                //    last line of the name.
+                const namerow = document.createElement("div");
+                namerow.className = "ac-doc-namerow";
                 const dn = document.createElement("div");
                 dn.className = "ac-doc-name";
                 dn.textContent = d.doctor_name;
-                body.appendChild(dn);
+                namerow.appendChild(dn);
+                const feeEl = document.createElement("span");
+                feeEl.className = "ac-doc-fee";
+                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
+                namerow.appendChild(feeEl);
+                body.appendChild(namerow);
 
                 // 2) Full Urdu name, right under the English name.
                 if (d.urdu_name) {
@@ -855,17 +863,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     body.appendChild(du);
                 }
 
-                // 3) Specialty with the fee beside it.
+                // 3) Specialty.
                 const specRow = document.createElement("div");
                 specRow.className = "ac-doc-specrow";
                 const spec = document.createElement("span");
                 spec.className = "ac-doc-spec";
                 spec.textContent = d.specialty_name || "";
                 specRow.appendChild(spec);
-                const feeEl = document.createElement("span");
-                feeEl.className = "ac-doc-fee";
-                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
-                specRow.appendChild(feeEl);
 
                 // 4) City with the timing beside it.
                 const cityRow = document.createElement("div");
