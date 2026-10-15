@@ -2212,32 +2212,29 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
         background: linear-gradient(145deg, #fff3e9, #ffe1cd);
         color: #7c2d12;
         border: 1px solid rgba(234, 88, 12, .20);
-        box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45);
-        animation: bookGlowPeach 5.2s ease-in-out infinite;
+        --hb-glow: 234, 88, 12;
+        animation: heroBookGlow 1.8s ease-in-out infinite;
     }
     .hero-book-clinic:hover { background: linear-gradient(145deg, #fff6ef, #ffe7d6); }
     .hero-book-online {
         background: linear-gradient(145deg, #eaf3ff, #d6e7ff);
         color: #1e3a8a;
         border: 1px solid rgba(37, 99, 235, .20);
-        box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45);
-        animation: bookGlowBlue 5.2s ease-in-out infinite;
+        --hb-glow: 37, 99, 235;
+        animation: heroBookGlow 1.8s ease-in-out infinite;
     }
     .hero-book-online:hover { background: linear-gradient(145deg, #f0f6ff, #dce9ff); }
-    /* sequential glow: Clinic breathes first, Online answers after. Each has
-       a rest window while the other peaks, so both never glow together. */
-    @keyframes bookGlowPeach {
-        0% { box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45), 0 0 0 0 rgba(234, 88, 12, .35); }
-        20% { box-shadow: 0 8px 22px -8px rgba(234, 88, 12, .55), 0 0 0 8px rgba(234, 88, 12, 0); }
-        40%, 100% { box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .45), 0 0 0 0 rgba(234, 88, 12, 0); }
-    }
-    @keyframes bookGlowBlue {
-        0%, 50% { box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45), 0 0 0 0 rgba(37, 99, 235, 0); }
-        70% { box-shadow: 0 8px 22px -8px rgba(37, 99, 235, .55), 0 0 0 8px rgba(37, 99, 235, 0); }
-        90%, 100% { box-shadow: 0 8px 18px -12px rgba(37, 99, 235, .45), 0 0 0 0 rgba(37, 99, 235, 0); }
+    /* Same soft breathing halo as the "Online" badge glow: a quiet expanding
+       ring instead of the old flashing sequence. */
+    @keyframes heroBookGlow {
+        0%, 100% { box-shadow: 0 8px 18px -12px rgba(var(--hb-glow), .45), 0 0 0 0 rgba(var(--hb-glow), 0); }
+        50% { box-shadow: 0 8px 18px -12px rgba(var(--hb-glow), .45), 0 0 0 3px rgba(var(--hb-glow), .22), 0 0 12px 1px rgba(var(--hb-glow), .45); }
     }
     @media (prefers-reduced-motion: reduce) {
-        .hero-book-clinic, .hero-book-online { animation: none; }
+        .hero-book-clinic, .hero-book-online {
+            animation: none;
+            box-shadow: 0 8px 18px -12px rgba(var(--hb-glow), .45), 0 0 0 3px rgba(var(--hb-glow), .22);
+        }
     }
 
     /* ---- Mobile booking modal trimming ----
