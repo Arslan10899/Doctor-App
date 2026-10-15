@@ -1105,7 +1105,8 @@ def _today_timing(timings_json):
 def api_doctors_list():
     q = request.args.get("q", "").strip()
     cols = (
-        "d.id, d.name AS doctor_name, s.name AS specialty_name, c.name AS city_name, "
+        "d.id, d.name AS doctor_name, d.urdu_name, d.image_url, "
+        "s.name AS specialty_name, c.name AS city_name, "
         "d.fee, d.online, d.rating, d.experience, d.phone, d.whatsapp_number"
     )
     if q:

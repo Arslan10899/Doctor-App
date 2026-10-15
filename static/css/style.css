@@ -2304,7 +2304,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     .book-modal.book-compact .book-field-doctor { order: -1; }
     /* Keep the visit-type switch in the slim popup, above the doctor search,
        so the Clinic / Online choice stays visible and changeable. */
-    .book-modal.book-compact .book-visit-switch { order: -2; }
+    .book-modal.book-compact .book-visit-switch { display: none; }
     /* The popup card scrolls, so an absolutely-positioned dropdown used to get
        clipped as soon as a search returned many doctors. Make the list an
        in-flow panel: it grows the popup and scrolls inside itself instead. */
@@ -4035,6 +4035,9 @@ body.promo-vid-lock { overflow: hidden; }
     white-space: nowrap;
 }
 .bs-offline { background: #eef2f4; color: #5b7480; }
+/* Booking-modal doctor suggestions reuse the search dropdown's card look. */
+.bs-cards { display: flex; flex-direction: column; gap: 8px; padding: 8px; }
+.bs-cards .ac-item-doctor { margin: 0; cursor: pointer; }
 
 /* Same-day surgery/OPD timing shown under a doctor in the booking list */
 .bs-timing {

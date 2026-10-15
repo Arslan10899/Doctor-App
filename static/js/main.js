@@ -813,55 +813,116 @@ document.addEventListener("DOMContentLoaded", function () {
             head.className = "book-suggest-head";
             head.textContent = matches.length + (matches.length === 1 ? " doctor found" : " doctors found");
             suggestBox.appendChild(head);
+            const list = document.createElement("div");
+            list.className = "bs-cards";
             matches.forEach(function (d) {
                 const item = document.createElement("div");
-                item.className = "book-suggest-item";
-                const main = document.createElement("div");
-                main.className = "bs-main";
+                item.className = "ac-item-doctor";
 
-                const left = document.createElement("div");
-                left.className = "bs-left";
-                const nm = document.createElement("strong");
-                nm.textContent = d.doctor_name;
-                left.appendChild(nm);
-                if (d.specialty_name || d.city_name) {
-                    const spec = document.createElement("small");
-                    spec.className = "bs-spec";
-                    spec.textContent = [d.specialty_name, d.city_name].filter(Boolean).join(" \u00b7 ");
-                    left.appendChild(spec);
+                const top = document.createElement("div");
+                top.className = "ac-doc-top";
+
+                const media = document.createElement("div");
+                media.className = "ac-doc-media";
+                const img = document.createElement("img");
+                img.className = "ac-doc-img";
+                img.alt = d.doctor_name;
+                img.loading = "lazy";
+                img.src = d.image_url || "/static/img/no-image.jpeg";
+                img.addEventListener("error", function () { this.src = "/static/img/no-image.jpeg"; });
+                media.appendChild(img);
+                const rate = document.createElement("span");
+                rate.className = "ac-doc-rating";
+                rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
+                rate.querySelector("span").textContent = d.rating ? Number(d.rating).toFixed(1) : "\u2014";
+                media.appendChild(rate);
+                top.appendChild(media);
+
+                const body = document.createElement("div");
+                body.className = "ac-doc-body";
+                const namerow = document.createElement("div");
+                namerow.className = "ac-doc-namerow";
+                const dn = document.createElement("div");
+                dn.className = "ac-doc-name";
+                dn.textContent = d.doctor_name;
+                namerow.appendChild(dn);
+                const feeEl = document.createElement("span");
+                feeEl.className = "ac-doc-fee";
+                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
+                body.appendChild(namerow);
+                if (d.urdu_name) {
+                    const urduRow = document.createElement("div");
+                    urduRow.className = "ac-doc-urdurow";
+                    const du = document.createElement("div");
+                    du.className = "ac-doc-urdu";
+                    du.textContent = d.urdu_name;
+                    urduRow.appendChild(du);
+                    urduRow.appendChild(feeEl);
+                    body.appendChild(urduRow);
+                } else {
+                    namerow.appendChild(feeEl);
                 }
+
+                const actions = document.createElement("div");
+                actions.className = "ac-doc-actions";
+                const clinicBtn = document.createElement("button");
+                clinicBtn.type = "button";
+                clinicBtn.className = "ac-doc-btn ac-doc-btn-clinic";
+                clinicBtn.textContent = "Clinic Check-up";
+                clinicBtn.addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selectDoctor(d);
+                    selectVisitType("Clinic Visit");
+                });
+                actions.appendChild(clinicBtn);
+                if (d.online) {
+                    const onlineBtn = document.createElement("button");
+                    onlineBtn.type = "button";
+                    onlineBtn.className = "ac-doc-btn ac-doc-btn-online";
+                    onlineBtn.textContent = "Online Check-up";
+                    onlineBtn.addEventListener("mousedown", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selectDoctor(d);
+                        selectVisitType("Online Check-up");
+                    });
+                    actions.appendChild(onlineBtn);
+                }
+                body.appendChild(actions);
+
+                top.appendChild(body);
+                item.appendChild(top);
+
+                const foot = document.createElement("div");
+                foot.className = "ac-doc-foot";
+                const spec = document.createElement("span");
+                spec.className = "ac-doc-spec";
+                spec.textContent = d.specialty_name || "";
+                const city = document.createElement("span");
+                city.className = "ac-doc-city";
+                city.textContent = d.city_name || "";
+                foot.appendChild(spec);
+                foot.appendChild(city);
                 const timing = doctorTimingText(d);
                 if (timing) {
                     const live = doctorOpenNow(d);
                     const tm = document.createElement("span");
-                    tm.className = "bs-timing" + (live ? " is-live" : "");
-                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.className = "ac-doc-timing" + (live ? " is-live" : "");
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                     tm.querySelector("span").textContent = timing;
                     if (live) tm.title = "Open now";
-                    left.appendChild(tm);
+                    top.appendChild(foot);
                 }
+                item.appendChild(top);
 
-                const right = document.createElement("div");
-                right.className = "bs-right";
-                if (!d.online) {
-                    // No "Online" badge here any more; only doctors who are
-                    // not available online keep the "In person" label.
-                    right.insertAdjacentHTML("beforeend", '<span class="bs-badge bs-offline">In person</span>');
-                }
-                const feeEl = document.createElement("span");
-                feeEl.className = "bs-fee";
-                feeEl.textContent = d.fee && d.fee > 0 ? "Rs " + d.fee : "Fee on request";
-                right.appendChild(feeEl);
-
-                main.appendChild(left);
-                main.appendChild(right);
-                item.appendChild(main);
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
                     selectDoctor(d);
                 });
-                suggestBox.appendChild(item);
+                list.appendChild(item);
             });
+            suggestBox.appendChild(list);
             suggestBox.classList.add("open");
         }
         function selectDoctor(d) {
