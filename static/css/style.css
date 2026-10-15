@@ -3576,75 +3576,120 @@ body.promo-vid-lock { overflow: hidden; }
 .book-modal-back:active { transform: scale(.96); }
 .book-modal-back:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 .book-type-card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 14px;
     width: 100%;
-    padding: 15px 15px;
-    border: 1.5px solid #dbe7ec;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--tc-bg, #fff) 0%, #fff 62%);
+    padding: 15px 16px;
+    border: 0;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, var(--tc-bg) 100%);
     font-family: inherit;
     text-align: left;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(15, 40, 60, .04);
-    transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
+    overflow: hidden;
+    /* Modern raised 3D key: top light catch, hard bottom edge, soft floor
+       shadow. Pressing it sinks the cap flat onto the edge. */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        inset 0 -3px 8px rgba(0, 0, 0, .05),
+        0 6px 0 var(--tc-edge),
+        0 14px 22px -10px var(--tc-shadow);
+    transform: translateY(0);
+    transition: transform .18s cubic-bezier(.2, .7, .3, 1),
+                box-shadow .18s ease, background .2s ease;
 }
+/* Glossy sheen across the cap - the modern glassy pop */
+.book-type-card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 62%;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, 0));
+    opacity: .75;
+    pointer-events: none;
+}
+.book-type-card > * { position: relative; z-index: 1; }
 .book-type-card:hover {
-    border-color: var(--tc, var(--primary));
-    background: var(--tc-bg, var(--primary-light, #e7f4f6));
     transform: translateY(-2px);
-    box-shadow: 0 12px 26px var(--tc-shadow, rgba(42, 127, 142, .16));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        inset 0 -3px 8px rgba(0, 0, 0, .05),
+        0 8px 0 var(--tc-edge),
+        0 20px 30px -12px var(--tc-shadow);
 }
-.book-type-card:active { transform: translateY(0) scale(.99); }
-.book-type-card:focus-visible { outline: 3px solid var(--tc, var(--primary)); outline-offset: 2px; }
+.book-type-card:active {
+    transform: translateY(5px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9),
+        inset 0 -2px 6px rgba(0, 0, 0, .07),
+        0 1px 0 var(--tc-edge),
+        0 6px 10px -6px var(--tc-shadow);
+}
+.book-type-card:focus-visible { outline: 3px solid var(--tc, var(--primary)); outline-offset: 3px; }
 .book-type-ic {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     flex-shrink: 0;
-    border-radius: 12px;
-    background: var(--tc-bg, var(--primary-light, #e7f4f6));
-    color: var(--tc, var(--primary));
-    transition: background .2s, color .2s, transform .2s;
+    border-radius: 14px;
+    background: linear-gradient(150deg, var(--tc-ic1), var(--tc-ic2));
+    color: #fff;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        inset 0 -4px 8px rgba(0, 0, 0, .22),
+        0 6px 14px -5px var(--tc-shadow);
+    transition: transform .2s, box-shadow .2s;
 }
 .book-type-card:hover .book-type-ic {
-    background: var(--tc, var(--primary));
-    color: #fff;
-    transform: scale(1.06);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .6),
+        inset 0 -4px 8px rgba(0, 0, 0, .22),
+        0 10px 18px -6px var(--tc-shadow);
 }
 .book-type-clinic {
     --tc: #12876f;
-    --tc-bg: #e3f6ef;
-    --tc-shadow: rgba(18, 135, 111, .2);
+    --tc-bg: #eafaf4;
+    --tc-edge: #0a6451;
+    --tc-shadow: rgba(15, 138, 114, .32);
+    --tc-ic1: #1fb592;
+    --tc-ic2: #0b6f5a;
 }
 .book-type-online {
     --tc: #2b6fd4;
-    --tc-bg: #e6f0fe;
-    --tc-shadow: rgba(43, 111, 212, .2);
+    --tc-bg: #eaf2fe;
+    --tc-edge: #1f4fa0;
+    --tc-shadow: rgba(47, 116, 216, .32);
+    --tc-ic1: #529bf3;
+    --tc-ic2: #2159b5;
 }
-.book-type-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-.book-type-txt strong { font-size: 15px; font-weight: 700; color: var(--text); }
+.book-type-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.book-type-txt strong { font-size: 15.5px; font-weight: 800; color: var(--text); letter-spacing: -.01em; }
 .book-type-txt small { font-size: 12px; color: var(--text-light); line-height: 1.35; }
 .book-type-check {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     flex-shrink: 0;
     border-radius: 50%;
-    border: 1.5px solid #dbe7ec;
+    background: rgba(15, 40, 60, .05);
+    border: 1.5px solid rgba(15, 40, 60, .12);
     color: transparent;
-    transition: background .2s, border-color .2s, color .2s, transform .2s;
+    transition: background .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s;
 }
 .book-type-card:hover .book-type-check {
-    border-color: var(--tc, var(--primary));
-    background: var(--tc, var(--primary));
+    border-color: transparent;
+    background: linear-gradient(150deg, var(--tc-ic1), var(--tc-ic2));
     color: #fff;
     transform: scale(1.08);
+    box-shadow: 0 4px 10px -3px var(--tc-shadow);
 }
 
 /* Booking modal: step 2 selected visit summary */
