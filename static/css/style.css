@@ -2781,18 +2781,13 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-item-doctor { gap: 8px; padding: 11px 11px 10px; }
 .book-suggest .ac-doc-top { gap: 10px; align-items: flex-start; }
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
-.book-suggest .ac-doc-namerow { align-items: baseline; flex-wrap: nowrap; gap: 6px; }
 .book-suggest .ac-doc-name {
-    flex: 0 1 auto;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12.5px;
-    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 13px;
+    line-height: 1.25;
 }
-.book-suggest .ac-doc-namerow .ac-doc-fee { flex: 0 0 auto; margin-top: 0; }
-.book-suggest .ac-doc-urdurow { align-items: flex-start; gap: 6px; }
 .book-suggest .ac-doc-urdu {
     white-space: normal;
     overflow: visible;
@@ -2800,23 +2795,27 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     font-size: 11.5px;
     line-height: 1.3;
 }
-.book-suggest .ac-doc-foot {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    margin-top: 4px;
-}
-.book-suggest .ac-doc-body .ac-doc-spec {
-    display: block;
-    max-width: 100%;
+.book-suggest .ac-doc-specrow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-top: 3px;
 }
+.book-suggest .ac-doc-specrow .ac-doc-spec {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+.book-suggest .ac-doc-specrow .ac-doc-fee { flex: 0 0 auto; margin-left: 0; }
 .book-suggest .ac-doc-cityrow {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
+    margin-top: 3px;
 }
+.book-suggest .ac-doc-cityrow .ac-doc-city::before { display: none; }
 .book-suggest .ac-doc-cityrow .ac-doc-timing { margin-top: 0; }
 .ac-doc-timing.is-live {
     animation: acTimingGlow 1.8s ease-in-out infinite;

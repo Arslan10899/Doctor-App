@@ -840,41 +840,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const body = document.createElement("div");
                 body.className = "ac-doc-body";
-                const namerow = document.createElement("div");
-                namerow.className = "ac-doc-namerow";
+
+                // 1) Full English name.
                 const dn = document.createElement("div");
                 dn.className = "ac-doc-name";
                 dn.textContent = d.doctor_name;
-                namerow.appendChild(dn);
-                // Fee sits right after the name on the same line.
-                const feeEl = document.createElement("span");
-                feeEl.className = "ac-doc-fee";
-                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
-                namerow.appendChild(feeEl);
-                body.appendChild(namerow);
+                body.appendChild(dn);
 
+                // 2) Full Urdu name.
                 if (d.urdu_name) {
-                    const urduRow = document.createElement("div");
-                    urduRow.className = "ac-doc-urdurow";
                     const du = document.createElement("div");
                     du.className = "ac-doc-urdu";
                     du.textContent = d.urdu_name;
-                    urduRow.appendChild(du);
-                    body.appendChild(urduRow);
+                    body.appendChild(du);
                 }
 
-                // Specialty sits right under the Urdu name.
-                const spec = document.createElement("div");
+                // 3) Specialty with the fee beside it.
+                const specRow = document.createElement("div");
+                specRow.className = "ac-doc-specrow";
+                const spec = document.createElement("span");
                 spec.className = "ac-doc-spec";
                 spec.textContent = d.specialty_name || "";
-                body.appendChild(spec);
+                specRow.appendChild(spec);
+                const feeEl = document.createElement("span");
+                feeEl.className = "ac-doc-fee";
+                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
+                specRow.appendChild(feeEl);
+                body.appendChild(specRow);
 
-                top.appendChild(body);
-                item.appendChild(top);
-
-                // Foot: city + timing on one line.
-                const foot = document.createElement("div");
-                foot.className = "ac-doc-foot";
+                // 4) City with the timing beside it.
                 const cityRow = document.createElement("div");
                 cityRow.className = "ac-doc-cityrow";
                 const city = document.createElement("span");
@@ -891,8 +885,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (live) tm.title = "Open now";
                     cityRow.appendChild(tm);
                 }
-                foot.appendChild(cityRow);
-                item.appendChild(foot);
+                body.appendChild(cityRow);
+
+                top.appendChild(body);
+                item.appendChild(top);
 
                 item.addEventListener("mousedown", function (e) {
                     e.preventDefault();
