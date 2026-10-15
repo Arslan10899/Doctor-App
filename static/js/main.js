@@ -551,7 +551,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 stepType.hidden = true;
                 form.hidden = false;
-                visitSummary.hidden = false;
+                if (visitSummary) visitSummary.hidden = false;
                 modalSub.textContent = SUB_FORM;
                 if (stepDots) stepDots.hidden = true;
                 // the date field is hidden on phones, so default it or the
@@ -569,10 +569,10 @@ document.addEventListener("DOMContentLoaded", function () {
         function selectVisitType(value) {
             chosenVisit = value;
             visitInput.value = value;
-            visitTypeLabel.textContent = value;
-            visitIconBox.innerHTML = ICONS[value] || "";
+            if (visitTypeLabel) visitTypeLabel.textContent = value;
+            if (visitIconBox) visitIconBox.innerHTML = ICONS[value] || "";
             const th = THEMES[value];
-            if (th) {
+            if (th && visitSummary) {
                 visitSummary.style.setProperty("--vs-c", th.c);
                 visitSummary.style.setProperty("--vs-bg", th.bg);
                 visitSummary.style.setProperty("--vs-bd", th.bd);
@@ -623,9 +623,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.style.overflow = "hidden";
             successBox.hidden = true;
             errorBox.hidden = true;
-            visitSummary.style.removeProperty("--vs-c");
-            visitSummary.style.removeProperty("--vs-bg");
-            visitSummary.style.removeProperty("--vs-bd");
+            visitSummary && visitSummary.style.removeProperty("--vs-c");
+            visitSummary && visitSummary.style.removeProperty("--vs-bg");
+            visitSummary && visitSummary.style.removeProperty("--vs-bd");
             setStep("type", { reset: true });
             updateContact(null);
             if (doctorCache.length === 0) {
