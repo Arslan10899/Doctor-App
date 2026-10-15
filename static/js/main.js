@@ -846,6 +846,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 dn.className = "ac-doc-name";
                 dn.textContent = d.doctor_name;
                 namerow.appendChild(dn);
+                // Fee sits right after the name on the same line.
+                const feeEl = document.createElement("span");
+                feeEl.className = "ac-doc-fee";
+                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
+                namerow.appendChild(feeEl);
                 body.appendChild(namerow);
 
                 if (d.urdu_name) {
@@ -858,38 +863,33 @@ document.addEventListener("DOMContentLoaded", function () {
                     body.appendChild(urduRow);
                 }
 
-                // Timing + fee sit together on their own row, under the Urdu name.
-                const timing = doctorTimingText(d);
-                const live = timing ? doctorOpenNow(d) : false;
-                const feeRow = document.createElement("div");
-                feeRow.className = "ac-doc-feetime";
-                if (timing) {
-                    const tm = document.createElement("span");
-                    tm.className = "ac-doc-timing" + (live ? " is-live" : "");
-                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
-                    tm.querySelector("span").textContent = timing;
-                    if (live) tm.title = "Open now";
-                    feeRow.appendChild(tm);
-                }
-                const feeEl = document.createElement("span");
-                feeEl.className = "ac-doc-fee";
-                feeEl.textContent = (d.fee && d.fee > 0) ? ("Rs " + d.fee) : "On request";
-                feeRow.appendChild(feeEl);
-                body.appendChild(feeRow);
-
                 top.appendChild(body);
                 item.appendChild(top);
 
+                // Foot: specialty on top, then city + timing on the same line.
                 const foot = document.createElement("div");
                 foot.className = "ac-doc-foot";
                 const spec = document.createElement("span");
                 spec.className = "ac-doc-spec";
                 spec.textContent = d.specialty_name || "";
+                foot.appendChild(spec);
+                const cityRow = document.createElement("div");
+                cityRow.className = "ac-doc-cityrow";
                 const city = document.createElement("span");
                 city.className = "ac-doc-city";
                 city.textContent = d.city_name || "";
-                foot.appendChild(spec);
-                foot.appendChild(city);
+                cityRow.appendChild(city);
+                const timing = doctorTimingText(d);
+                if (timing) {
+                    const live = doctorOpenNow(d);
+                    const tm = document.createElement("span");
+                    tm.className = "ac-doc-timing" + (live ? " is-live" : "");
+                    tm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
+                    tm.querySelector("span").textContent = timing;
+                    if (live) tm.title = "Open now";
+                    cityRow.appendChild(tm);
+                }
+                foot.appendChild(cityRow);
                 item.appendChild(foot);
 
                 item.addEventListener("mousedown", function (e) {
