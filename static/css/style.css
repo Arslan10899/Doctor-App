@@ -2300,6 +2300,9 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     }
     .book-modal.book-compact .book-modal-back { display: none; }
     .book-modal.book-compact .book-field-doctor { order: -1; }
+    /* Keep the visit-type switch in the slim popup, above the doctor search,
+       so the Clinic / Online choice stays visible and changeable. */
+    .book-modal.book-compact .book-visit-switch { order: -2; }
     /* The popup card scrolls, so an absolutely-positioned dropdown used to get
        clipped as soon as a search returned many doctors. Make the list an
        in-flow panel: it grows the popup and scrolls inside itself instead. */
@@ -3856,6 +3859,43 @@ body.promo-vid-lock { overflow: hidden; }
 
 .book-form { display: flex; flex-direction: column; gap: 11px; }
 .book-form[hidden] { display: none; }
+
+/* Compact two-way visit-type switch kept inside the form so the choice stays
+   visible and changeable while the details are being filled in. */
+.book-visit-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    padding: 5px;
+    background: var(--bg-light, #eef3f5);
+    border-radius: 14px;
+}
+.bvs-opt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 8px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #64748b;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .18s, color .18s, box-shadow .18s;
+}
+.bvs-opt svg { flex-shrink: 0; }
+.bvs-opt:active { transform: scale(.98); }
+.bvs-opt.active {
+    background: #fff;
+    color: #0f766e;
+    box-shadow: 0 3px 9px -4px rgba(15, 40, 60, .35);
+}
+.bvs-opt.bvs-online.active { color: #2b6fd4; }
 .book-step[hidden] { display: none; }
 .book-field-notes textarea { min-height: 0; }
 .book-field label {
