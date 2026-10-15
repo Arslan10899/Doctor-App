@@ -4005,13 +4005,13 @@ body.promo-vid-lock { overflow: hidden; }
     padding: 2px 9px 2px 7px;
     border-radius: 999px;
     background: #f1f5f7;
-    color: #4a6773;
+    color: #111827;
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
     width: fit-content;
 }
-.bs-timing svg { flex-shrink: 0; color: #0f9d8f; }
+.bs-timing svg { flex-shrink: 0; color: currentColor; }
 
 /* The Online badge breathes only while the current time sits inside the
    doctor's own timing for today; otherwise it stays flat and greyed. */
@@ -4020,8 +4020,12 @@ body.promo-vid-lock { overflow: hidden; }
     50% { box-shadow: 0 0 0 3px rgba(18, 135, 111, .30), 0 0 12px 1px rgba(18, 135, 111, .55); }
 }
 .bs-online.on { animation: bsOnlineGlow 1.8s ease-in-out infinite; }
+/* Mirror the Online badge glow on the timing chip while the clinic is open
+   right now, so both lights agree instead of only the badge moving. */
+.bs-timing.is-live { animation: bsOnlineGlow 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
     .bs-online.on { animation: none; box-shadow: 0 0 0 2px rgba(18, 135, 111, .35); }
+    .bs-timing.is-live { animation: none; box-shadow: 0 0 0 2px rgba(18, 135, 111, .35); }
 }
 .book-suggest-item:hover, .book-suggest-item.active { background: var(--bg-light, #f0f5f7); }
 .book-slots {

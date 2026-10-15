@@ -794,6 +794,16 @@ document.addEventListener("DOMContentLoaded", function () {
             if (c === null) return now >= o;
             return now >= o && now <= c;
         }
+        function doctorOpenNow(d) {
+            // Timing-only sibling of doctorOnlineNow: true whenever the clock
+            // sits inside today's clinic hours, whether or not the doctor is
+            // flagged for online consultation. Drives the timing chip glow.
+            if (d.today_closed) return false;
+            var o = hmToMin(d.today_open), c = hmToMin(d.today_close), now = nowMinutes();
+            if (o === null) return false;
+            if (c === null) return now >= o;
+            return now >= o && now <= c;
+        }
 
         function renderSuggestions(matches) {
             suggestBox.innerHTML = "";
@@ -824,10 +834,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 const timing = doctorTimingText(d);
                 if (timing) {
+                    const live = doctorOpenNow(d);
                     const tm = document.createElement("span");
-                    tm.className = "bs-timing";
+                    tm.className = "bs-timing" + (live ? " is-live" : "");
                     tm.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span></span>';
                     tm.querySelector("span").textContent = timing;
+                    if (live) tm.title = "Open now";
                     left.appendChild(tm);
                 }
 
