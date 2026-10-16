@@ -2785,7 +2785,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .book-suggest .ac-doc-top { gap: 11px; align-items: flex-start; }
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
-.book-suggest .ac-doc-namerow { display: block; }
+.book-suggest .ac-doc-namerow { display: block; font-size: 12.5px; line-height: 1.2; }
 .book-suggest .ac-doc-namerow .ac-doc-name {
     display: inline;
     white-space: normal;
@@ -2868,7 +2868,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-specrow .ac-doc-city::before { display: none; }
 .book-suggest .ac-doc-specrow .ac-doc-timing {
     flex: 0 0 auto;
-    margin: 0;
+    margin: 0 0 0 auto;
     padding: 1px 6px;
     font-size: 9.5px;
 }
