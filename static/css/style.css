@@ -2785,20 +2785,18 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .book-suggest .ac-doc-top { gap: 11px; align-items: flex-start; }
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
-.book-suggest .ac-doc-namerow {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-}
+.book-suggest .ac-doc-namerow { display: block; }
 .book-suggest .ac-doc-namerow .ac-doc-name {
-    flex: 0 1 auto;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: inline;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
-.book-suggest .ac-doc-namerow .ac-doc-fee { flex: 0 0 auto; }
+.book-suggest .ac-doc-namerow .ac-doc-fee {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+}
 .book-suggest .ac-doc-name {
     white-space: normal;
     overflow-wrap: anywhere;
