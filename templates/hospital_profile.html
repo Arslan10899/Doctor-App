@@ -98,7 +98,7 @@
                         </div>
                     </div>
                     <div class="doctor-card-foot">
-                        <span class="fee">Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult</span>
+                        <span class="fee">{% if d['fee'] %}Rs. <strong>{{ '{:,}'.format(d['fee']) }}</strong> / consult{% else %}<strong>Fee on call</strong>{% endif %}</span>
                         <span class="btn btn-primary btn-sm">Book Now</span>
                     </div>
                 </a>

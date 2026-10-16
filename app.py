@@ -38,6 +38,13 @@ def cfg_bool(name, default=False):
     return str(cfg(name, str(default))).strip().lower() in ("1", "true", "yes", "on")
 
 
+def cfg_int(name, default=0):
+    try:
+        return int(str(cfg(name, str(default))).strip())
+    except (TypeError, ValueError):
+        return default
+
+
 # --- Meta WhatsApp Cloud API ---
 META_TOKEN = cfg("META_WHATSAPP_TOKEN")
 META_PHONE_NUMBER_ID = cfg("META_PHONE_NUMBER_ID")
@@ -49,10 +56,10 @@ WEBHOOK_VERIFY_TOKEN = cfg("WEBHOOK_VERIFY_TOKEN")
 AI_ENABLED = cfg_bool("AI_ENABLED", False)
 GEMINI_API_KEY = cfg("GEMINI_API_KEY")
 AI_MODEL = cfg("AI_MODEL", "gemini-2.5-flash")
-AI_TIMEOUT = int(cfg("AI_TIMEOUT", "8"))
+AI_TIMEOUT = cfg_int("AI_TIMEOUT", 8)
 
 # --- Flow behaviour ---
-APPOINTMENT_EXPIRY_HOURS = int(cfg("APPOINTMENT_EXPIRY_HOURS", "12"))
+APPOINTMENT_EXPIRY_HOURS = cfg_int("APPOINTMENT_EXPIRY_HOURS", 12)
 WHATSAPP_DRY_RUN = cfg_bool("WHATSAPP_DRY_RUN", True)
 
 # --- Public contact details (single source of truth for the whole site) ---
@@ -100,8 +107,34 @@ APPT_COLUMNS = [
     ("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
 ]
 
+def _secret_key():
+    """Session signing key: env override, else a persisted random key.
+
+    A hardcoded default (the old behaviour) lets anyone forge the admin
+    session cookie. We generate one on first run and keep it in a gitignored
+    file so restarts don't log everyone out.
+    """
+    env = cfg("SECRET_KEY")
+    if env:
+        return env
+    path = os.path.join(BASE_DIR, "instance", "secret.key")
+    try:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as fh:
+                saved = fh.read().strip()
+            if saved:
+                return saved
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        key = os.urandom(32).hex()
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(key)
+        return key
+    except OSError:
+        return os.urandom(32).hex()
+
+
 app = Flask(__name__)
-app.secret_key = "doctor-app-super-secret-key-2026"
+app.secret_key = _secret_key()
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
 ADMIN_USERNAME = "admin"
@@ -178,7 +211,6 @@ def yt_embed(url, autoplay=True):
 # ---------------------------------------------------------------------------
 # Database helpers
 # ---------------------------------------------------------------------------
-
 def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(DB_PATH)
@@ -204,8 +236,15 @@ def query(sql, args=(), one=False):
 def execute(sql, args=()):
     db = get_db()
     cur = db.execute(sql, args)
-    db.commit()
-    return cur.lastrowid
+    rowid = cur.lastrowid
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        cur.close()
+    return rowid
 
 
 # ---------------------------------------------------------------------------
@@ -812,6 +851,11 @@ def login_required(fn):
         if "patient_id" not in session:
             flash("Please login first to continue.", "warning")
             return redirect(url_for("auth", next=request.path))
+        if get_current_patient() is None:
+            # Stale patient_id (e.g. DB reset) would crash the view on lookup.
+            session.clear()
+            flash("Your session has expired. Please login again.", "warning")
+            return redirect(url_for("auth"))
         return fn(*args, **kwargs)
     return wrapper
 
@@ -822,23 +866,28 @@ def get_current_patient():
     return query("SELECT * FROM patients WHERE id=?", (session["patient_id"],), one=True)
 
 
+# Bookable half-hour start/end pairs (single source of truth for the day grid).
+SLOT_TIMES = [
+    ("09:00 AM", "09:30 AM"), ("09:30 AM", "10:00 AM"), ("10:00 AM", "10:30 AM"),
+    ("10:30 AM", "11:00 AM"), ("11:00 AM", "11:30 AM"), ("11:30 AM", "12:00 PM"),
+    ("12:00 PM", "12:30 PM"), ("12:30 PM", "01:00 PM"), ("05:00 PM", "05:30 PM"),
+    ("05:30 PM", "06:00 PM"), ("06:00 PM", "06:30 PM"), ("06:30 PM", "07:00 PM"),
+    ("07:00 PM", "07:30 PM"), ("07:30 PM", "08:00 PM"),
+]
+VALID_SLOT_STARTS = {s[0] for s in SLOT_TIMES}
+
+
 def available_slots(doctor_id, booking_date):
     """Return list of free half-hour slots for a doctor on a given date."""
-    slots = [
-        ("09:00 AM", "09:30 AM"), ("09:30 AM", "10:00 AM"), ("10:00 AM", "10:30 AM"),
-        ("10:30 AM", "11:00 AM"), ("11:00 AM", "11:30 AM"), ("11:30 AM", "12:00 PM"),
-        ("12:00 PM", "12:30 PM"), ("12:30 PM", "01:00 PM"), ("05:00 PM", "05:30 PM"),
-        ("05:30 PM", "06:00 PM"), ("06:00 PM", "06:30 PM"), ("06:30 PM", "07:00 PM"),
-        ("07:00 PM", "07:30 PM"), ("07:30 PM", "08:00 PM"),
-    ]
     taken = {
         r["slot"]
         for r in query(
-            "SELECT slot FROM appointments WHERE doctor_id=? AND appointment_date=? AND status != 'cancelled'",
+            "SELECT slot FROM appointments WHERE doctor_id=? AND appointment_date=? "
+            "AND status IN ('pending','doctor_notified','confirmed','reschedule_requested')",
             (doctor_id, booking_date),
         )
     }
-    return [s for s in slots if s[0] not in taken]
+    return [s for s in SLOT_TIMES if s[0] not in taken]
 
 
 def recommend_doctors(limit=6):
@@ -1212,7 +1261,7 @@ def booking_request():
         appt_id = query("SELECT last_insert_rowid() AS id", one=True)["id"]
         if not doctor_phone:
             execute(
-                "UPDATE appointments SET needs_human_review=1 WHERE id=? AND needs_human_review IS NULL",
+                "UPDATE appointments SET needs_human_review=1 WHERE id=? AND needs_human_review=0",
                 (appt_id,),
             )
         else:
@@ -1415,6 +1464,9 @@ def auth():
                 session.permanent = True
                 flash(f"Welcome back, {row['full_name']}!", "success")
                 nxt = request.args.get("next") or url_for("dashboard")
+                # Only allow same-site relative paths (block //evil.com open redirects).
+                if not nxt.startswith("/") or nxt.startswith("//"):
+                    nxt = url_for("dashboard")
                 return redirect(nxt)
             flash("Invalid email or password. Please try again.", "danger")
         elif form_type == "signup":
@@ -1430,17 +1482,21 @@ def auth():
                 flash("Please enter a valid email address.", "danger")
             elif len(password) < 6:
                 flash("Password must be at least 6 characters long.", "danger")
-            elif username and query("SELECT id FROM patients WHERE username=?", (username,), one=True):
-                flash("That username is already taken.", "danger")
             elif query("SELECT id FROM patients WHERE email=?", (email,), one=True):
                 flash("An account with this email already exists.", "danger")
+            elif query("SELECT id FROM patients WHERE username=?", (username or email.split("@")[0],), one=True):
+                flash("That username is already taken.", "danger")
             elif confirm != password:
                 flash("Passwords do not match.", "danger")
             else:
-                uid = execute(
-                    "INSERT INTO patients (username, email, password, full_name, gender, phone) VALUES (?,?,?,?,?,?)",
-                    (username or email.split("@")[0], email, password, full_name, gender, phone),
-                )
+                try:
+                    uid = execute(
+                        "INSERT INTO patients (username, email, password, full_name, gender, phone) VALUES (?,?,?,?,?,?)",
+                        (username or email.split("@")[0], email, password, full_name, gender, phone),
+                    )
+                except sqlite3.IntegrityError:
+                    flash("That username or email is already in use. Please try another.", "danger")
+                    return render_template("auth.html", cities=CITIES)
                 session.clear()
                 session["patient_id"] = uid
                 session["patient_name"] = full_name
@@ -1500,9 +1556,13 @@ def book(doctor_id):
     if not slot:
         flash("Please select an appointment time slot.", "danger")
         return redirect(url_for("doctor_profile", doctor_id=doctor_id))
+    if slot not in VALID_SLOT_STARTS:
+        flash("Please select a valid time slot.", "danger")
+        return redirect(url_for("doctor_profile", doctor_id=doctor_id))
 
     exists = query(
-        "SELECT id FROM appointments WHERE doctor_id=? AND appointment_date=? AND slot=? AND status != 'cancelled'",
+        "SELECT id FROM appointments WHERE doctor_id=? AND appointment_date=? AND slot=? "
+        "AND status IN ('pending','doctor_notified','confirmed','reschedule_requested')",
         (doctor_id, date_str, slot),
         one=True,
     )
@@ -1516,9 +1576,10 @@ def book(doctor_id):
         (patient["id"], doctor_id, normalize_pk_e164(doc["whatsapp_number"]) or normalize_pk_e164(doc["phone"]),
          date_str, slot, appt_type, APPT_CONFIRMED, patient["full_name"], patient["phone"], notes),
     )
+    fee_txt = f"Rs. {doc['fee']:,}" if doc["fee"] else "Fee on call"
     flash(
         f"Appointment confirmed with {doc['name']} on {d.strftime('%A, %d %B %Y')} at {slot}. "
-        f"Fee: Rs. {doc['fee']:,} (payable at clinic).",
+        f"Fee: {fee_txt} (payable at clinic).",
         "success",
     )
     return redirect(url_for("dashboard"))
@@ -1611,6 +1672,7 @@ def admin_login():
         row = query("SELECT * FROM admins WHERE username=? OR email=?", (username, username), one=True)
         if row and row["password"] == password:
             session["admin_logged_in"] = True
+            session["admin_id"] = row["id"]
             session["admin_name"] = row["name"] or row["username"]
             session.permanent = True
             flash("Welcome to Admin Panel, " + (row["name"] or row["username"]) + "!", "success")
@@ -1666,6 +1728,7 @@ def admin_signup():
         row = query("SELECT * FROM admins WHERE username=?", (username,), one=True)
         if row:
             session["admin_logged_in"] = True
+            session["admin_id"] = row["id"]
             session["admin_name"] = row["name"] or row["username"]
             session.permanent = True
             flash("Account create ho chuka hai! Welcome to Admin Panel.", "success")
@@ -1952,6 +2015,8 @@ def admin_doctor_edit(doctor_id):
         ct = query("SELECT id FROM cities WHERE name=?", (city or doc["city_name"],), one=True)
         if not name:
             flash("Doctor name is required.", "danger")
+        elif not sp or not ct:
+            flash("Please choose a valid specialty and city.", "danger")
         else:
             db = get_db()
             cur = db.cursor()
@@ -2128,7 +2193,7 @@ def admin_admins():
                     execute("UPDATE admins SET username=?, name=?, email=? WHERE id=?",
                             (username, name or None, email or None, aid))
                     flash("Admin updated (password unchanged).", "success")
-                if session.get("admin_logged_in") and session.get("admin_name") == row["name"]:
+                if session.get("admin_logged_in") and session.get("admin_id") == aid:
                     session["admin_name"] = name or username
         else:
             username = request.form.get("username", "").strip()
@@ -2153,7 +2218,7 @@ def admin_admin_delete(admin_id):
     row = query("SELECT * FROM admins WHERE id=?", (admin_id,), one=True)
     if not row:
         abort(404)
-    if session.get("admin_name") == row["name"] and session.get("admin_logged_in"):
+    if session.get("admin_logged_in") and session.get("admin_id") == row["id"]:
         flash("You cannot delete your own account.", "warning")
     else:
         cur_total = query("SELECT COUNT(*) c FROM admins")[0]["c"]
@@ -2537,7 +2602,7 @@ def admin_upload():
     # Generous enough for a short promo clip, small enough that a mistyped
     # multi-GB file cannot fill the disk. FileStorage.content_length is not
     # reliably populated for multipart parts, so measure the stream instead.
-    max_bytes = int(os.environ.get("UPLOAD_MAX_BYTES", 100 * 1024 * 1024))
+    max_bytes = cfg_int("UPLOAD_MAX_BYTES", 100 * 1024 * 1024)
     size = f.content_length or 0
     if not size:
         try:
@@ -2589,11 +2654,12 @@ def admin_backup():
                 db.rollback()
                 flash("Import failed: " + str(exc), "danger")
         elif action == "export":
+            from import_backup import build_export
             try:
-                from import_backup import build_export
                 export_data = build_export()
-            except Exception:
-                export_data = {}
+            except Exception as exc:
+                flash("Could not build the backup: " + str(exc), "danger")
+                return redirect(url_for("admin_backup"))
             blob = json.dumps(export_data, ensure_ascii=False, indent=2).encode("utf-8")
             fname = "doctorapp_backup_%s.json" % date.today().isoformat()
             return Response(
@@ -2654,9 +2720,12 @@ def admin_lookups():
         elif action == "city_delete":
             cid = request.form.get("id", type=int)
             if cid:
-                cnt = query("SELECT COUNT(*) c FROM doctors WHERE city_id=?", (cid,), one=True)["c"]
-                if cnt:
-                    flash(f"Cannot delete: {cnt} doctor(s) use this city.", "warning")
+                doc_cnt = query("SELECT COUNT(*) c FROM doctors WHERE city_id=?", (cid,), one=True)["c"]
+                hosp_cnt = query("SELECT COUNT(*) c FROM hospitals WHERE city_id=?", (cid,), one=True)["c"]
+                if doc_cnt:
+                    flash(f"Cannot delete: {doc_cnt} doctor(s) use this city.", "warning")
+                elif hosp_cnt:
+                    flash(f"Cannot delete: {hosp_cnt} hospital(s) use this city.", "warning")
                 else:
                     execute("DELETE FROM cities WHERE id=?", (cid,))
                     flash("City removed.", "info")
@@ -2703,4 +2772,4 @@ except Exception as _exc:  # pragma: no cover - keep the site bootable
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="127.0.0.1", port=port)
+    app.run(debug=cfg_bool("FLASK_DEBUG", False), host="127.0.0.1", port=port)

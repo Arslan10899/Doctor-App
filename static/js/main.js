@@ -110,7 +110,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // arrows: three tiles fill the frame, so there is nothing to step past - the
     // strip advances itself and the dots are the only manual control.
     const mcardStrip = document.getElementById("mcardStrip");
-    if (mcardStrip && mcardStrip.dataset.mode === "many") {
+    if (mcardStrip && mcardStrip.dataset.mode === "many"
+        && document.getElementById("mcardTrack") && document.getElementById("mcardDots")) {
         const track = document.getElementById("mcardTrack");
         const cards = Array.prototype.slice.call(mcardStrip.querySelectorAll(".mcard"));
         const dotsWrap = document.getElementById("mcardDots");
@@ -1020,6 +1021,25 @@ document.addEventListener("DOMContentLoaded", function () {
             if (first) first.click();
         }
 
+        function renderSlotButtons(list) {
+            slotGrid.innerHTML = "";
+            list.forEach(function (t) {
+                var b = document.createElement("button");
+                b.type = "button";
+                b.className = "book-slot";
+                b.textContent = t;
+                b.addEventListener("click", function () {
+                    slotInput.value = t;
+                    slotGrid.querySelectorAll(".book-slot").forEach(function (x) {
+                        x.classList.remove("selected");
+                    });
+                    b.classList.add("selected");
+                });
+                slotGrid.appendChild(b);
+            });
+            autoPickSlot();
+        }
+
         function loadSlots() {
             if (!slotGrid) return;
             var dateVal = dateInput ? dateInput.value : "";
@@ -1031,52 +1051,22 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if (dateInput.min && dateVal < dateInput.min) return setSlotHint("Please pick today or a later date");
 
+            // No doctor picked yet: show the generic grid directly. Calling the
+            // API without a doctor_id would just return a 400 (noisy console).
+            if (!doctorId) {
+                renderSlotButtons(GENERIC_SLOTS);
+                return;
+            }
+
             slotGrid.innerHTML = '<p class="book-slots-hint">Loading slots...</p>';
-            var url = "/slots";
-            var parts = [];
-            if (doctorId) parts.push("doctor_id=" + encodeURIComponent(doctorId));
-            parts.push("date=" + encodeURIComponent(dateVal));
-            fetch(url + "?" + parts.join("&"))
+            fetch("/slots?doctor_id=" + encodeURIComponent(doctorId) + "&date=" + encodeURIComponent(dateVal))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     var list = (data && data.slots && data.slots.length) ? data.slots : GENERIC_SLOTS;
-                    slotGrid.innerHTML = "";
-                    if (!list.length) {
-                        return setSlotHint("No slots available on this date. Please try another day.");
-                    }
-                    list.forEach(function (t) {
-                        var b = document.createElement("button");
-                        b.type = "button";
-                        b.className = "book-slot";
-                        b.textContent = t;
-                        b.addEventListener("click", function () {
-                            slotInput.value = t;
-                            slotGrid.querySelectorAll(".book-slot").forEach(function (x) {
-                                x.classList.remove("selected");
-                            });
-                            b.classList.add("selected");
-                        });
-                        slotGrid.appendChild(b);
-                    });
-                    autoPickSlot();
+                    renderSlotButtons(list);
                 })
                 .catch(function () {
-                    slotGrid.innerHTML = "";
-                    GENERIC_SLOTS.forEach(function (t) {
-                        var b = document.createElement("button");
-                        b.type = "button";
-                        b.className = "book-slot";
-                        b.textContent = t;
-                        b.addEventListener("click", function () {
-                            slotInput.value = t;
-                            slotGrid.querySelectorAll(".book-slot").forEach(function (x) {
-                                x.classList.remove("selected");
-                            });
-                            b.classList.add("selected");
-                        });
-                        slotGrid.appendChild(b);
-                    });
-                    autoPickSlot();
+                    renderSlotButtons(GENERIC_SLOTS);
                 });
         }
         if (dateInput) {
@@ -1095,7 +1085,7 @@ document.addEventListener("DOMContentLoaded", function () {
             errorBox.hidden = true;
             if (!name) return showError("Please enter the patient name.");
             if (!whatsapp) return showError("Please enter your WhatsApp number.");
-            if (!/^\+?92?\d{10,13}$/.test(whatsapp.replace(/[\s-]/g, ""))) {
+            if (!/^\+?(?:92|0)?3\d{9}$/.test(whatsapp.replace(/[\s-]/g, ""))) {
                 return showError("Please enter a valid WhatsApp number (e.g. 0300 1234567).");
             }
             if (!dateVal) return showError("Please choose your preferred date.");
