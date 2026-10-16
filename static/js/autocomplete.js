@@ -126,7 +126,7 @@
             items.forEach(function (it, i) {
                 var el = document.createElement("div");
                 el.className = "ac-item";
-                if (isMobile && it.type === "doctor") {
+                if (it.type === "doctor") {
                     el.className = "ac-item ac-item-doctor";
                     var media = document.createElement("div");
                     media.className = "ac-doc-media";
