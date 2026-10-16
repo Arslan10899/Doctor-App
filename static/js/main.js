@@ -857,8 +857,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const body = document.createElement("div");
                 body.className = "ac-doc-body";
 
-                // 1) English name, with the fee at its right, aligned to the
-                //    last line of the name.
+                // 1) English name, with the fee sitting right after it.
                 const namerow = document.createElement("div");
                 namerow.className = "ac-doc-namerow";
                 const dn = document.createElement("div");
@@ -880,7 +879,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     body.appendChild(du);
                 }
 
-                // 3) Rating, specialty, city and timing on one line.
+                // 3) Specialty on its own line, just below the Urdu name.
+                if (d.specialty_name) {
+                    const spec = document.createElement("div");
+                    spec.className = "ac-doc-specline";
+                    spec.textContent = d.specialty_name;
+                    body.appendChild(spec);
+                }
+
+                // 4) Rating, city and timing on one line.
                 const specRow = document.createElement("div");
                 specRow.className = "ac-doc-specrow";
                 const rate = document.createElement("span");
@@ -888,10 +895,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 rate.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span></span>';
                 rate.querySelector("span").textContent = d.rating ? Number(d.rating).toFixed(1) : "\u2014";
                 specRow.appendChild(rate);
-                const spec = document.createElement("span");
-                spec.className = "ac-doc-spec";
-                spec.textContent = d.specialty_name || "";
-                specRow.appendChild(spec);
                 const city = document.createElement("span");
                 city.className = "ac-doc-city";
                 city.textContent = d.city_name || "";

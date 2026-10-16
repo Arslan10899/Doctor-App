@@ -2787,11 +2787,18 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-body { flex: 1 1 auto; min-width: 0; }
 .book-suggest .ac-doc-namerow {
     display: flex;
-    align-items: flex-end;
-    gap: 8px;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
 }
-.book-suggest .ac-doc-namerow .ac-doc-name { flex: 1 1 auto; min-width: 0; }
-.book-suggest .ac-doc-namerow .ac-doc-fee { flex: 0 0 auto; align-self: flex-end; }
+.book-suggest .ac-doc-namerow .ac-doc-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.book-suggest .ac-doc-namerow .ac-doc-fee { flex: 0 0 auto; }
 .book-suggest .ac-doc-name {
     white-space: normal;
     overflow-wrap: anywhere;
@@ -2839,14 +2846,16 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     font-size: 9.5px;
     padding: 1px 4px;
 }
-.book-suggest .ac-doc-specrow .ac-doc-spec {
-    flex: 0 1 auto;
+.book-suggest .ac-doc-specline {
+    margin-top: 3px;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #0d5e66;
+    font-weight: 600;
     font-size: 10.5px;
-    line-height: 1.2;
+    line-height: 1.25;
 }
 .book-suggest .ac-doc-specrow .ac-doc-city {
     flex: 0 1 auto;
