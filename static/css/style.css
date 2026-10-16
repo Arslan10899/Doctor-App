@@ -4385,10 +4385,13 @@ body.promo-vid-lock { overflow: hidden; }
     margin: 2px 0 6px;
 }
 @media (min-width: 769px) {
-    /* Desktop: make the doctor's Urdu name a touch larger and bolder. */
+    /* Desktop: doctor's Urdu name in the official Nastaliq typeface, a touch
+       larger and bolder. */
     .dp-urdu {
-        font-size: 18px;
-        font-weight: 800;
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Noto Naskh Arabic', 'Segoe UI', serif;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 2.6;
         text-align: left;
     }
 }
