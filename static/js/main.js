@@ -875,6 +875,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (d.urdu_name) {
                     const du = document.createElement("div");
                     du.className = "ac-doc-urdu";
+                    du.dir = "rtl";
                     du.textContent = d.urdu_name;
                     body.appendChild(du);
                 }
