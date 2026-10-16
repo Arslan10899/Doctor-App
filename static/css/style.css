@@ -4389,6 +4389,7 @@ body.promo-vid-lock { overflow: hidden; }
     .dp-urdu {
         font-size: 18px;
         font-weight: 800;
+        text-align: left;
     }
 }
 .dp-specialty {
