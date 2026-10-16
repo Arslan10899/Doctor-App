@@ -4384,6 +4384,13 @@ body.promo-vid-lock { overflow: hidden; }
     color: #a9d9d2;
     margin: 2px 0 6px;
 }
+@media (min-width: 769px) {
+    /* Desktop: make the doctor's Urdu name a touch larger and bolder. */
+    .dp-urdu {
+        font-size: 18px;
+        font-weight: 800;
+    }
+}
 .dp-specialty {
     font-size: 15.5px;
     font-weight: 700;
