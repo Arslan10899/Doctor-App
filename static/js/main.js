@@ -495,6 +495,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const doctorInput = document.getElementById("bkDoctor");
         const doctorIdInput = document.getElementById("bkDoctorId");
         const suggestBox = document.getElementById("bkSuggest");
+        const doctorClearBtn = document.getElementById("bkDoctorClear");
         const submitBtn = form.querySelector(".book-submit");
         const errorBox = document.getElementById("bkError");
         const successBox = document.getElementById("bkSuccess");
@@ -743,8 +744,27 @@ document.addEventListener("DOMContentLoaded", function () {
             if (e.key === "Escape" && !bookingModal.hidden) closeModal();
         });
 
+        function syncDoctorClear() {
+            if (doctorClearBtn) doctorClearBtn.hidden = !doctorInput.value.trim();
+        }
+        if (doctorClearBtn) {
+            // Keep focus in the field so the click does not blur-close the list
+            // before the handler runs.
+            doctorClearBtn.addEventListener("mousedown", function (e) { e.preventDefault(); });
+            doctorClearBtn.addEventListener("click", function () {
+                doctorInput.value = "";
+                doctorIdInput.value = "";
+                suggestBox.classList.remove("open");
+                suggestBox.innerHTML = "";
+                syncOnlineCard(null);
+                updateContact(null);
+                syncDoctorClear();
+                doctorInput.focus();
+            });
+        }
         doctorInput.addEventListener("input", function () {
             const q = doctorInput.value.trim();
+            syncDoctorClear();
             clearTimeout(debounceTimer);
             // Any edit invalidates the current pick, so shortcuts fall back to
             // the site line until a suggestion is chosen again.
@@ -901,6 +921,7 @@ document.addEventListener("DOMContentLoaded", function () {
             doctorInput.value = d.doctor_name;
             doctorIdInput.value = d.id;
             suggestBox.classList.remove("open");
+            syncDoctorClear();
             updateContact(d);
             syncOnlineCard(d);
             loadSlots();
