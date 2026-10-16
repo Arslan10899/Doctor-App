@@ -2828,19 +2828,20 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
     overflow: hidden;
 }
 .book-suggest .ac-doc-specrow {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: flex-start;
     gap: 6px;
     min-width: 0;
     max-width: 100%;
     margin-top: 6px;
-    padding-top: 6px;
+    padding: 8px 0 5px;
     border-top: 1px solid #edf2f4;
+    overflow: visible;
 }
 .book-suggest .ac-doc-specrow .ac-doc-rating {
     flex: 0 0 auto;
+    justify-self: start;
     font-size: 9.5px;
     padding: 1px 4px;
 }
@@ -2857,6 +2858,7 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 }
 .book-suggest .ac-doc-specrow .ac-doc-city {
     flex: 0 1 auto;
+    justify-self: center;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2868,7 +2870,8 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .book-suggest .ac-doc-specrow .ac-doc-city::before { display: none; }
 .book-suggest .ac-doc-specrow .ac-doc-timing {
     flex: 0 0 auto;
-    margin: 0 0 0 auto;
+    justify-self: end;
+    margin: 0;
     padding: 1px 6px;
     font-size: 9.5px;
 }
