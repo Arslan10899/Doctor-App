@@ -2573,6 +2573,16 @@ span.store-apple:hover { transform: none; border-color: rgba(255,255,255,.35); b
 .ac-box::-webkit-scrollbar { width: 6px; }
 .ac-box::-webkit-scrollbar-track { background: transparent; }
 .ac-box::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, .28); border-radius: 3px; }
+@media (min-width: 769px) {
+    /* Desktop: let the results panel grow wider than the field so long
+       doctor names are not ellipsised. */
+    .ac-box {
+        width: max-content;
+        min-width: 100%;
+        max-width: min(600px, calc(100vw - 32px));
+    }
+    .ac-box .ac-doc-name { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+}
 .ac-scrim {
     position: fixed;
     inset: 0;
